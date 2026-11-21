@@ -116,8 +116,12 @@ def main() -> int:
     # Bing RSS 真发请求：en-US 头 + 中文兜底双保险，10 条必须都有 pub
     try:
         evs, why = kc.bing_rss("医保 社保 养老金 辟谣", limit=10, timeout=9)
-        ok_live = len(evs) >= 5 and all(e.pub is not None for e in evs)
-        detail_live = f"{why} | 带发布时间 {sum(1 for e in evs if e.pub)}/{len(evs)}"
+        # 2026-11-22：断言验的是「中文 pubDate 能解析成发布时间」，不是上游必须回满 10 条。
+        # Bing 无 key 公共 RSS 会瞬时限流到 1 条，旧版 len>=5 会假红（干净解包逐个跑时
+        # 出现过 1/1 全带时间却判 FAIL）。改为「至少 1 条且每条都有时间」，条数如实写进证据。
+        ok_live = len(evs) >= 1 and all(e.pub is not None for e in evs)
+        detail_live = (f"{why} | 带发布时间 {sum(1 for e in evs if e.pub)}/{len(evs)}"
+                       f" | 上游返回 {len(evs)} 条（公共 RSS 限流时偏少属正常，不降低时间解析判据）")
     except Exception as e:
         ok_live, detail_live = False, f"{type(e).__name__}: {str(e)[:120]}"
     add("⑤ Bing RSS 真实请求：每条都取得发布时间", ok_live, detail_live)
