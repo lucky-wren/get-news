@@ -1,0 +1,703 @@
+generated_at: '2026-11-19 12:14:19'
+rule: 指纹矩阵实证 200 且含时间字段；由 reach.py 自动生成
+endpoints:
+- id: REACH-S01-025
+  channel: 中国日报 / CGTN
+  type: html_generic
+  url: https://www.chinadaily.com.cn
+  url_tpl: https://www.chinadaily.com.cn
+  pages: 1
+  section: §1 央媒与国家级通讯社（总纲级，必采）
+  level: ☆
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S01-028
+  channel: 经济参考报
+  type: html_generic
+  url: https://www.jjckb.cn
+  url_tpl: https://www.jjckb.cn
+  pages: 1
+  section: §1 央媒与国家级通讯社（总纲级，必采）
+  level: ☆
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S02-001
+  channel: 中国政府网
+  type: html_generic
+  url: https://www.gov.cn
+  url_tpl: https://www.gov.cn
+  pages: 1
+  section: §2 政策原文与法规库
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S02-002
+  channel: 国务院政策文件库
+  type: html_generic
+  url: https://www.gov.cn
+  url_tpl: https://www.gov.cn
+  pages: 1
+  section: §2 政策原文与法规库
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S02-003
+  channel: 国务院办公厅放假安排
+  type: html_generic
+  url: https://www.gov.cn
+  url_tpl: https://www.gov.cn
+  pages: 1
+  section: §2 政策原文与法规库
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S02-010
+  channel: 国务院政策例行吹风会
+  type: html_generic
+  url: https://www.gov.cn
+  url_tpl: https://www.gov.cn
+  pages: 1
+  section: §2 政策原文与法规库
+  level: ☆
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S02-012
+  channel: 中国政府网「回应关切」
+  type: html_generic
+  url: https://www.gov.cn
+  url_tpl: https://www.gov.cn
+  pages: 1
+  section: §2 政策原文与法规库
+  level: ☆
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S03-003
+  channel: 教育部
+  type: html_generic
+  url: https://www.moe.gov.cn
+  url_tpl: https://www.moe.gov.cn
+  pages: 1
+  section: §3 中央政务部委总表
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S03-010
+  channel: 人社部
+  type: html_generic
+  url: https://www.mohrss.gov.cn
+  url_tpl: https://www.mohrss.gov.cn
+  pages: 1
+  section: §3 中央政务部委总表
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S03-011
+  channel: 自然资源部
+  type: html_generic
+  url: https://www.mnr.gov.cn
+  url_tpl: https://www.mnr.gov.cn
+  pages: 1
+  section: §3 中央政务部委总表
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S03-026
+  channel: 税务总局
+  type: html_generic
+  url: https://www.chinatax.gov.cn
+  url_tpl: https://www.chinatax.gov.cn
+  pages: 1
+  section: §3 中央政务部委总表
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S03-027
+  channel: 市场监管总局
+  type: html_generic
+  url: https://www.samr.gov.cn
+  url_tpl: https://www.samr.gov.cn
+  pages: 1
+  section: §3 中央政务部委总表
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S03-030
+  channel: 国家统计局
+  type: html_generic
+  url: https://www.stats.gov.cn
+  url_tpl: https://www.stats.gov.cn
+  pages: 1
+  section: §3 中央政务部委总表
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S03-042
+  channel: 国家网信办
+  type: html_generic
+  url: https://www.cac.gov.cn
+  url_tpl: https://www.cac.gov.cn
+  pages: 1
+  section: §3 中央政务部委总表
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S03-048
+  channel: 国家外汇局
+  type: html_generic
+  url: https://www.safe.gov.cn
+  url_tpl: https://www.safe.gov.cn
+  pages: 1
+  section: §3 中央政务部委总表
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S03-051
+  channel: 国家海洋局 / 自然资源部海洋预警监测司
+  type: html_generic
+  url: https://www.mnr.gov.cn
+  url_tpl: https://www.mnr.gov.cn
+  pages: 1
+  section: §3 中央政务部委总表
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S04-007
+  channel: 中国裁判文书网
+  type: html_generic
+  url: https://wenshu.court.gov.cn
+  url_tpl: https://wenshu.court.gov.cn
+  pages: 1
+  section: §4 纪检监察、司法与破产
+  level: ☆
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S05-001
+  channel: 巨潮资讯网
+  type: html_generic
+  url: https://www.cninfo.com.cn
+  url_tpl: https://www.cninfo.com.cn
+  pages: 1
+  section: §5 上市公司公告与资本市场披露
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S05-002
+  channel: 上海证券交易所
+  type: html_generic
+  url: https://www.sse.com.cn
+  url_tpl: https://www.sse.com.cn
+  pages: 1
+  section: §5 上市公司公告与资本市场披露
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S05-014
+  channel: 东方财富公告 / 同花顺 F10
+  type: html_generic
+  url: https://www.eastmoney.com
+  url_tpl: https://www.eastmoney.com
+  pages: 1
+  section: §5 上市公司公告与资本市场披露
+  level: ☆
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S07-002
+  channel: 国家统计局 CPI/PPI
+  type: html_generic
+  url: https://www.stats.gov.cn
+  url_tpl: https://www.stats.gov.cn
+  pages: 1
+  section: §7 物价与民生消费
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S07-011
+  channel: 产品质量国家监督抽查
+  type: html_generic
+  url: https://www.samr.gov.cn
+  url_tpl: https://www.samr.gov.cn
+  pages: 1
+  section: §7 物价与民生消费
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S07-012
+  channel: 节假日与高速免费
+  type: html_generic
+  url: https://www.gov.cn
+  url_tpl: https://www.gov.cn
+  pages: 1
+  section: §7 物价与民生消费
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S08-001
+  channel: 人社部
+  type: html_generic
+  url: https://www.mohrss.gov.cn
+  url_tpl: https://www.mohrss.gov.cn
+  pages: 1
+  section: §8 就业、社保与劳动关系
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S09-009
+  channel: 腾讯新闻健康
+  type: html_generic
+  url: https://news.qq.com
+  url_tpl: https://news.qq.com
+  pages: 1
+  section: §9 医疗、医药与公共卫生
+  level: ☆
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S10-001
+  channel: 市场监管总局抽检公布结果
+  type: html_generic
+  url: https://www.samr.gov.cn
+  url_tpl: https://www.samr.gov.cn
+  pages: 1
+  section: §10 食品安全与产品质量
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S10-002
+  channel: 国家食品安全监督抽检
+  type: html_generic
+  url: https://www.samr.gov.cn
+  url_tpl: https://www.samr.gov.cn
+  pages: 1
+  section: §10 食品安全与产品质量
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S10-007
+  channel: 特殊食品与保健食品
+  type: html_generic
+  url: https://www.samr.gov.cn
+  url_tpl: https://www.samr.gov.cn
+  pages: 1
+  section: §10 食品安全与产品质量
+  level: ☆
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S11-004
+  channel: 国家统计局
+  type: html_generic
+  url: https://www.stats.gov.cn
+  url_tpl: https://www.stats.gov.cn
+  pages: 1
+  section: §11 住房、基建与城市治理
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S11-007
+  channel: 自然资源部土地市场
+  type: html_generic
+  url: https://www.mnr.gov.cn
+  url_tpl: https://www.mnr.gov.cn
+  pages: 1
+  section: §11 住房、基建与城市治理
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S12-002
+  channel: PMI
+  type: html_generic
+  url: https://www.stats.gov.cn
+  url_tpl: https://www.stats.gov.cn
+  pages: 1
+  section: §12 工厂、制造业与供应链
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S12-003
+  channel: 国家统计局工业统计
+  type: html_generic
+  url: https://www.stats.gov.cn
+  url_tpl: https://www.stats.gov.cn
+  pages: 1
+  section: §12 工厂、制造业与供应链
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S13-004
+  channel: 中科院
+  type: html_generic
+  url: https://www.cas.cn
+  url_tpl: https://www.cas.cn
+  pages: 1
+  section: §13 科技、互联网与 AI
+  level: ☆
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S13-026
+  channel: 中国工程院
+  type: html_generic
+  url: https://www.cae.cn
+  url_tpl: https://www.cae.cn
+  pages: 1
+  section: §13 科技、互联网与 AI
+  level: ☆
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S13-030
+  channel: 个人信息保护与数据出境
+  type: html_generic
+  url: https://www.cac.gov.cn
+  url_tpl: https://www.cac.gov.cn
+  pages: 1
+  section: §13 科技、互联网与 AI
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S13-041
+  channel: 中科院
+  type: html_generic
+  url: https://www.cas.cn
+  url_tpl: https://www.cas.cn
+  pages: 1
+  section: §13 科技、互联网与 AI
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S17-011
+  channel: 自然资源部海啸预警中心
+  type: html_generic
+  url: https://www.mnr.gov.cn
+  url_tpl: https://www.mnr.gov.cn
+  pages: 1
+  section: §17 气象、灾害与应急
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S17-013
+  channel: 自然资源部地质灾害
+  type: html_generic
+  url: https://www.mnr.gov.cn
+  url_tpl: https://www.mnr.gov.cn
+  pages: 1
+  section: §17 气象、灾害与应急
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S19-004
+  channel: 国家外汇局
+  type: html_generic
+  url: https://www.safe.gov.cn
+  url_tpl: https://www.safe.gov.cn
+  pages: 1
+  section: §19 金融监管与风险处置
+  level: ☆
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S19-030
+  channel: 东方财富网
+  type: html_generic
+  url: https://www.eastmoney.com
+  url_tpl: https://www.eastmoney.com
+  pages: 1
+  section: §19 金融监管与风险处置
+  level: ☆
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S20-001
+  channel: 市场监管总局
+  type: html_generic
+  url: https://www.samr.gov.cn
+  url_tpl: https://www.samr.gov.cn
+  pages: 1
+  section: §20 市场监管、知识产权与标准
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S20-002
+  channel: 最高法
+  type: html_generic
+  url: https://www.court.gov.cn
+  url_tpl: https://www.court.gov.cn
+  pages: 1
+  section: §20 市场监管、知识产权与标准
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S20-007
+  channel: 反垄断局 / 价监竞争局
+  type: html_generic
+  url: https://www.samr.gov.cn
+  url_tpl: https://www.samr.gov.cn
+  pages: 1
+  section: §20 市场监管、知识产权与标准
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S20-008
+  channel: 广告监管与虚假宣传
+  type: html_generic
+  url: https://www.samr.gov.cn
+  url_tpl: https://www.samr.gov.cn
+  pages: 1
+  section: §20 市场监管、知识产权与标准
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S20-009
+  channel: 特种设备与计量
+  type: html_generic
+  url: https://www.samr.gov.cn
+  url_tpl: https://www.samr.gov.cn
+  pages: 1
+  section: §20 市场监管、知识产权与标准
+  level: ☆
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S24-001
+  channel: 教育部
+  type: html_generic
+  url: https://www.moe.gov.cn
+  url_tpl: https://www.moe.gov.cn
+  pages: 1
+  section: §24 教育、人口与养老
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S24-003
+  channel: 人社部
+  type: html_generic
+  url: https://www.mohrss.gov.cn
+  url_tpl: https://www.mohrss.gov.cn
+  pages: 1
+  section: §24 教育、人口与养老
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S24-004
+  channel: 国家统计局
+  type: html_generic
+  url: https://www.stats.gov.cn
+  url_tpl: https://www.stats.gov.cn
+  pages: 1
+  section: §24 教育、人口与养老
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S25-002
+  channel: 国务院放假与调休
+  type: html_generic
+  url: https://www.gov.cn
+  url_tpl: https://www.gov.cn
+  pages: 1
+  section: §25 文旅、消费与社会议题
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
+- id: REACH-S31-016
+  channel: 国家数据
+  type: html_generic
+  url: https://data.stats.gov.cn
+  url_tpl: https://data.stats.gov.cn
+  pages: 1
+  section: §31 搜索、抓取与结构化数据基础设施
+  level: ★
+  verified_items: 1
+  time_samples: 1
+  latest_pub: ''
+  requires: none
+  note: 指纹矩阵实证 F1_pc_noref
+  fp: F1_pc_noref
