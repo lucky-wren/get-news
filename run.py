@@ -228,6 +228,29 @@ def summarize(R: dict) -> dict:
     }
 
 
+def _reject_artifact(out: Path, reason: str) -> None:
+    """不达标时撤回本批产物：正式 xlsx 不留、只留 .rejected + 原因 json 供排障。
+
+    2026-11-22 真联网 live 探测发现：run.py 先出表再判质量门禁，rc=1 虽然拦住了
+    workflow 后续的建站/提交/部署，但 runner 工作目录还躺着一份不达标的 xlsx。
+    这不是「交付」（固定页面仍是上一批），但语义不干净；撤回后「不达标不交付」
+    从「不部署」变成「连正式产物名都不存在」。
+    """
+    try:
+        if not out.exists():
+            return
+        rej = out.with_name(out.name + ".rejected")
+        out.replace(rej)
+        out.with_suffix(".reject.json").write_text(
+            json.dumps({"批次": out.name, "撤回原因": reason,
+                        "处置": "本批不达标，产物已撤回；未覆盖固定地址、未提交、未部署",
+                        "排障": "逐项指标见同目录运行摘要 JSON 与 logs/ci-run.log"},
+                       ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"[撤回] 本批不达标，产物已改为 {rej.name}（不交付 / 不覆盖固定地址）")
+    except Exception as e:                       # 撤回失败不掩盖质量失败
+        print(f"[撤回] 未能重命名产物（不影响失败判定）：{e}")
+
+
 def main() -> int:
     args = parse_args()
     log_dir = Path(os.environ.get("NEWS_LOG_DIR") or args.log_dir)
@@ -274,10 +297,22 @@ def main() -> int:
             if q["未达标项"]:
                 rl.event("WARN", "采集质量未达标（不伪造成品，仅如实标注）",
                          未达标="、".join(q["未达标项"]), 处置=q["结论"])
-            if q["结论"] == "不达标":
-                raise RuntimeError("采集质量门禁未达标：" + "、".join(q["未达标项"]))
         print("[质量] " + q["结论"] +
               ("；未达标：" + "、".join(q["未达标项"]) if q["未达标项"] else ""))
+        # 2026-11-22：旧版 raise 嵌在 if rl: 里，--no-log 就绕过整个硬门禁。
+        # 质量是否达标与「是否写运行日志」无关；内容硬指标不达标一律失败，
+        # 否则又会出现「[质量] 告警/不达标」却继续建站部署的假成功。
+        if q["结论"].startswith("不达标"):
+            reason = "采集质量门禁未达标：" + "、".join(q["未达标项"])
+            _reject_artifact(Path(out), reason)
+            raise RuntimeError(reason)
+        # 2026-11-22 二次修正：形态硬闸全部通过、仅多渠道覆盖不足时，出表但显式标注。
+        # q["未达标项"] 仍含这两项 → 页面质量行 ⚠ 红条、CI 摘要、Excel 工程留痕 A 都看得到；
+        # 不 raise 是为了不让页面永久停在上一批（上一轮硬门禁引入的副作用）。
+        if q.get("产能未达标项"):
+            print("[产能] 内容形态全部达标，但 " + "、".join(q["产能未达标项"]) +
+                  " 未达阈值；已如实标注，不用低质条目凑数。" +
+                  "提升：配 SERPER_API_KEY / 补 ★ 端点 / 提高预算余量内正文补采配额。")
         if rl:
             s["run_id"] = rl.run_id
             s["日志文件"] = rl.path.name
@@ -338,6 +373,14 @@ def main() -> int:
             if rl:
                 rl.checkpoint("纯代码规格验收", 结论=vres["结论"],
                               通过=vres["通过"], 检查项=vres["检查项"])
+            # 2026-11-22 线上事故：规格验收打印「不达标 55/59」+ 4 行 FAIL 之后，
+            # run.py 仍 return 0 → CI 继续建站/提交/部署 → job success。
+            # 用户要求「必须达到效果」，验收 FAIL 必须真阻断（可用 spec_fail_hard=false 关闭）。
+            if bool((cfg.get("quality") or {}).get("spec_fail_hard", True)) and vres["结论"] != "达标":
+                reason = ("规格验收不达标：" +
+                          "；".join(c["项"] for c in vres["明细"] if c["结果"] == "FAIL"))
+                _reject_artifact(Path(out), reason)
+                raise RuntimeError(reason)
 
         if rl:
             rl.finish("ok", file=out.name, window=win.label, interval=win.interval,
