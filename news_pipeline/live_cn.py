@@ -569,7 +569,7 @@ def enrich_bodies(specs: List[dict], win, cfg: dict) -> dict:
     timed_out = 0
     if todo:
         from concurrent.futures import wait, FIRST_COMPLETED
-        ex = ThreadPoolExecutor(max_workers=8)
+        ex = ThreadPoolExecutor(max_workers=max(1, int(live.get("body_workers", 8))))
         try:
             futs = {ex.submit(fetch_body, s["url"], timeout): s for s in todo}
             pending = set(futs)
@@ -792,9 +792,49 @@ def fetch_cn_sources(cfg: dict, win) -> Tuple[List[dict], dict]:
                            "status": "未取得", "条数": 0,
                            "detail": {"error": f"{type(e).__name__}: {str(e)[:100]}"}})
 
-    # 到点后不再启动正文补采 / 社交热榜这两段额外请求，保留已解析的 specs
-    body = enrich_bodies(specs, win, cfg) if not _budget_done() else {}
-    social = collect_social_hotboards(cfg, win, timeout) if not _budget_done() else {}
+    # 2026-11-22 线上复盘（二次修正）：旧版预算到点把 enrich_bodies 整段跳成 {}，
+    # 线上批次短路 rss 后「正文补采 0 篇」→ 条目 evidence 全为 B → scoring 封顶
+    # C（Final≤54.9）→ A 级独立原文占比 0.1071 且数学上不可能达标。
+    # 第一版补救固定「6 篇 / 4s」仍然不够：线上日志 353.7s / 600s、剩余 246.3s，
+    # 「预算耗尽」其实是**层配额之和用尽**，全局硬墙还大把余量，却被当成快没时间。
+    # 现改为按全局硬墙余量自适应足量补采（8 并发），期间临时豁免 _get 预算检查、
+    # 补完立即恢复；deadline 最多占余量 55%，永远留出筛选/评级/出表时间。
+    if _budget_done():
+        import copy as _copy
+        _wall = float((cfg.get("budget") or {}).get("_wall_at") or 0)
+        _left = (_wall - time.monotonic()) if _wall else 0.0
+        # 硬墙余量 < 2s：后台补采会与主线程争 CPU，得不偿失，如实跳过。
+        if _left < 2.0:
+            body = {"启用": False, "原因": "全局硬墙余量不足，本批正文补采跳过（如实留痕）"}
+            social = {}
+        else:
+            _bc = _copy.deepcopy(cfg)
+            _lv = _bc.setdefault("source", {}).setdefault("live", {})
+            _need = sum(1 for s in specs
+                        if s.get("url")
+                        and (s.get("pub") is None or win.contains(s["pub"]))
+                        and len(re.sub(r"\s+", "", s.get("abstract") or "")) < 60)
+            _cap = int(_lv.get("max_articles", 60))
+            # 余量的 55% 给补采，上限 90s；剩下 45% + reserve 给出表，绝不拖过 _wall。
+            _budget = min(_left * 0.55, 90.0)
+            _lv["max_articles"] = min(_cap, max(1, _need))
+            _lv["body_deadline_seconds"] = _budget
+            _lv["article_timeout"] = min(float(_lv.get("article_timeout", 6)), 6.0)
+            _lv["body_workers"] = 8
+            _saved = _BUDGET_DEADLINE[0]
+            _BUDGET_DEADLINE[0] = 0.0
+            try:
+                body = enrich_bodies(specs, win, _bc)
+            finally:
+                _BUDGET_DEADLINE[0] = _saved
+            body["短路后按余量足量补采"] = {
+                "全局硬墙余量秒": round(_left, 1), "待补条目": _need,
+                "本批上限": _lv["max_articles"], "整批截止秒": round(_budget, 1),
+                "依据": "层配额用尽 ≠ 全局预算耗尽；evidence 升 A 需要真补到正文"}
+            social = {}
+    else:
+        body = enrich_bodies(specs, win, cfg)
+        social = collect_social_hotboards(cfg, win, timeout)
     hinted = 0
     for s in specs:
         if not s.get("group"):
