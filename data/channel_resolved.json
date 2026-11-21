@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-21T18:07:27+08:00",
+ "generated_at": "2026-11-21T20:21:30+08:00",
  "产品": "资讯获取",
  "结论": "两类终态已全部逐条解析为可拉取通路；本环境 DNS 失败不等于域名不存在，栏目/账号不等于没有数据",
  "判定口径": "直接读原始主白名单 Markdown 入口列（无域名=非独立站点）+ reach 的 DNS 失败状态；不依赖 reach 的状态字符串或补写的域名",
@@ -30,7 +30,7 @@
     "名称": "Bing site:mof.gov.cn（DNS 失败域名的替代回查）",
     "url": "https://www.bing.com/search?q=site%3Amof.gov.cn%20%E5%9C%B0%E6%96%B9%E5%80%BA&format=rss",
     "http": 200,
-    "items": 10,
+    "items": 7,
     "has_time": true,
     "error": ""
    },

@@ -1,0 +1,777 @@
+{
+  "generated_at": "2026-11-21 20:22:24",
+  "渠道数": 21,
+  "通过渠道数": 21,
+  "新增发现端点数": 19,
+  "发现端点总数": 19,
+  "采集端点总数": 56,
+  "结论": "21 条逐条真实重测完成；通过者写入 star_discovery 段（发现端点，不直接进候选池），未通过者逐候选写明 HTTP 状态/解析结果，不预设成功；采集端点段保持原样",
+  "诚实边界": "site: RSS 为发现端点非成稿端点；仍须逐条回查独立原文、补正文、校验发布时间落在窗口内；本模块负责『拿到可拉取通路』，词条→正文的回查由 search_api/lookup_article 链路承担；沙盒与 Actions runner 网络不同，结果以 CI 实测为准",
+  "逐条": [
+    {
+      "序号": 1,
+      "渠道": "央视网·央视频",
+      "判定": "通过",
+      "通过端点": "https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/news_1.jsonp?cb=news",
+      "条目数": 1,
+      "候选留痕": [
+        {
+          "url": "https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/news_1.jsonp?cb=news",
+          "type": "jsonp",
+          "status": 200,
+          "items": 1,
+          "time_samples": 1,
+          "ok": true,
+          "reason": ""
+        },
+        {
+          "url": "https://www.bing.com/search?q=site%3Aysxw.cctv.cn&format=rss&count=50",
+          "type": "rss",
+          "status": 200,
+          "items": 10,
+          "time_samples": 10,
+          "ok": true,
+          "reason": ""
+        },
+        {
+          "url": "https://ysxw.cctv.cn/rss.xml",
+          "type": "rss",
+          "status": 404,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "HTTP 404"
+        },
+        {
+          "url": "https://ysxw.cctv.cn/",
+          "type": "html",
+          "status": 200,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "首页/连通性候选，无可枚举带时间条目（按规格不登记为端点）"
+        }
+      ]
+    },
+    {
+      "序号": 2,
+      "渠道": "中国互联网络信息中心",
+      "判定": "通过",
+      "通过端点": "https://www.bing.com/search?q=site%3Acnnic.cn&format=rss&count=50",
+      "条目数": 10,
+      "候选留痕": [
+        {
+          "url": "https://www.bing.com/search?q=site%3Acnnic.cn&format=rss&count=50",
+          "type": "rss",
+          "status": 200,
+          "items": 10,
+          "time_samples": 9,
+          "ok": true,
+          "reason": ""
+        },
+        {
+          "url": "https://cnnic.cn/rss.xml",
+          "type": "rss",
+          "status": 404,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "HTTP 404"
+        },
+        {
+          "url": "https://cnnic.cn/",
+          "type": "html",
+          "status": 200,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "首页/连通性候选，无可枚举带时间条目（按规格不登记为端点）"
+        }
+      ]
+    },
+    {
+      "序号": 3,
+      "渠道": "赛迪网",
+      "判定": "通过",
+      "通过端点": "https://www.bing.com/search?q=site%3Accidnet.com&format=rss&count=50",
+      "条目数": 10,
+      "候选留痕": [
+        {
+          "url": "https://www.bing.com/search?q=site%3Accidnet.com&format=rss&count=50",
+          "type": "rss",
+          "status": 200,
+          "items": 10,
+          "time_samples": 10,
+          "ok": true,
+          "reason": ""
+        },
+        {
+          "url": "https://ccidnet.com/rss.xml",
+          "type": "rss",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectTimeout: HTTPSConnectionPool(host='ccidnet.com', port=443): Max retries exceeded with url: /rss.xml (Caused by ConnectTimeoutErro"
+        },
+        {
+          "url": "https://ccidnet.com/",
+          "type": "html",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectTimeout: HTTPSConnectionPool(host='ccidnet.com', port=443): Max retries exceeded with url: / (Caused by ConnectTimeoutError(<HTTP"
+        }
+      ]
+    },
+    {
+      "序号": 4,
+      "渠道": "财政部",
+      "判定": "通过",
+      "通过端点": "https://www.bing.com/search?q=site%3Amof.gov.cn&format=rss&count=50",
+      "条目数": 10,
+      "候选留痕": [
+        {
+          "url": "https://www.bing.com/search?q=site%3Amof.gov.cn&format=rss&count=50",
+          "type": "rss",
+          "status": 200,
+          "items": 10,
+          "time_samples": 10,
+          "ok": true,
+          "reason": ""
+        },
+        {
+          "url": "https://mof.gov.cn/rss.xml",
+          "type": "rss",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectionError: HTTPSConnectionPool(host='mof.gov.cn', port=443): Max retries exceeded with url: /rss.xml (Caused by NameResolutionError"
+        },
+        {
+          "url": "https://mof.gov.cn/",
+          "type": "html",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectionError: HTTPSConnectionPool(host='mof.gov.cn', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTPS"
+        }
+      ]
+    },
+    {
+      "序号": 5,
+      "渠道": "新华财经",
+      "判定": "通过",
+      "通过端点": "https://www.bing.com/search?q=site%3Acnfin.com&format=rss&count=50",
+      "条目数": 7,
+      "候选留痕": [
+        {
+          "url": "https://www.bing.com/search?q=site%3Acnfin.com&format=rss&count=50",
+          "type": "rss",
+          "status": 200,
+          "items": 7,
+          "time_samples": 7,
+          "ok": true,
+          "reason": ""
+        },
+        {
+          "url": "https://cnfin.com/rss.xml",
+          "type": "rss",
+          "status": 200,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "RSS/Atom 0 条目"
+        },
+        {
+          "url": "https://cnfin.com/",
+          "type": "html",
+          "status": 200,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "首页/连通性候选，无可枚举带时间条目（按规格不登记为端点）"
+        }
+      ]
+    },
+    {
+      "序号": 6,
+      "渠道": "中汽协",
+      "判定": "通过",
+      "通过端点": "https://www.bing.com/search?q=site%3Acaam.org.cn&format=rss&count=50",
+      "条目数": 10,
+      "候选留痕": [
+        {
+          "url": "https://www.bing.com/search?q=site%3Acaam.org.cn&format=rss&count=50",
+          "type": "rss",
+          "status": 200,
+          "items": 10,
+          "time_samples": 10,
+          "ok": true,
+          "reason": ""
+        },
+        {
+          "url": "https://caam.org.cn/rss.xml",
+          "type": "rss",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectionError: HTTPSConnectionPool(host='caam.org.cn', port=443): Max retries exceeded with url: /rss.xml (Caused by NameResolutionErro"
+        },
+        {
+          "url": "https://caam.org.cn/",
+          "type": "html",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectionError: HTTPSConnectionPool(host='caam.org.cn', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTP"
+        }
+      ]
+    },
+    {
+      "序号": 7,
+      "渠道": "乘联会",
+      "判定": "通过",
+      "通过端点": "https://www.bing.com/search?q=site%3Acpcaauto.com&format=rss&count=50",
+      "条目数": 10,
+      "候选留痕": [
+        {
+          "url": "https://www.bing.com/search?q=site%3Acpcaauto.com&format=rss&count=50",
+          "type": "rss",
+          "status": 200,
+          "items": 10,
+          "time_samples": 9,
+          "ok": true,
+          "reason": ""
+        },
+        {
+          "url": "https://cpcaauto.com/rss.xml",
+          "type": "rss",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ReadTimeout: HTTPSConnectionPool(host='cpcaauto.com', port=443): Read timed out. (read timeout=4.0)"
+        },
+        {
+          "url": "https://cpcaauto.com/",
+          "type": "html",
+          "status": 403,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "HTTP 403"
+        }
+      ]
+    },
+    {
+      "序号": 8,
+      "渠道": "国家能源局",
+      "判定": "通过",
+      "通过端点": "https://www.bing.com/search?q=site%3Anea.gov.cn&format=rss&count=50",
+      "条目数": 10,
+      "候选留痕": [
+        {
+          "url": "https://www.bing.com/search?q=site%3Anea.gov.cn&format=rss&count=50",
+          "type": "rss",
+          "status": 200,
+          "items": 10,
+          "time_samples": 9,
+          "ok": true,
+          "reason": ""
+        },
+        {
+          "url": "https://nea.gov.cn/rss.xml",
+          "type": "rss",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectionError: HTTPSConnectionPool(host='nea.gov.cn', port=443): Max retries exceeded with url: /rss.xml (Caused by NameResolutionError"
+        },
+        {
+          "url": "https://nea.gov.cn/",
+          "type": "html",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectionError: HTTPSConnectionPool(host='nea.gov.cn', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTPS"
+        }
+      ]
+    },
+    {
+      "序号": 9,
+      "渠道": "中电联",
+      "判定": "通过",
+      "通过端点": "https://www.bing.com/search?q=site%3Acec.org.cn&format=rss&count=50",
+      "条目数": 10,
+      "候选留痕": [
+        {
+          "url": "https://www.bing.com/search?q=site%3Acec.org.cn&format=rss&count=50",
+          "type": "rss",
+          "status": 200,
+          "items": 10,
+          "time_samples": 9,
+          "ok": true,
+          "reason": ""
+        },
+        {
+          "url": "https://cec.org.cn/rss.xml",
+          "type": "rss",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectTimeout: HTTPSConnectionPool(host='cec.org.cn', port=443): Max retries exceeded with url: /rss.xml (Caused by ConnectTimeoutError"
+        },
+        {
+          "url": "https://cec.org.cn/",
+          "type": "html",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectTimeout: HTTPSConnectionPool(host='cec.org.cn', port=443): Max retries exceeded with url: / (Caused by ConnectTimeoutError(<HTTPS"
+        }
+      ]
+    },
+    {
+      "序号": 10,
+      "渠道": "中国气象局",
+      "判定": "通过",
+      "通过端点": "https://www.bing.com/search?q=site%3Acma.gov.cn&format=rss&count=50",
+      "条目数": 10,
+      "候选留痕": [
+        {
+          "url": "https://www.bing.com/search?q=site%3Acma.gov.cn&format=rss&count=50",
+          "type": "rss",
+          "status": 200,
+          "items": 10,
+          "time_samples": 10,
+          "ok": true,
+          "reason": ""
+        },
+        {
+          "url": "https://cma.gov.cn/rss.xml",
+          "type": "rss",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectionError: HTTPSConnectionPool(host='cma.gov.cn', port=443): Max retries exceeded with url: /rss.xml (Caused by NameResolutionError"
+        },
+        {
+          "url": "https://cma.gov.cn/",
+          "type": "html",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectionError: HTTPSConnectionPool(host='cma.gov.cn', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTPS"
+        }
+      ]
+    },
+    {
+      "序号": 11,
+      "渠道": "国家药监局",
+      "判定": "通过",
+      "通过端点": "https://www.bing.com/search?q=site%3Anmpa.gov.cn&format=rss&count=50",
+      "条目数": 10,
+      "候选留痕": [
+        {
+          "url": "https://www.bing.com/search?q=site%3Anmpa.gov.cn&format=rss&count=50",
+          "type": "rss",
+          "status": 200,
+          "items": 10,
+          "time_samples": 10,
+          "ok": true,
+          "reason": ""
+        },
+        {
+          "url": "https://nmpa.gov.cn/rss.xml",
+          "type": "rss",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectionError: HTTPSConnectionPool(host='nmpa.gov.cn', port=443): Max retries exceeded with url: /rss.xml (Caused by NameResolutionErro"
+        },
+        {
+          "url": "https://nmpa.gov.cn/",
+          "type": "html",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectionError: HTTPSConnectionPool(host='nmpa.gov.cn', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTP"
+        }
+      ]
+    },
+    {
+      "序号": 12,
+      "渠道": "卫健委",
+      "判定": "通过",
+      "通过端点": "https://www.bing.com/search?q=site%3Anhc.gov.cn&format=rss&count=50",
+      "条目数": 10,
+      "候选留痕": [
+        {
+          "url": "https://www.bing.com/search?q=site%3Anhc.gov.cn&format=rss&count=50",
+          "type": "rss",
+          "status": 200,
+          "items": 10,
+          "time_samples": 9,
+          "ok": true,
+          "reason": ""
+        },
+        {
+          "url": "https://nhc.gov.cn/rss.xml",
+          "type": "rss",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectionError: HTTPSConnectionPool(host='nhc.gov.cn', port=443): Max retries exceeded with url: /rss.xml (Caused by NameResolutionError"
+        },
+        {
+          "url": "https://nhc.gov.cn/",
+          "type": "html",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectionError: HTTPSConnectionPool(host='nhc.gov.cn', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTPS"
+        }
+      ]
+    },
+    {
+      "序号": 13,
+      "渠道": "国家医保局",
+      "判定": "通过",
+      "通过端点": "https://www.bing.com/search?q=site%3Anhsa.gov.cn&format=rss&count=50",
+      "条目数": 7,
+      "候选留痕": [
+        {
+          "url": "https://www.bing.com/search?q=site%3Anhsa.gov.cn&format=rss&count=50",
+          "type": "rss",
+          "status": 200,
+          "items": 7,
+          "time_samples": 7,
+          "ok": true,
+          "reason": ""
+        },
+        {
+          "url": "https://nhsa.gov.cn/rss.xml",
+          "type": "rss",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectTimeout: HTTPSConnectionPool(host='nhsa.gov.cn', port=443): Max retries exceeded with url: /rss.xml (Caused by ConnectTimeoutErro"
+        },
+        {
+          "url": "https://nhsa.gov.cn/",
+          "type": "html",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectTimeout: HTTPSConnectionPool(host='nhsa.gov.cn', port=443): Max retries exceeded with url: / (Caused by ConnectTimeoutError(<HTTP"
+        }
+      ]
+    },
+    {
+      "序号": 14,
+      "渠道": "国家疾控局",
+      "判定": "通过",
+      "通过端点": "https://www.bing.com/search?q=site%3Andcpa.gov.cn&format=rss&count=50",
+      "条目数": 7,
+      "候选留痕": [
+        {
+          "url": "https://www.bing.com/search?q=site%3Andcpa.gov.cn&format=rss&count=50",
+          "type": "rss",
+          "status": 200,
+          "items": 7,
+          "time_samples": 7,
+          "ok": true,
+          "reason": ""
+        },
+        {
+          "url": "https://ndcpa.gov.cn/rss.xml",
+          "type": "rss",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectionError: HTTPSConnectionPool(host='ndcpa.gov.cn', port=443): Max retries exceeded with url: /rss.xml (Caused by NameResolutionErr"
+        },
+        {
+          "url": "https://ndcpa.gov.cn/",
+          "type": "html",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectionError: HTTPSConnectionPool(host='ndcpa.gov.cn', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTT"
+        }
+      ]
+    },
+    {
+      "序号": 15,
+      "渠道": "住建部",
+      "判定": "通过",
+      "通过端点": "https://www.bing.com/search?q=site%3Amohurd.gov.cn&format=rss&count=50",
+      "条目数": 10,
+      "候选留痕": [
+        {
+          "url": "https://www.bing.com/search?q=site%3Amohurd.gov.cn&format=rss&count=50",
+          "type": "rss",
+          "status": 200,
+          "items": 10,
+          "time_samples": 10,
+          "ok": true,
+          "reason": ""
+        },
+        {
+          "url": "https://mohurd.gov.cn/rss.xml",
+          "type": "rss",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectionError: HTTPSConnectionPool(host='mohurd.gov.cn', port=443): Max retries exceeded with url: /rss.xml (Caused by NameResolutionEr"
+        },
+        {
+          "url": "https://mohurd.gov.cn/",
+          "type": "html",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectionError: HTTPSConnectionPool(host='mohurd.gov.cn', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HT"
+        }
+      ]
+    },
+    {
+      "序号": 16,
+      "渠道": "交通运输部",
+      "判定": "通过",
+      "通过端点": "https://www.bing.com/search?q=site%3Amot.gov.cn&format=rss&count=50",
+      "条目数": 10,
+      "候选留痕": [
+        {
+          "url": "https://www.bing.com/search?q=site%3Amot.gov.cn&format=rss&count=50",
+          "type": "rss",
+          "status": 200,
+          "items": 10,
+          "time_samples": 10,
+          "ok": true,
+          "reason": ""
+        },
+        {
+          "url": "https://mot.gov.cn/rss.xml",
+          "type": "rss",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectionError: HTTPSConnectionPool(host='mot.gov.cn', port=443): Max retries exceeded with url: /rss.xml (Caused by NameResolutionError"
+        },
+        {
+          "url": "https://mot.gov.cn/",
+          "type": "html",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectionError: HTTPSConnectionPool(host='mot.gov.cn', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTPS"
+        }
+      ]
+    },
+    {
+      "序号": 17,
+      "渠道": "公安部",
+      "判定": "通过",
+      "通过端点": "https://www.bing.com/search?q=site%3Amps.gov.cn&format=rss&count=50",
+      "条目数": 7,
+      "候选留痕": [
+        {
+          "url": "https://www.bing.com/search?q=site%3Amps.gov.cn&format=rss&count=50",
+          "type": "rss",
+          "status": 200,
+          "items": 7,
+          "time_samples": 7,
+          "ok": true,
+          "reason": ""
+        },
+        {
+          "url": "https://mps.gov.cn/rss.xml",
+          "type": "rss",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectionError: HTTPSConnectionPool(host='mps.gov.cn', port=443): Max retries exceeded with url: /rss.xml (Caused by NameResolutionError"
+        },
+        {
+          "url": "https://mps.gov.cn/",
+          "type": "html",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectionError: HTTPSConnectionPool(host='mps.gov.cn', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTPS"
+        }
+      ]
+    },
+    {
+      "序号": 18,
+      "渠道": "应急管理部",
+      "判定": "通过",
+      "通过端点": "https://www.bing.com/search?q=site%3Amem.gov.cn&format=rss&count=50",
+      "条目数": 7,
+      "候选留痕": [
+        {
+          "url": "https://www.bing.com/search?q=site%3Amem.gov.cn&format=rss&count=50",
+          "type": "rss",
+          "status": 200,
+          "items": 7,
+          "time_samples": 7,
+          "ok": true,
+          "reason": ""
+        },
+        {
+          "url": "https://mem.gov.cn/rss.xml",
+          "type": "rss",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectionError: HTTPSConnectionPool(host='mem.gov.cn', port=443): Max retries exceeded with url: /rss.xml (Caused by NameResolutionError"
+        },
+        {
+          "url": "https://mem.gov.cn/",
+          "type": "html",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectionError: HTTPSConnectionPool(host='mem.gov.cn', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTPS"
+        }
+      ]
+    },
+    {
+      "序号": 19,
+      "渠道": "气象局",
+      "判定": "通过",
+      "通过端点": "https://www.bing.com/search?q=site%3Acma.gov.cn&format=rss&count=50",
+      "条目数": 10,
+      "候选留痕": [
+        {
+          "url": "https://www.bing.com/search?q=site%3Acma.gov.cn&format=rss&count=50",
+          "type": "rss",
+          "status": 200,
+          "items": 10,
+          "time_samples": 9,
+          "ok": true,
+          "reason": ""
+        },
+        {
+          "url": "https://cma.gov.cn/rss.xml",
+          "type": "rss",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectionError: HTTPSConnectionPool(host='cma.gov.cn', port=443): Max retries exceeded with url: /rss.xml (Caused by NameResolutionError"
+        },
+        {
+          "url": "https://cma.gov.cn/",
+          "type": "html",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectionError: HTTPSConnectionPool(host='cma.gov.cn', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTPS"
+        }
+      ]
+    },
+    {
+      "序号": 20,
+      "渠道": "中国航天科技集团",
+      "判定": "通过",
+      "通过端点": "https://www.bing.com/search?q=site%3Aspacechina.com&format=rss&count=50",
+      "条目数": 10,
+      "候选留痕": [
+        {
+          "url": "https://www.bing.com/search?q=site%3Aspacechina.com&format=rss&count=50",
+          "type": "rss",
+          "status": 200,
+          "items": 10,
+          "time_samples": 9,
+          "ok": true,
+          "reason": ""
+        },
+        {
+          "url": "https://spacechina.com/rss.xml",
+          "type": "rss",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "SSLError: HTTPSConnectionPool(host='spacechina.com', port=443): Max retries exceeded with url: /rss.xml (Caused by SSLError(SSLCer"
+        },
+        {
+          "url": "https://spacechina.com/",
+          "type": "html",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "SSLError: HTTPSConnectionPool(host='spacechina.com', port=443): Max retries exceeded with url: / (Caused by SSLError(SSLCertVerifi"
+        }
+      ]
+    },
+    {
+      "序号": 21,
+      "渠道": "中国商飞",
+      "判定": "通过",
+      "通过端点": "https://www.bing.com/search?q=site%3Acomac.cc&format=rss&count=50",
+      "条目数": 7,
+      "候选留痕": [
+        {
+          "url": "https://www.bing.com/search?q=site%3Acomac.cc&format=rss&count=50",
+          "type": "rss",
+          "status": 200,
+          "items": 7,
+          "time_samples": 7,
+          "ok": true,
+          "reason": ""
+        },
+        {
+          "url": "https://comac.cc/rss.xml",
+          "type": "rss",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectionError: HTTPSConnectionPool(host='comac.cc', port=443): Max retries exceeded with url: /rss.xml (Caused by NameResolutionError(\""
+        },
+        {
+          "url": "https://comac.cc/",
+          "type": "html",
+          "status": 0,
+          "items": 0,
+          "time_samples": 0,
+          "ok": false,
+          "reason": "ConnectionError: HTTPSConnectionPool(host='comac.cc', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTPSCo"
+        }
+      ]
+    }
+  ]
+}
