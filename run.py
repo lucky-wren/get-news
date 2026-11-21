@@ -119,10 +119,17 @@ def make_cfg(args) -> dict:
     return cfg
 
 
-def sync_single_xlsx(cfg: dict, out: Path) -> Path:
+def sync_single_xlsx(cfg: dict, out: Path, apply_latest: bool = True) -> Path:
     """需求⑤：单个 xlsx。output 目录只留本批一份；docs/downloads/latest.xlsx 是它的字节副本。
 
     页面固定地址与下载链接永不变；不累积往期归档、不产生第二套口径。
+
+    2026-11-22 线上 CI 截图暴露顺序漏洞：旧版「清理往期 + 覆盖 latest」在规格验收
+    **之前**做完，日志先打印 `[单文件交付] → 覆盖 docs/downloads/latest.xlsx`，
+    下一行才 `[规格验收] 不达标`，最后 `[撤回] …（不交付 / 不覆盖固定地址）`——
+    固定地址其实已经被覆盖了，撤回声明不成立（只是 job 变红让后续 commit 没跑，
+    仓库里的 latest 才侥幸没变）。现拆两步：apply_latest=False 只清往期供验收，
+    **验收通过后**才 apply_latest=True 真正覆盖固定地址。
     """
     import os
     import shutil
@@ -133,10 +140,12 @@ def sync_single_xlsx(cfg: dict, out: Path) -> Path:
         if f.resolve() != out.resolve():
             f.unlink()
     name = cfg.get("output", {}).get("latest_name", "latest.xlsx")
+    latest = BASE / "docs" / "downloads" / name
+    if not apply_latest:
+        return latest
     if os.environ.get("NEWS_SKIP_FIXED_OUTPUT") == "1":
         # 离线回放专用：不覆盖固定下载文件，避免多个 verify 脚本并发/顺序互相踩。
-        return BASE / "docs" / "downloads" / name
-    latest = BASE / "docs" / "downloads" / name
+        return latest
     latest.parent.mkdir(parents=True, exist_ok=True)
     # copy2 会 copystat（utime），在 Actions/沙盒里目标文件属主不同会抛
     # PermissionError: [Errno 1] Operation not permitted，导致「出表成功但整批失败」。
@@ -341,15 +350,10 @@ def main() -> int:
             p = out.with_suffix(".json")
             p.write_text(json.dumps(s, ensure_ascii=False, indent=2), encoding="utf-8")
 
-        if args.deliver:
-            # 需求⑤：不再产出第二份副本；单 xlsx 已由 sync_single_xlsx 覆盖到固定地址
-            print("[交付] 单文件已覆盖固定地址；按 01 第六节交付名 "
-                  f"daily_news_{win.end.strftime('%Y%m%d')}_20h.xlsx 可用 --name 指定")
-
-
-        # 需求⑤：单 xlsx 覆盖式（清理往期 + 覆盖固定下载），验收前完成
-        latest = sync_single_xlsx(cfg, out)
-        print(f"[单文件交付] {out.name} → 覆盖 {latest.relative_to(BASE)}（字节一致，不累积期次）")
+        # 需求⑤：验收前只清理往期期次产物，让规格验收看到「单个 xlsx」。
+        # 固定下载地址此时**不动**；不达标撤回时「未覆盖固定地址」才是一句真话。
+        latest = sync_single_xlsx(cfg, out, apply_latest=False)
+        print(f"[单文件交付] 已清理往期期次产物，待验收通过后覆盖 {latest.relative_to(BASE)}")
 
         if args.spec_verify:
             from news_pipeline.spec import verify_workbook, verify_extra
@@ -381,6 +385,18 @@ def main() -> int:
                           "；".join(c["项"] for c in vres["明细"] if c["结果"] == "FAIL"))
                 _reject_artifact(Path(out), reason)
                 raise RuntimeError(reason)
+
+        # 走到这里才说明质量门禁 + 规格验收都已通过：现在才覆盖固定下载地址。
+        # 不达标批次不会执行到这一步，页面与 latest.xlsx 保持上一批不变。
+        latest = sync_single_xlsx(cfg, out, apply_latest=True)
+        if os.environ.get("NEWS_SKIP_FIXED_OUTPUT") == "1":
+            print(f"[单文件交付] {out.name} 验收通过；离线回放模式不覆盖 {latest.relative_to(BASE)}")
+        else:
+            print(f"[单文件交付] {out.name} → 覆盖 {latest.relative_to(BASE)}（字节一致，不累积期次）")
+        if args.deliver:
+            # 需求⑤：不再产出第二份副本；单 xlsx 已由 sync_single_xlsx 覆盖到固定地址
+            print("[交付] 单文件已覆盖固定地址；按 01 第六节交付名 "
+                  f"daily_news_{win.end.strftime('%Y%m%d')}_20h.xlsx 可用 --name 指定")
 
         if rl:
             rl.finish("ok", file=out.name, window=win.label, interval=win.interval,
