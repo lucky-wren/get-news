@@ -294,6 +294,19 @@ def static_checks() -> None:
         and "contentFail.length" in text("docs/assets/app.js"),
         "6 项形态硬闸不达标仍 rc≠0；2 项产能指标不达标出表但页面 contentFail 红条 / "
         "CI 摘要 / Excel 工程留痕 A 显式标注，避免推包后 20:00 必然失败、页面永远停在旧基线")
+    add("线上 CI 截图三条规格 FAIL 全部修掉（56/59 不再由自检口径造成）",
+        all(k in text("news_pipeline/editorial_gate.py")
+            for k in ('"sohu.com": "搜狐网"', '"163.com": "网易"', '"ycpai.ycwb.com": "羊城派"'))
+        and r"\d+\.(?=\s|$)" in text("news_pipeline/spec.py")
+        and "10 个社交主干平台逐条申报" in text("news_pipeline/exporter.py")
+        and "主干发现入口" in text("news_pipeline/exporter.py")
+        and "同批其它期次产物" in text("news_pipeline/spec.py")
+        and "apply_latest=False" in text("run.py")
+        and "apply_latest=True" in text("run.py")
+        and (BASE / "scripts/verify_spec_ci.py").exists()
+        and (BASE / "output/spec_ci_verify.json").exists(),
+        "裸域名映射 / 编号正则 / 口径表逐平台 10 行 / 单个 xlsx 只数期次产物 / "
+        "验收通过后才覆盖固定地址；verify_spec_ci.py 真出表 + 子进程拦截 copyfile 验证")
     add("㉜ 质量门禁按最终成品/真实回查复算（硬闸越严不再越容易红）",
         "product_noise" in text("news_pipeline/quality.py")
         and "_failed_attempts" in text("news_pipeline/quality.py")
@@ -365,6 +378,8 @@ def verify_scripts(quick: bool) -> None:
         # 2026-11-22 续：质量门禁口径方向 + 正文补采达标链路，真调运行时函数
         scripts.append("scripts/verify_quality_metric_scope.py")
         scripts.append("scripts/rejudge_online_batch.py")
+        # 2026-11-22 线上 CI 截图三条规格 FAIL + 覆盖顺序漏洞的确定性回归
+        scripts.append("scripts/verify_spec_ci.py")
     rows = []
     # 2026-11-22：多个 verify 脚本各自跑 run.py 离线回放，会共享
     # docs/downloads/latest.xlsx 与环境变量，顺序执行时结果偶发漂移。
