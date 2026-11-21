@@ -54,6 +54,11 @@ REQUIRED = [
     "output/quality_gate_verify.json", "output/latest_batch_audit.json",
     "scripts/verify_throughput.py", "output/throughput_verify.json",
     "资讯获取_主链路吞吐根因与并发改造.md",
+    "scripts/smoke_run.py", "output/smoke_report.json",
+    "output/smoke_report_s01.json", "output/smoke_report_s002.json",
+    "output/smoke_worst_budget.json", "output/smoke_fast_budget.json",
+    "output/smoke_hang_budget.json",
+    "资讯获取_15分钟超时事故复盘与真限时修复.md",
     "output/keyless_cn_verify.json", "scripts/verify_keyless_cn.py",
     "data/keyless_noise_corpus.json",
     "data/latest_batch_regression.json", "data/hc_url_regression.json",
@@ -88,6 +93,7 @@ REQUIRED_CN = [
     "资讯获取_自测数字与线上批次差异说明.md",
     "资讯获取_检索层零成稿根因修复.md",
     "资讯获取_无Key中文召回根因与修复.md",
+    "资讯获取_15分钟超时事故复盘与真限时修复.md",
     "静态页面预览.html",
 ]
 
