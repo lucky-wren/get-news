@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>资讯获取</title>
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="head">
+    <h1>资讯获取</h1>
+    <div class="meta" id="meta">—</div>
+  </header>
+
+  <section class="card">
+    <h2>窗口期设置</h2>
+    <div class="row">
+      <label>开始 <input id="start" type="datetime-local" step="60"></label>
+      <label>结束 <input id="end" type="datetime-local" step="60"></label>
+      <label>端点
+        <select id="interval">
+          <option value="lo-ro" selected>左开右开 (a, b) · 默认</option>
+          <option value="lo-rc">左开右闭 (a, b]</option>
+          <option value="lc-ro">左闭右开 [a, b)</option>
+          <option value="lc-rc">左闭右闭 [a, b]</option>
+        </select>
+      </label>
+      <button id="rerun" class="primary">重跑并刷新</button>
+      <a id="download" class="btn primary" href="./downloads/latest.xlsx" download="latest.xlsx">↓ 下载 Excel</a>
+    </div>
+    <div class="row sub">
+      <label>每天几点跑 <input id="runat" type="time" step="60"></label>
+      <button id="copySchedule" class="btn">复制改定时命令</button>
+      <span class="hint">定时改在仓库 <code>config.yaml</code>，命令会同步 cron；重跑只影响本次窗口。</span>
+    </div>
+    <div id="status" class="status">就绪。</div>
+  </section>
+
+  <section class="card">
+    <h2>本期数据 <span id="counts" class="counts">—</span></h2>
+    <div id="quality" class="quality">—</div>
+    <div class="table-wrap">
+      <table id="table">
+        <thead><tr><th>#</th><th>标题</th><th>来源</th><th>大类</th><th>分类</th><th>等级</th><th>内容摘要（≤100 字）</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div id="empty" class="empty" hidden>本期暂无数据。</div>
+  </section>
+
+  <details class="setup log" id="logPanel">
+    <summary>运行日志（排查用；展开才读取，静态 Pages 下看 Actions 运行页）</summary>
+    <div class="row sub">
+      <button id="logRefresh" class="btn">刷新日志</button>
+      <button id="logCopy" class="btn">复制全文</button>
+      <a id="logDownload" class="btn" href="#" download>下载 .log</a>
+      <span class="hint" id="logHint">本地服务（python serve.py）点重跑后可看完整阶段日志；失败会自动展开并定位错误尾部。</span>
+    </div>
+    <div id="logList" class="log-list">展开后加载最近 12 次运行…</div>
+    <pre id="logText" class="log-pre" hidden></pre>
+  </details>
+
+  <details class="setup">
+    <summary>高级（可选）：不填也能重跑，默认无需任何配置</summary>
+    <div class="row">
+      <label>owner <input id="owner" placeholder="自动读仓库坐标"></label>
+      <label>repo <input id="repo" placeholder="自动读仓库坐标"></label>
+      <label>分支 <input id="branch" value="main"></label>
+      <label>Token <input id="token" type="password" placeholder="仅想「页面内直接触发并等待」时才填" autocomplete="off"></label>
+    </div>
+    <p class="hint"><b>「重跑并刷新」零配置</b>：本地 <code>python serve.py</code> 直接跑流水线；静态 Pages 下自动打开本仓库
+      <code>Actions → daily-news.yml</code> 运行页，点一下「Run workflow」即可，页面会轮询固定 <code>latest.json</code>，
+      新批次上线后自动刷新表格与下载。仓库坐标由 <code>config.yaml → site.github_repo</code>（或 git remote）写进页面数据，
+      <b>不需要填 owner / repo / Token</b>。填 Token 只是可选的「页面内直接触发并等待完成」，令牌仅存当前标签页。</p>
+  </details>
+
+  <footer class="foot">
+    固定地址不随批次变化；每次运行覆盖 <code>docs/data/latest.json</code> 与 <code>docs/downloads/latest.xlsx</code>。
+    默认 <code>live</code> 模式真实联网抓取：央视网 JSONP 秒级时间倒排、中新网/人民网 RSS、
+    站内时间倒排页与独立原文正文补采；受限网络下按可达性自适应，逐源触达与失败原因见 Excel 附录 21。
+    配置见 <code>config.yaml</code>；运行日志见上方「运行日志」折叠区与 GitHub Actions 运行页。
+  </footer>
+</div>
+
+<script src="assets/news-data.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
