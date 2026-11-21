@@ -147,7 +147,7 @@
     {
       "项": "行为 A：内容硬指标不达标时 run.py 真失败（warn_only 不再掩盖）",
       "结果": "PASS",
-      "证据": "rc=1 | nt call last):   File \"/data/workspace/news_daily/run.py\", line 308, in main     raise RuntimeError(reason) RuntimeError: 采集质量门禁未达标：实时源触达率、A级独立原文占比、发布时间取得率、渠道触达率、摘要有效率、端点配置率、非新闻噪声率  [失败] RuntimeError: 采集质量门禁未达标：实时源触达率、A级独立原文占比、发布时间取得率、渠道触达率、摘要有效率、端点配置率、非新闻噪声率 "
+      "证据": "rc=1 | nt call last):   File \"/data/workspace/news_daily/run.py\", line 317, in main     raise RuntimeError(reason) RuntimeError: 采集质量门禁未达标：实时源触达率、A级独立原文占比、发布时间取得率、渠道触达率、摘要有效率、端点配置率、非新闻噪声率  [失败] RuntimeError: 采集质量门禁未达标：实时源触达率、A级独立原文占比、发布时间取得率、渠道触达率、摘要有效率、端点配置率、非新闻噪声率 "
     },
     {
       "项": "行为 A2：不达标批次产物被撤回（正式 xlsx 不存在，只留 .rejected 供排障）",
@@ -157,17 +157,17 @@
     {
       "项": "行为 B：规格验收不达标时 run.py 真失败（线上 55/59 却 success 的终结）",
       "结果": "PASS",
-      "证据": "rc=1 | | probe [撤回] 本批不达标，产物已改为 probe_窗口期.xlsx.rejected（不交付 / 不覆盖固定地址） Traceback (most recent call last):   File \"/data/workspace/news_daily/run.py\", line 383, in main     raise RuntimeError(reason) RuntimeError: 规格验收不达标：模拟规格FAIL  [失败] RuntimeError: 规格验收不达标：模拟规格FAIL "
+      "证据": "rc=1 | | probe [撤回] 本批不达标，产物已改为 probe_窗口期.xlsx.rejected（不交付 / 不覆盖固定地址） Traceback (most recent call last):   File \"/data/workspace/news_daily/run.py\", line 387, in main     raise RuntimeError(reason) RuntimeError: 规格验收不达标：模拟规格FAIL  [失败] RuntimeError: 规格验收不达标：模拟规格FAIL "
     },
     {
       "项": "行为 C：仅产能不足时 run.py 不阻断（推包后页面不会永久停在旧基线）",
       "结果": "PASS",
-      "证据": "rc=0 | 。「非新闻噪声率」按最终主表逐条复检编辑部硬闸，不按采集侧 F5 剔除数：后者会让硬闸越严、比值越大（方向相反）。「词条回查成功率」按真实回查尝试计，按规格进附录 15 的未回查快照不再算失败；有线索却零回查仍如实判 0。\"   },   \"配置\": {     \"定时\": \"20:00\",     \"UTC cron\": \"0 12 * * *\",     \"窗口模式\": \"relative\",     \"覆盖产物\": \"latest.xlsx\"   } } [单文件交付] probe_窗口期.xlsx → 覆盖 docs/downloads/latest.xlsx（字节一致，不累积期次） "
+      "证据": "rc=0 | 向相反）。「词条回查成功率」按真实回查尝试计，按规格进附录 15 的未回查快照不再算失败；有线索却零回查仍如实判 0。\"   },   \"配置\": {     \"定时\": \"20:00\",     \"UTC cron\": \"0 12 * * *\",     \"窗口模式\": \"relative\",     \"覆盖产物\": \"latest.xlsx\"   } } [单文件交付] 已清理往期期次产物，待验收通过后覆盖 docs/downloads/latest.xlsx [单文件交付] probe_窗口期.xlsx 验收通过；离线回放模式不覆盖 docs/downloads/latest.xlsx "
     },
     {
       "项": "行为 C2：产能不足仍如实列出未达标项（页面/CI/Excel 显式可见，不伪装达标）",
       "结果": "PASS",
-      "证据": "结论与未达标项均在 stdout：却零回查仍如实判 0。\"   },   \"配置\": {     \"定时\": \"20:00\",     \"UTC cron\": \"0 12 * * *\",     \"窗口模式\": \"relative\",     \"覆盖产物\": \"latest.xlsx\"   } } [单文件交付] probe_窗口期.xlsx → 覆盖 docs/downloads/latest.xlsx（字节一致，不累积期次） "
+      "证据": "结论与未达标项均在 stdout：UTC cron\": \"0 12 * * *\",     \"窗口模式\": \"relative\",     \"覆盖产物\": \"latest.xlsx\"   } } [单文件交付] 已清理往期期次产物，待验收通过后覆盖 docs/downloads/latest.xlsx [单文件交付] probe_窗口期.xlsx 验收通过；离线回放模式不覆盖 docs/downloads/latest.xlsx "
     },
     {
       "项": "行为 C3：产能不足不等于放行低质内容（形态硬闸仍在 hard_fail_metrics）",
