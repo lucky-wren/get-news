@@ -1,7 +1,7 @@
 {
- "generated_at": "2026-11-21T20:00:06+08:00",
- "硬项": 43,
- "PASS": 43,
+ "generated_at": "2026-11-21T23:20:15+08:00",
+ "硬项": 53,
+ "PASS": 53,
  "FAIL": 0,
  "失败项": [],
  "全部": [
@@ -194,7 +194,7 @@
   {
    "项": "㉔ 端到端冒烟三场景 21/21（真跑 run_pipeline，非静态算式）",
    "结果": "PASS",
-   "证据": "worst / fast / hang × 7 项；两种缩放各 21/21，Excel 落盘且总耗时 ≤ 预算",
+   "证据": "worst / fast / hang × 7 项；scale=0.1 单档 21/21（固定 CPU 不随缩放，0.02 档不作交付判据）；Excel 落盘且总耗时 ≤ 预算，argparse 默认与 SCALE 一致",
    "硬项": true
   },
   {
@@ -207,6 +207,66 @@
    "项": "㉖ 中文相关性闸不误杀换说法的中文报道",
    "结果": "PASS",
    "证据": "旧按零 2-gram 交集剔 8/10 条中文候选；verify_keyless_cn 改确定性 mock 9/9",
+   "硬项": true
+  },
+  {
+   "项": "㉗ 线上真产物语料与逐条回归随包（不再用离线样例自证）",
+   "结果": "PASS",
+   "证据": "用户上传 latest.xlsx 主表 1–18 条逐字照抄：3 负例 / 8 正例 / 3 格式样本",
+   "硬项": true
+  },
+  {
+   "项": "㉘ 编辑部硬闸 E1–E5 接线（垃圾条目 / 假合并 / 半句摘要 / 裸域名）",
+   "结果": "PASS",
+   "证据": "线上 A 级第 2 条是法律 SEO 页、B 级第 3 条是黄页广告、D 级第 17 条是 GTA6 剧透",
+   "硬项": true
+  },
+  {
+   "项": "㉙ 质量/规格验收 FAIL 真阻断（线上 55/59 却 success 的终结）",
+   "结果": "PASS",
+   "证据": "真跑 run.py 两个行为验证：内容硬指标不达标 rc≠0、规格不达标 rc≠0",
+   "硬项": true
+  },
+  {
+   "项": "㉚ 预算短路时正文补采不再整段跳过（线上 0 篇 / A级 0.1071）",
+   "结果": "PASS",
+   "证据": "层配额用尽但硬墙有余量时按 0.55×余量 / 8 并发足量补正文；余量不足如实跳过，不拖过 600s",
+   "硬项": true
+  },
+  {
+   "项": "㉜ 线上全量 56+344 条真表随包并逐条重判（不再只用 18 条样本）",
+   "结果": "PASS",
+   "证据": "851K 线上真产物，表行数与日志「候选 344 / 主表 56」逐格对上",
+   "硬项": true
+  },
+  {
+   "项": "㉝ 全量重判修掉过杀：只删 3 条垃圾、保住 S 级地震与 5 条 F10 真新闻",
+   "结果": "PASS",
+   "证据": "56 → 53 条；序 2/3/17 拦下，序 1/4/9/10/29/31 保留；摘要修复 8 / 来源规范化 10",
+   "硬项": true
+  },
+  {
+   "项": "㉞ 不达标批次产物撤回（真联网 live rc=1，正式 xlsx 不存在）",
+   "结果": "PASS",
+   "证据": "质量硬失败与规格 FAIL 都撤回产物，只留 .rejected + 原因 json 供排障",
+   "硬项": true
+  },
+  {
+   "项": "形态硬闸 / 产能指标分级（硬门禁自身「永久红」副作用已修）",
+   "结果": "PASS",
+   "证据": "6 项形态硬闸不达标仍 rc≠0；2 项产能指标不达标出表但页面 contentFail 红条 / CI 摘要 / Excel 工程留痕 A 显式标注，避免推包后 20:00 必然失败、页面永远停在旧基线",
+   "硬项": true
+  },
+  {
+   "项": "㉜ 质量门禁按最终成品/真实回查复算（硬闸越严不再越容易红）",
+   "结果": "PASS",
+   "证据": "线上 353.7s/600s 剩余 246.3s 误报预算耗尽 → 只补 6 篇 → evidence 全 B 封顶 → A 恒空",
+   "硬项": true
+  },
+  {
+   "项": "㉛ smoke 默认档 = 0.1 且与模块常量一致（0.02 档固定 CPU 不自洽）",
+   "结果": "PASS",
+   "证据": "干净解包后无参数跑 smoke 必须 21/21，不再出现 700s 假超限",
    "硬项": true
   },
   {
@@ -248,7 +308,7 @@
   {
    "项": "⑧ 全套既有 verify 脚本 rc=0",
    "结果": "PASS",
-   "证据": "scripts/verify_spec.py=0; scripts/verify_rules.py=0; scripts/verify_search_quality.py=0; scripts/verify_workflow.py=0; scripts/verify_deploy.py=0; scripts/verify_channel_resolve.py=0; scripts/verify_quality_v3.py=0; scripts/check_keys.py=0; scripts/verify_branding.py=0; scripts/verify_budget.py=0; scripts/verify_runtime_budget.py=0; scripts/verify_quality_gate.py=0; scripts/verify_share_pages.py=0",
+   "证据": "scripts/verify_spec.py=0; scripts/verify_rules.py=0; scripts/verify_search_quality.py=0; scripts/verify_workflow.py=0; scripts/verify_deploy.py=0; scripts/verify_channel_resolve.py=0; scripts/verify_quality_v3.py=0; scripts/check_keys.py=0; scripts/verify_branding.py=0; scripts/verify_budget.py=0; scripts/verify_runtime_budget.py=0; scripts/verify_quality_gate.py=0; scripts/verify_share_pages.py=0; scripts/smoke_run.py=0; scripts/verify_quality_metric_scope.py=0; scripts/rejudge_online_batch.py=0",
    "硬项": true,
    "明细": [
     {
@@ -290,7 +350,7 @@
     {
      "脚本": "scripts/verify_quality_v3.py",
      "rc": 0,
-     "尾行": "[回放] rc=0 | S+A=9 | {'S': 0, 'A': 9, 'B': 9, 'C': 15, 'D': 8}",
+     "尾行": "[回放] rc=0 | S+A=9 | {'S': 0, 'A': 9, 'B': 9, 'C': 13, 'D': 9}",
      "一次rc": 0
     },
     {
@@ -328,6 +388,24 @@
      "rc": 0,
      "尾行": "============================================================================",
      "一次rc": 0
+    },
+    {
+     "脚本": "scripts/smoke_run.py",
+     "rc": 0,
+     "尾行": "21/21 PASS → /data/workspace/news_daily/output/smoke_report.json",
+     "一次rc": 0
+    },
+    {
+     "脚本": "scripts/verify_quality_metric_scope.py",
+     "rc": 0,
+     "尾行": "13/13 PASS → /data/workspace/news_daily/output/quality_metric_scope_verify.json",
+     "一次rc": 0
+    },
+    {
+     "脚本": "scripts/rejudge_online_batch.py",
+     "rc": 0,
+     "尾行": "14/14 PASS → /data/workspace/news_daily/output/online_batch_rejudge.json | /data/workspace/news_daily/output/线上批次新规则重判对照.xlsx",
+     "一次rc": 0
     }
    ]
   },
@@ -340,10 +418,10 @@
   {
    "项": "⑨ 项目包完整性（隐藏目录 / 证据 / 中文名 / 单份 xlsx）",
    "结果": "PASS",
-   "证据": "194 条目",
+   "证据": "207 条目",
    "硬项": true,
    "明细": {
-    "条目数": 194,
+    "条目数": 207,
     "问题": [],
     "PASS": true
    }
