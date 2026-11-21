@@ -122,24 +122,69 @@ def cjk_bigrams(text: str) -> set:
     return {t[i:i + 2] for i in range(len(t) - 1)} if len(t) >= 2 else set()
 
 
-def is_offtopic(title: str, query: str, url: str = "") -> tuple[bool, str]:
-    """中文 query 与标题零交集 / 命中噪声域名 → 判不相干。
+# 权威中文新闻源：端点时间流 / 正规媒体，标题换说法也放行（贴合度交给下游成稿）
+TRUSTED_NEWS_DOMAIN = re.compile(
+    r"(?:^|\.)(?:cctv|chinanews|people|xinhuanet|news\.cn|ce\.cn|gmw\.cn|cyol|"
+    r"thepaper|cnr|gov\.cn|12306|caac|weather\.com\.cn|cnstock|stcn|cs\.com\.cn|"
+    r"21jingji|yicai|eeo|jiemian|caixin|sohu|sina|qq\.com|163\.com|ifeng|hexun|"
+    r"eastmoney|jrj|新华|人民|央视|中新)", re.I)
+# 明确不是新闻的形态：百科 / 问答 / 经验 / 技术博客 / 影视 / 软件商店 / 电商
+NON_NEWS_DOMAIN = re.compile(
+    r"baike\.baidu|zhidao\.baidu|jingyan\.baidu|wenku\.baidu|"
+    r"zhihu\.com/(?:question|column)|zhuanlan\.zhihu|"
+    r"blog\.csdn|cnblogs\.com|jianshu|segmentfault|"
+    r"microsoftstore|iqiyi|youku|wikipedia|douban\.com/subject|"
+    r"taobao|tmall|jd\.com|pinduoduo|steam|crazygames", re.I)
+NON_NEWS_TITLE = re.compile(
+    r"百度百科|维基百科|自然数之一|怎么(?:看|办|样|设置|开启|下载)|如何|"
+    r"教程|安装|下载|系统安装|Windows\s*11|Win11|官网|最新版|亲测|"
+    r"免费观看|直播|游戏平台|邮箱|电视剧|综艺|试题|答案|范文|模板|"
+    r"申请书怎么写|大全|排行榜|选购|测评", re.I)
+# 新闻体裁词：换说法的报道若与 query 共享数字锚点，可宽恕放行
+NEWS_HINT = re.compile(
+    r"发生|发布|通报|提醒|表示|预计|启动|致|遇难|伤亡|地震|预警|"
+    r"出炉|维持|上调|下调|辟谣|回应|公布|实施|落地|开工|开通", re.I)
 
-    返回 (是否不相干, 依据)。只用于**丢弃候选**，不用于打分、不用于成稿。
-    英文标题（无中文）对中文 query 一律不相干：线上 crazygames / fanbolt
-    正是这么混进来的。中文标题但零 2-gram 交集，也判不相干。
+
+def _num_anchors(s: str) -> set:
+    """提取 ≥3 位数字或带小数点的数字锚点（排除泛化的月份 11/12）。"""
+    return {m for m in re.findall(r"\d+(?:\.\d+)?", str(s or ""))
+            if len(m) >= 3 or "." in m}
+
+
+def is_offtopic(title: str, query: str, url: str = "") -> tuple[bool, str]:
+    """中文 query ↔ 标题的相关性硬闸，挡掉检索召回的噪声页（不用于打分/成稿）。
+
+    2026-11-22 真发请求复现：Bing RSS 对「德令哈5.6级地震」返回的全是 NBA 直播，
+    对「11月LPR」返回 Windows 11 / 百度百科 11 / 爱奇艺《11》，对「医保91种药品」
+    返回 163 邮箱问答——都是把查询里的数字当关键词误匹配。旧版为防误杀改成
+    「中文标题一律保留」，结果这些垃圾被当成独立原文，形成 5 个独立域名的假
+    多渠道合并并抬到 A 级（线上主表序 2 / 序 3 / 序 17 即由此而来）。
+
+    现在用三层确定性判据，不靠一刀切放行：
+      ① 权威新闻域名 → 放行（标题换说法不影响）；
+      ② 百科/问答/教程/影视/电商等形态 → 拦；
+      ③ 其余中文标题 → 至少 1 个共享中文 2-gram，或「新闻体裁词 + 共享数字锚点」→ 放行。
     """
+    t, q = str(title or ""), str(query or "")
     if OFFTOPIC_DOMAIN.search(url or ""):
         return True, "命中已实测的噪声域名（游戏 / 电影 / 境外机构页）"
-    qb, tb = cjk_bigrams(query), cjk_bigrams(title)
+    if NON_NEWS_DOMAIN.search(url or ""):
+        return True, "非新闻形态域名（百科 / 问答 / 教程 / 影视 / 电商）"
+    tb, qb = cjk_bigrams(t), cjk_bigrams(q)
     if not tb:
         return True, "标题无中文 2-gram（英文 / 纯符号页）"
-    # 2026-11-22 冒烟暴露：中文新闻标题常与 query 换一种说法
-    #（「LPR连续18个月按兵不动」vs「11月LPR报价出炉 5年期和1年期利率均维持不变」），
-    # 按「零 2-gram 交集」硬剔会把真正相关的中文独立原文全部误杀
-    #（verify_keyless_cn 实测 10 条 bing_rss 中文候选被剔 8 条 → 0 中文域名）。
-    # 中文标题一律保留，贴合度交给下游事件成稿与评级判；本闸只挡英文噪声页。
-    return False, ""
+    if TRUSTED_NEWS_DOMAIN.search(url or ""):
+        return False, ""
+    if NON_NEWS_TITLE.search(t):
+        return True, "标题命中非新闻形态词（教程 / 百科 / 安装 / 直播 / 问答）"
+    shared = len(tb & qb)
+    if shared >= 1:
+        return False, ""
+    anchors = _num_anchors(t) & _num_anchors(q)
+    if anchors and NEWS_HINT.search(t):
+        return False, ""
+    return True, f"与线索零中文实词交集（共享 2-gram={shared}，数字锚点={sorted(anchors)}）"
 
 
 def dedup_key(ev_url: str, ev_domain: str) -> str:
