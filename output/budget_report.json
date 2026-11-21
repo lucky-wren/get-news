@@ -1,73 +1,83 @@
 {
  "启用": true,
- "总预算秒": 1.0,
- "出表保留秒": 25.0,
- "实际耗时秒": 2.3,
- "剩余秒": 0.0,
- "全局硬墙": true,
+ "总预算秒": 60.0,
+ "出表保留秒": 2.5,
+ "实际耗时秒": 39.0,
+ "剩余秒": 21.0,
+ "全局硬墙": false,
  "被短路的层": [
   "rss",
-  "keyless",
-  "platform",
-  "free_sources",
-  "social",
-  "second_pass"
+  "keyless"
  ],
  "参数裁剪": {
-  "_deadline_at": 1494.497945229,
-  "keyless_deadline": 1.0,
+  "_deadline_at": 6110.807329949,
+  "keyless_deadline": 18.5,
   "gdelt_calls": 4,
-  "body_deadline": 1.0,
-  "second_pass_deadline": 1.0,
+  "body_deadline": 7.0,
+  "second_pass_deadline": 5.0,
   "max_calls": 160,
   "max_lookup": 32,
   "expansion_queries": 2,
-  "expansion_deadline": 1.0,
-  "platform_deadline": 1.0
+  "expansion_deadline": 3.5,
+  "platform_deadline": 2.5
  },
  "逐层": [
   {
    "层": "rss",
-   "配额秒": 95.0,
-   "实耗秒": 0.0,
-   "允许": false,
-   "短路": "全局硬墙/预算耗尽"
+   "配额秒": 9.5,
+   "允许": true,
+   "实耗秒": 11.5,
+   "短路": "层超时（主线程继续出表）"
   },
   {
    "层": "keyless",
-   "配额秒": 185.0,
-   "剩余全局秒": 0.7,
-   "允许": false,
-   "实耗秒": 0.0
+   "配额秒": 18.5,
+   "剩余全局秒": 48.3,
+   "允许": true,
+   "实耗秒": 18.5,
+   "短路": "层超时（主线程继续出表）"
   },
   {
    "层": "platform",
-   "配额秒": 25.0,
-   "剩余全局秒": 0.7,
-   "允许": false,
-   "实耗秒": 0.0
+   "配额秒": 2.5,
+   "剩余全局秒": 28.9,
+   "允许": true,
+   "实耗秒": 1.2,
+   "短路": ""
   },
   {
    "层": "free_sources",
-   "配额秒": 15.0,
-   "剩余全局秒": 0.7,
-   "允许": false,
-   "实耗秒": 0.0
+   "配额秒": 1.5,
+   "剩余全局秒": 27.4,
+   "允许": true,
+   "实耗秒": 0.0,
+   "短路": "",
+   "异常": "TypeError: run_pipeline.<locals>._free_probe() takes 0 positional arguments but 1 was given"
+  },
+  {
+   "层": "expansion",
+   "配额秒": 3.5,
+   "剩余全局秒": 27.4,
+   "允许": true,
+   "实耗秒": 3.0,
+   "短路": ""
   },
   {
    "层": "social",
-   "配额秒": 35.0,
-   "剩余全局秒": 0.7,
-   "允许": false,
-   "实耗秒": 0.0
+   "配额秒": 3.5,
+   "剩余全局秒": 24.4,
+   "允许": true,
+   "实耗秒": 0.0,
+   "短路": ""
   },
   {
    "层": "second_pass",
-   "配额秒": 50.0,
-   "剩余全局秒": 0.7,
-   "允许": false,
-   "实耗秒": 0.0
+   "配额秒": 5.0,
+   "剩余全局秒": 24.4,
+   "允许": true,
+   "实耗秒": 0.0,
+   "短路": ""
   }
  ],
- "结论": "预算耗尽/层超时，已短路 rss、keyless、platform、free_sources、social、second_pass；采集层停止但本批仍出表"
+ "结论": "层配额用尽（全局硬墙仍有余量 21.0s），已短路 rss、keyless；采集层停止但本批仍出表"
 }
