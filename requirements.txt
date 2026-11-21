@@ -1,0 +1,30 @@
+# 资讯获取 · 纯代码流水线依赖（全部为可离线运行的开源组件，无任何模型/AI 服务）
+# 判定链（贴近度词组表 / Final_adj / U / 聚类阈值）由 news_pipeline/rules.py 等自写规则实现，
+# 开源库只负责解析、抽取、归一化、重试、清洗、校验与出表，不替代业务规则。
+
+# ---- 出表与配置 ----
+openpyxl>=3.1.0            # 五工作表 / 12 列 / wrap_text / 批注（当前规模首选）
+XlsxWriter>=3.2.0          # 万行以上 constant_memory 流式出表评估备选
+PyYAML>=6.0                # 配置（一律 safe_load）
+pydantic>=2.6              # 配置强类型校验（档位三档 / λ / story_max_keep）
+
+# ---- 抓取与 Feed 解析 ----
+httpx>=0.27                # 连接池 / 超时 / 重定向
+tenacity>=8.2              # 429/503/超时 指数退避重试（4xx 立即失败）
+requests>=2.31.0           # 存量采集器兼容
+feedparser>=6.0.10         # RSS 0.9x/1.0/2.0 + Atom 统一解析（替代手写 ElementTree）
+
+# ---- 正文与 HTML ----
+trafilatura>=2.1           # 独立原文正文 + 元数据抽取（Apache-2.0；v1.8 前是 GPLv3+，须锁版本）
+lxml_html_clean>=0.4       # trafilatura 的 lxml.html.clean 依赖（lxml 6.1+ 已拆包）
+beautifulsoup4>=4.12.0     # 站点降级 DOM 遍历
+lxml>=5.0                  # HTML/XML 解析
+bleach>=6.0                # 允许清单 HTML 清洗
+
+# ---- 时间归一化 ----
+dateparser>=1.2            # 绝对时间归一化（相对时间串按规格不换算）
+cn2an>=0.5.20              # 中文数词前置规范化
+
+# ---- 相似度 / 中文分词（诊断与召回，不替代规格判据）----
+rapidfuzz>=3.6             # LCSseq / fuzz 快速诊断（实测 3.14.5 无 Jaccard 模块）
+jieba>=0.42                # 词级 2-gram 辅助信号
