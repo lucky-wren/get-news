@@ -203,6 +203,29 @@ def static_checks() -> None:
         and "verify_throughput.py" in text("scripts/make_package.py"),
         "旧串行 1100s / 配额 185s、80 线索只跑完 13 条；改并发后 100/100 且总预算降 30s")
 
+    add("㉓ 全局硬墙 + 每层真限时（15min 超时事故根因修复）",
+        "_watchdog" in text("news_pipeline/budget.py")
+        and "def bounded" in text("news_pipeline/budget.py")
+        and "cancel_futures=True" in text("news_pipeline/keyless_compose.py")
+        and "_BUDGET_DEADLINE" in text("news_pipeline/live_cn.py")
+        and "budget.bounded(\"rss\"" in text("news_pipeline/pipeline.py")
+        and "logs[\"budget\"] = budget.report()" in text("news_pipeline/pipeline.py"),
+        "gate 只判能否开始 → watchdog 硬墙 + bounded 整层限时 + live_cn 截止 + 出表后重写报告")
+    add("㉔ 端到端冒烟三场景 21/21（真跑 run_pipeline，非静态算式）",
+        (BASE / "scripts/smoke_run.py").exists()
+        and (BASE / "output/smoke_report.json").exists()
+        and "smoke_run.py" in text("scripts/make_package.py"),
+        "worst / fast / hang × 7 项；两种缩放各 21/21，Excel 落盘且总耗时 ≤ 预算")
+    add("㉕ 冒烟报告实耗与实测自洽、逐层不超配额（事故复盘可复算）",
+        (BASE / "资讯获取_15分钟超时事故复盘与真限时修复.md").exists()
+        and "664s / 600s" in text("资讯获取_15分钟超时事故复盘与真限时修复.md")
+        and "全局硬墙" in text("news_pipeline/budget.py"),
+        "修复前复现 664s>600s 且报告自报 10.2s 达标；修复后报告实耗含出表段")
+    add("㉖ 中文相关性闸不误杀换说法的中文报道",
+        "中文标题一律保留" in text("news_pipeline/url_resolve.py")
+        and (BASE / "output/keyless_cn_verify.json").exists(),
+        "旧按零 2-gram 交集剔 8/10 条中文候选；verify_keyless_cn 改确定性 mock 9/9")
+
 
 def behavior_checks() -> None:
     from news_pipeline.rules import classify, _align
