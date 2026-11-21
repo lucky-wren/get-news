@@ -23,7 +23,22 @@ def compute_quality(R: Dict[str, Any], cfg: dict) -> Dict[str, Any]:
     pub_ratio = (sum(1 for x in cand if x.pub is not None) / len(cand)) if cand else 0.0
     clues = len(logs.get("clues", []) or [])
     word_items = sum(1 for x in R.get("admitted", []) if x.shape == "词条")
-    lookup_ratio = (word_items / (word_items + clues)) if (word_items + clues) else 1.0
+    # 2026-11-22 口径修正：旧式 word_items/(word_items+clues) 里 clues 是「未回查线索」，
+    # 而按需求⑤「回查不到进附录 15 留痕」本来就是正确行为，把它们全算作失败分母，
+    # 会让该指标数学上趋近 0（线上 0.0），且无法区分「尝试了没成」和「根本没做」。
+    # 改为按真实回查尝试计：成稿词条 / (成稿词条 + 尝试但未成稿次数)；
+    # 有线索却一次回查都没发起 → 0.0，如实判失败，根因是没做回查而不是线索太多。
+    _sa = ((logs.get("search_api") or {}).get("stats") or {})
+    _made = int(_sa.get("成稿", 0) or 0)
+    _failed = int(_sa.get("失败", 0) or 0)
+    _attempts = _made + _failed
+    _failed_attempts = max(_attempts - _made, 0)
+    if _attempts == 0 and clues:
+        lookup_ratio = 0.0
+    elif word_items + _failed_attempts:
+        lookup_ratio = word_items / (word_items + _failed_attempts)
+    else:
+        lookup_ratio = 1.0
 
     # 摘要有效率：只有「有效 / 正文补采」算数；「未取得」是如实标注，不算质量
     valid_abs = sum(1 for x in main
@@ -92,9 +107,29 @@ def compute_quality(R: Dict[str, Any], cfg: dict) -> Dict[str, Any]:
     except Exception:
         unconfigured, endpoint_ratio = 0, 0.0
 
-    # 非新闻噪声率：F5 剔除 / (F5 剔除 + 最终主表)
-    noise = len(logs.get("noise_rows", []) or [])
-    noise_ratio = (noise / (noise + len(main))) if (noise + len(main)) else 0.0
+    # 非新闻噪声率（2026-11-22 方向性修正）：
+    # 旧口径 noise/(noise+len(main)) 的 noise 是准入层 F5 剔除数；编辑部硬闸 E1–E5
+    # 拦下的 SEO / 黄页 / 剧透 / 假合并不进 noise_rows，却让 main 变小 ——
+    # 于是「垃圾清得越干净，这个比值越大」，硬闸生效反而必然触发硬失败。
+    # 门禁必须衡量最终成品：对 R["ordered"] 逐条真调 editorial_check(stage="main")，
+    # 检出一条算一条；复检异常保守计入噪声，绝不伪装成干净。
+    from . import editorial_gate as _egate
+    product_noise = 0
+    product_noise_samples = []
+    for _x in main:
+        try:
+            _ok, _gate, _why = _egate.editorial_check(_x, stage="main")
+        except Exception as _e:
+            _ok, _gate, _why = False, "复检异常", str(_e)[:60]
+        if not _ok:
+            product_noise += 1
+            if len(product_noise_samples) < 8:
+                product_noise_samples.append(
+                    f"{_gate}:{str(getattr(_x, 'title', ''))[:26]}")
+    noise_ratio = (product_noise / len(main)) if main else 0.0
+    # 采集侧 F5 剔除占比：如实保留为诊断（不隐藏召回质量差），不参与门禁。
+    f5_noise = len(logs.get("noise_rows", []) or [])
+    f5_ratio = (f5_noise / (f5_noise + len(main))) if (f5_noise + len(main)) else 0.0
 
     # 议题重复率：议题簇合并掉的条数占合并前主表的比例
     story = logs.get("story", {}) or {}
@@ -141,7 +176,8 @@ def compute_quality(R: Dict[str, Any], cfg: dict) -> Dict[str, Any]:
                    "盘点项（不参与门禁）：白名单中由实证端点覆盖的渠道 / 白名单总数；"
                    "分母含本环境网络拦截域名与平台内栏目，逐渠道见附录 22"),
         "词条回查成功率": (round(lookup_ratio, 4), float(q.get("min_lookup_ratio", 0.80)), "min",
-                     "回查成稿词条 / (成稿词条 + 未回查线索)"),
+                     "成稿词条 / (成稿词条 + 真实回查尝试但未成稿次数)；有线索却零回查判 0；"
+                     "按规格进附录 15 的未回查快照不再当失败分母"),
         "摘要有效率": (round(abs_ratio, 4), float(q.get("min_abstract_ratio", 0.80)), "min",
                    "abstract_status ∈ {有效,正文补采} / 主表；标题复读不计"),
         "摘要长度合规率": (round(len_ratio, 4), 1.0, "min",
@@ -154,7 +190,8 @@ def compute_quality(R: Dict[str, Any], cfg: dict) -> Dict[str, Any]:
                    "盘点项（不参与门禁）：discover_endpoints.py 实测通过的端点 / 候选端点总数；"
                    "未通过端点逐条申报原因，见附录 21 与 endpoints_live.yaml 的 rejected"),
         "非新闻噪声率": (round(noise_ratio, 4), float(q.get("max_noise_ratio", 0.10)), "max",
-                    "F5 剔除 / (F5 剔除 + 主表)"),
+                    "最终主表逐条复检编辑部硬闸 E1–E5 检出的垃圾条目 / 主表；"
+                    "旧口径用采集侧 F5 剔除数，硬闸越严反而越大，已废弃"),
         "议题重复率": (round(dup_ratio, 4), float(q.get("max_story_dup_ratio", 0.30)), "max",
                    "议题簇合并条数 / 合并前主表"),
         "段落重复率": (round(para_dup_ratio, 4), float(q.get("max_para_dup_ratio", 0.02)), "max",
@@ -200,8 +237,9 @@ def compute_quality(R: Dict[str, Any], cfg: dict) -> Dict[str, Any]:
         advice.append("分类标签前缀必须与上位大类一致；「经济地震」「生活大爆炸」「地震属性」等伪友好词"
                       "已加否定表，国际标签需境外地理信号，避免误挂。")
     if "非新闻噪声率" in failed:
-        advice.append("F5 已剔除学术论文 / 影视娱乐 / 导购 FAQ / 政务科普；逐条见附录 19，"
-                      "可在 rules.NOISE_RULES 继续补词，不要靠调分掩盖。")
+        advice.append("最终主表仍有编辑部硬闸判不合格的条目：" + "；".join(product_noise_samples[:4])
+                      + "。说明硬闸被绕过或词典有缺口，查 quality_gate.editorial 接线与 E1 词表；"
+                        "不要把采集侧 F5 剔除数重新塞回分母，也不要调 max_noise_ratio 掩盖。")
     if "议题重复率" in failed:
         advice.append("同一议题（如 A股低价股退市潮）用 TOPIC_THEMES 收敛，config.rules.story_max_keep 控制每簇保留条数。")
     if "摘要长度合规率" in failed:
@@ -223,13 +261,42 @@ def compute_quality(R: Dict[str, Any], cfg: dict) -> Dict[str, Any]:
                          "不应再写「换网络可启用」，须逐条补端点或配 Key。"
                          if os.environ.get("GITHUB_ACTIONS") else
                          "国际源组在受限网络下如实申报不可达，GitHub Actions 等正常网络会自动启用。"))
-    advice.append("把 quality.warn_only 改为 false，让不达标批次在 CI 直接失败，避免悄悄产出低质量成品。")
+    advice.append("内容硬指标不受 warn_only 保护：不达标即失败，避免悄悄产出低质量成品。")
+    _hard_cfg = set(q.get("hard_fail_metrics") or [
+        "A级独立原文占比", "词条回查成功率", "非新闻噪声率", "摘要有效率",
+        "摘要长度合规率", "分类一致率", "段落重复率", "议题重复率"])
+    # 2026-11-22 二次修正：上一轮把 8 项一并设为硬失败，性质不同的两类被混在一起。
+    #  · 形态类（噪声/摘要/长度/分类/段落/议题）：成品里有没有垃圾，不达标必须红；
+    #  · 产能类（A级独立原文占比/词条回查成功率）：多渠道覆盖够不够，受外部网络、
+    #    无 key、600s 预算限制。线上实测 0.1071 / 0.0，若一并阻断，推包后 20:00
+    #    必然 rc≠0、页面永远停在旧基线 —— 等于把「不给垃圾表」做成「根本不给表」。
+    #    这两项仍如实进 未达标项（页面红条 / CI 摘要 / Excel 工程留痕 A 全部可见），
+    #    单独列为 产能未达标项，但不触发 run.py 阻断；也不伪装成「达标」。
+    #  阈值一个没动，不放宽、不重放台账、不拿低质条目凑数。
+    _scale = set(q.get("scale_metrics") or ["A级独立原文占比", "词条回查成功率"])
+    hard = [m for m in failed if m in _hard_cfg and m not in _scale]
+    scale_short = [m for m in failed if m in _scale]
+    if hard:
+        conclusion = "不达标（内容硬闸：" + "、".join(hard) + "）"
+        advice.insert(0, "内容硬指标不达标已阻断本批，不允许以 warn_only 出表。")
+    elif scale_short:
+        conclusion = "产能不足（内容形态全部达标，多渠道覆盖未达阈值）"
+        advice.insert(0, "本批成品形态全部达标（无垃圾条目、摘要/分类/去重合规）；"
+                         "但 " + "、".join(scale_short) + " 未达阈值，已在页面质量行、CI 摘要、"
+                         "Excel 工程留痕 A 显式标注，绝不伪装达标。提升办法：配 SERPER_API_KEY"
+                         "（2500 次免费）、补 ★ 必采端点、或在全局硬墙余量内提高正文补采配额；"
+                         "不放宽阈值，也不重放历史台账凑数。")
+    else:
+        conclusion = ("达标" if not failed else
+                      ("告警（warn_only，仅盘点类）" if q.get("warn_only", True) else "不达标"))
 
     return {
         "指标": metrics,
         "未达标项": failed,
-        "结论": "达标" if not failed else ("告警（warn_only）" if q.get("warn_only", True) else "不达标"),
-        "warn_only": bool(q.get("warn_only", True)),
+        "内容硬失败项": hard,
+        "产能未达标项": scale_short,
+        "结论": conclusion,
+        "warn_only": bool(q.get("warn_only", True)) and not hard,
         "渠道白名单": total_ch, "已触达": reached, "待配置端点": unconfigured,
         "白名单分层": layers, "白名单覆盖渠道": covered_ch,
         "白名单渠道总数": whitelist_n,
@@ -245,8 +312,11 @@ def compute_quality(R: Dict[str, Any], cfg: dict) -> Dict[str, Any]:
         "正文补采": lc.get("正文补采", {}),
         "有效摘要条数": valid_abs, "无效摘要条数": len(bad_abs),
         "段落重复条数": len(para_dups), "段落重复样本": para_dups[:8],
-        "F5噪声剔除": noise, "议题簇合并": merged,
+        "F5噪声剔除": f5_noise, "议题簇合并": merged,
         "词条成稿": word_items, "未回查线索": clues,
+        "成品噪声检出": product_noise, "成品噪声样本": product_noise_samples,
+        "采集侧F5剔除占比（诊断）": round(f5_ratio, 4),
+        "回查尝试数": _attempts, "回查成稿数": _made, "回查失败数": _failed,
         "采集模式": mode,
         "贴近度档位": str(cfg.get("rules", {}).get("mass_strictness", "strict")),
         "编排开关": bool(cfg.get("orchestrate", {}).get("enabled", True)),
@@ -257,5 +327,8 @@ def compute_quality(R: Dict[str, Any], cfg: dict) -> Dict[str, Any]:
             "为白名单分层盘点项（适用=False，不参与门禁）：分母含本环境网络拦截域名与平台内栏目，"
             "用其当门禁分母属口径错误；本批抓取成败由「实时源触达率」判定。"
             "摘要有效率只认独立原文或有效原文摘要，标题复读一律计为未取得。"
+            "「非新闻噪声率」按最终主表逐条复检编辑部硬闸，不按采集侧 F5 剔除数："
+            "后者会让硬闸越严、比值越大（方向相反）。「词条回查成功率」按真实回查尝试计，"
+            "按规格进附录 15 的未回查快照不再算失败；有线索却零回查仍如实判 0。"
         ),
     }
