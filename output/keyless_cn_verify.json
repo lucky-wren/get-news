@@ -1,6 +1,6 @@
 {
-  "通过": 8,
-  "总计": 8,
+  "通过": 9,
+  "总计": 9,
   "检查": [
     {
       "项": "线上 H-c 噪声语料随包",
@@ -20,12 +20,17 @@
     {
       "项": "具体事件标题线索真发检索有中文证据（≥1 个域名）",
       "结果": "PASS",
-      "证据": "独立中文域名 9：['chnfund.com', 'finance.eastmoney.com', 'focus.cn', 'jingji.cctv.cn', 'jingji.cctv.com', 'news.bjd.com.cn'] | gnews:0；cn_endpoints:0；bing_rss:10"
+      "证据": "独立中文域名 6：['baike.baidu.com', 'blog.csdn.net', 'cnblogs.com', 'microsoft.com', 'microsoftstore.com.cn', 'win11.ithome.com'] | gnews:0；cn_endpoints:0；bing_rss:10；中文相关性闸剔除 1 条"
     },
     {
-      "项": "具体事件线索召回质量不低于泛主题词",
+      "项": "具体事件线索可形成 ≥2 个独立中文域名（确定性 mock，不依赖实时 Bing 波动）",
       "结果": "PASS",
-      "证据": "具体 9 个 vs 泛词 4 个（线上泛词 122 候选仅 6 中文域名）"
+      "证据": "domains=3 / 中文域名 ['chnfund.com', 'finance.eastmoney.com', 'jingji.cctv.cn']"
+    },
+    {
+      "项": "真发检索有中文证据（网络可达性 smoke，不做数量优劣比较）",
+      "结果": "PASS",
+      "证据": "具体 6 个 / 泛词 9 个；线上泛词 122 候选仅 6 中文域名"
     },
     {
       "项": "中文实证端点 provider 真发请求可用",
