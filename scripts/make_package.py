@@ -26,8 +26,11 @@ BASE = Path(__file__).resolve().parents[1]
 DEFAULT_OUT = BASE.parent / "news_daily_project.zip"
 
 # 目录级排除：日志/缓存不进包；logs/.gitkeep 单独保留（旧 workflow 的兜底）
-SKIP_DIRS = {".git", "__pycache__", "node_modules", "_sim", "_verify_final", ".pytest_cache"}
-SKIP_EXT = {".pyc", ".pyo", ".log", ".tmp", ".out", ".zip", ".bak"}
+SKIP_DIRS = {".git", "__pycache__", "node_modules", "_sim", "_verify_final", ".pytest_cache",
+               # verify_online_quality 行为验证的临时探针目录：会随跑批创建又删除，
+               # 既不该入包，也会让 collect→read_bytes 出现竞态 FileNotFoundError。
+               "online_probe"}
+SKIP_EXT = {".pyc", ".pyo", ".log", ".tmp", ".out", ".zip", ".bak", ".rejected"}
 SKIP_NAMES = {"deploy_selftest_state.json"}
 
 # 解包后必须存在的文件（缺一个就判打包失败）
@@ -55,7 +58,18 @@ REQUIRED = [
     "scripts/verify_throughput.py", "output/throughput_verify.json",
     "资讯获取_主链路吞吐根因与并发改造.md",
     "scripts/smoke_run.py", "output/smoke_report.json",
-    "output/smoke_report_s01.json", "output/smoke_report_s002.json",
+    "news_pipeline/editorial_gate.py",
+    "data/online_quality_corpus_20261121.json",
+    "scripts/verify_online_quality.py", "output/online_quality_verify.json",
+    "scripts/verify_quality_metric_scope.py", "output/quality_metric_scope_verify.json",
+    "output/online_recompute_after_fix.json",
+    "资讯获取_线上数据质量事故复盘与硬门禁修复.md",
+    # 2026-11-22 第二轮：线上全量真表 + 逐条重判证据 + 真联网撤回日志
+    "data/online_batch_20261121_2028.xlsx",
+    "scripts/rejudge_online_batch.py", "output/online_batch_rejudge.json",
+    "output/线上批次新规则重判对照.xlsx", "output/live_probe_ci.txt",
+    "资讯获取_线上批次全量重判与不达标撤回报告.md",
+    "output/smoke_report_s01.json",
     "output/smoke_worst_budget.json", "output/smoke_fast_budget.json",
     "output/smoke_hang_budget.json",
     "资讯获取_15分钟超时事故复盘与真限时修复.md",
@@ -94,6 +108,7 @@ REQUIRED_CN = [
     "资讯获取_检索层零成稿根因修复.md",
     "资讯获取_无Key中文召回根因与修复.md",
     "资讯获取_15分钟超时事故复盘与真限时修复.md",
+    "资讯获取_线上数据质量事故复盘与硬门禁修复.md",
     "静态页面预览.html",
 ]
 
@@ -131,7 +146,11 @@ def write_zip(path: Path, files: list[Path]) -> None:
             info.flag_bits |= 0x800  # UTF-8 文件名
             info.compress_type = zipfile.ZIP_DEFLATED
             info.external_attr = (0o644 & 0xFFFF) << 16
-            z.writestr(info, p.read_bytes())
+            # 验证脚本的临时产物可能在 collect 之后被并发清理：跳过而不是整包失败
+            try:
+                z.writestr(info, p.read_bytes())
+            except (FileNotFoundError, OSError):
+                continue
 
 
 def check(path: Path) -> dict:
