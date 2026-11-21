@@ -1,3 +1,7 @@
 # 由 channel_quality.py 按本批真实数据自动生成，勿手改
 # 采集端跳采；白名单仍逐条申报淘汰原因与解禁条件
-blocked: []
+blocked:
+- channel_id: INBOX-001
+  source: 财联社汽车 · 新浪财经 · 港交所公告
+  reason: 摘要有效率 0% < 15%；主表率 0.0%、过滤率 100%
+  unblock: 补该站独立原文端点 / 配 Jina key / 连续 2 批摘要有效率 ≥ 15% 后自动解禁
