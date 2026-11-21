@@ -68,7 +68,17 @@ SENT_END = ("。", "！", "？", "；")
 # 裸域名 → 渠道名（规格验收点名：eqsn.gov.cn / www1.xinhuanet.com / news.cn / Sohu 混用）
 DOMAIN_TO_CHANNEL = {
     "eqsn.gov.cn": "中国地震台网", "www1.xinhuanet.com": "新华网",
-    "news.cn": "新华网", "www.xinhuanet.com": "新华网", "sohu": "搜狐网",
+    "news.cn": "新华网", "www.xinhuanet.com": "新华网",
+    # 2026-11-22 线上 CI 截图：规格验收 FAIL 第 3 行
+    # `sohu.com · 163.com · 腾讯新闻 · ycpai.ycwb.com` 三个裸域名漏网。
+    # 旧表把 key 写成 "sohu"（永远匹配不到 "sohu.com"），且缺 163 / 羊城派；
+    # 其中 `163.com` 还命中 source_format_ok 的 `\d+[、.]`（数字+点被当编号）→ 整行 FAIL。
+    # "sohu" 这个裸词 key 必须保留：线上语料序 1 的来源串末尾正是单独的
+    # `Sohu`（不是域名），靠它映射成「搜狐网」；域名形态另配下面三条。
+    "sohu": "搜狐网",
+    "sohu.com": "搜狐网", "m.sohu.com": "搜狐网", "www.sohu.com": "搜狐网",
+    "163.com": "网易", "news.163.com": "网易新闻", "www.163.com": "网易",
+    "ycpai.ycwb.com": "羊城派", "ycwb.com": "羊城晚报",
     "people.com.cn": "人民网", "chinanews.com.cn": "中新网",
     "cctv.com": "央视网", "gmw.cn": "光明网", "ce.cn": "中国经济网",
     "finance.sina.com.cn": "新浪财经", "eastmoney.com": "东方财富",
