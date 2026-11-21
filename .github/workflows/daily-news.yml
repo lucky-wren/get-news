@@ -308,11 +308,15 @@ jobs:
           if [ -n "${{ steps.cfg.outputs.suffix }}" ]; then
             ARGS+=(--suffix "${{ steps.cfg.outputs.suffix }}")
           fi
-          python run.py "${ARGS[@]}" 2>&1 | tee logs/ci-run.log
+          # 本批文件名由 cfg step 决定，不依赖产物是否已生成，先算好供质量回归精确配对
           XLSX="output/${{ steps.cfg.outputs.xlsx_name }}"
+          python run.py "${ARGS[@]}" 2>&1 | tee logs/ci-run.log
           if [ ! -f "$XLSX" ]; then XLSX="$(ls -t output/*_窗口期*.xlsx | head -1)"; fi
           test -n "$XLSX" && test -f "$XLSX" || { echo '未生成 Excel 产物'; exit 1; }
           echo "XLSX=$XLSX" >> "$GITHUB_ENV"
+          # 2026-11-22：拿本批真产物做逐条质量回归（非离线样例自证）；FAIL 直接红，
+          # 不再出现「规格验收 55/59 + 质量告警」却继续建站部署的假成功。
+          XLSX="$XLSX" python scripts/verify_online_quality.py --mode ci 2>&1 | tee logs/online-quality.log
           echo "本期产物：$XLSX"
           if [ -f output/budget_report.json ]; then
             python - <<'PY' || true
