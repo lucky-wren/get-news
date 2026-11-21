@@ -121,6 +121,18 @@ BODY_HOSTS = ("news.cctv.com", "www.chinanews.com.cn", "politics.people.com.cn",
               "www.miit.gov.cn", "www.pbc.gov.cn", "www.mofcom.gov.cn", "www.csrc.gov.cn")
 
 
+# 2026-11-22 事故根因之二：live_cn._get 完全不看全局预算，失败还会走
+# reach.get_with_matrix 的 8 组指纹重试（注释自己写了「把整批拖到数分钟」）。
+# Collector.run 的 _deadline_at 只保护 collectors._get（requests），管不到这里。
+# 到点后停止发新请求，让 fetch_cn_sources 带着**已抓到的部分条目**正常返回。
+_BUDGET_DEADLINE = [0.0]
+
+
+def _budget_done() -> bool:
+    d = _BUDGET_DEADLINE[0]
+    return bool(d and time.monotonic() > d)
+
+
 def _get(url: str, timeout: float = 8.0, encoding: str | None = None,
          matrix: bool = True) -> str:
     """默认指纹失败自动换请求指纹 / 协议重试（reach.py 全渠道补齐链第 2 步）。
@@ -129,6 +141,8 @@ def _get(url: str, timeout: float = 8.0, encoding: str | None = None,
     UA/协议逐一试），正文补采是高频并发请求，单 URL 失败就该立即留空，否则一个
     挂住的站点会串行试 8 组 × timeout，把整批拖到数分钟（实测根因）。
     """
+    if _budget_done():
+        return ""              # 预算到点：不再发新请求，保留已有条目
     try:
         req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "*/*"})
         with urllib.request.urlopen(req, timeout=timeout) as f:
@@ -136,8 +150,8 @@ def _get(url: str, timeout: float = 8.0, encoding: str | None = None,
             cs = encoding or f.headers.get_content_charset() or "utf-8"
         return raw.decode(cs, "replace")
     except Exception:
-        if not matrix:
-            return ""          # 正文补采失败即如实留空，不做 8 组指纹重试
+        if _budget_done() or not matrix:
+            return ""          # 到点 / 正文补采失败：如实留空，不做 8 组指纹重试
         from .reach import get_with_matrix
         text = get_with_matrix(url, timeout)
         if encoding:
@@ -740,6 +754,7 @@ def probe_intl(timeout: float = 4.0) -> dict:
 def fetch_cn_sources(cfg: dict, win) -> Tuple[List[dict], dict]:
     live = (cfg.get("source", {}).get("live", {}) or {})
     timeout = float(live.get("request_timeout", 8))
+    _BUDGET_DEADLINE[0] = float((cfg.get("budget") or {}).get("_deadline_at") or 0)
     probe = probe_intl(float(live.get("probe_timeout", 3.0)))
     feeds, ep_meta = load_endpoints(cfg)
     # 国际源组：清单里已验证通过的直接用；未通过但本次探测可达时补上（unrestricted 网络）
@@ -753,6 +768,12 @@ def fetch_cn_sources(cfg: dict, win) -> Tuple[List[dict], dict]:
     specs: List[dict] = []
     report: List[dict] = []
     for feed in feeds:
+        if _budget_done():
+            report.append({"id": feed["id"], "name": feed["name"], "type": feed["type"],
+                           "status": "预算到点短路", "条数": 0,
+                           "detail": {"原因": "采集层全局预算耗尽，剩余端点本批不请求；"
+                                              "已抓条目全部保留并继续出表"}})
+            break
         p = PARSERS.get(feed["type"])
         if not p:
             continue
@@ -771,8 +792,9 @@ def fetch_cn_sources(cfg: dict, win) -> Tuple[List[dict], dict]:
                            "status": "未取得", "条数": 0,
                            "detail": {"error": f"{type(e).__name__}: {str(e)[:100]}"}})
 
-    body = enrich_bodies(specs, win, cfg)
-    social = collect_social_hotboards(cfg, win, timeout)
+    # 到点后不再启动正文补采 / 社交热榜这两段额外请求，保留已解析的 specs
+    body = enrich_bodies(specs, win, cfg) if not _budget_done() else {}
+    social = collect_social_hotboards(cfg, win, timeout) if not _budget_done() else {}
     hinted = 0
     for s in specs:
         if not s.get("group"):
