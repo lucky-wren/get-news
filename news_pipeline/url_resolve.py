@@ -134,8 +134,11 @@ def is_offtopic(title: str, query: str, url: str = "") -> tuple[bool, str]:
     qb, tb = cjk_bigrams(query), cjk_bigrams(title)
     if not tb:
         return True, "标题无中文 2-gram（英文 / 纯符号页）"
-    if qb and not (qb & tb):
-        return True, "中文标题与检索词零 2-gram 交集"
+    # 2026-11-22 冒烟暴露：中文新闻标题常与 query 换一种说法
+    #（「LPR连续18个月按兵不动」vs「11月LPR报价出炉 5年期和1年期利率均维持不变」），
+    # 按「零 2-gram 交集」硬剔会把真正相关的中文独立原文全部误杀
+    #（verify_keyless_cn 实测 10 条 bing_rss 中文候选被剔 8 条 → 0 中文域名）。
+    # 中文标题一律保留，贴合度交给下游事件成稿与评级判；本闸只挡英文噪声页。
     return False, ""
 
 
