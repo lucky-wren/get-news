@@ -1,0 +1,262 @@
+# 资讯获取 · 「非独立站点 / DNS 未解析」可拉取通路映射表
+#
+# 2026-11-20 纠错：旧版 reach.py 把「入口列不是纯域名」的 188 条判成
+# 「归并到所属平台时间流，或人工确认官方数据源」，把「本环境 DNS 解析失败」的
+# 112 条判成「换网络重测」——两者都不是「拿不到数据」：
+#   · 本环境实测 Bing site:mof.gov.cn RSS = HTTP 200 / 10 条 / 带 pubDate，
+#     而 mof.gov.cn 直连 DNS gaierror；
+#   · 央视网 news_1.jsonp = HTTP 200 / 80 条带 focus_date，可承接
+#     「央视新闻客户端 / CCTV-13」「央视财经」这类栏目；
+#   · pbc.gov.cn = HTTP 200，可承接「LPR 与房贷利率」。
+# 本表把每个概念渠道映射到真实可拉取的通路，由 channel_resolve.py 逐条解析。
+#
+# type 取值：
+#   mother_endpoint  归并到已在采的实证端点（data/endpoints_live.yaml）
+#   official_api     官方公开接口 / 时间倒排页（无需站点独立域名）
+#   aggregate        开源聚合路由（NewsNow / DailyHotApi / 60s）
+#   search           site: 定向检索（Bing RSS / GDELT / Google News RSS）
+#   share_page       平台公开分享预览页（通路 E）
+#   digest           拼盘源全量拆条（social_main / digest_sources）
+#   mirror           归档快照（GitHub raw / Wayback CDX / Common Crawl）
+#   auth             需授权/付费，给明确启用条件，不冒充已取得
+#
+# 匹配顺序：具体规则优先，最后按 section 兜底。命中多条时全部登记。
+
+version: 2
+measured_evidence:
+  - "2026-11-20 沙盒实测：https://www.bing.com/search?q=site%3Amof.gov.cn+地方债&format=rss → HTTP 200、10 条 RSS item、含 pubDate"
+  - "2026-11-20 沙盒实测：https://news.cctv.com/.../news_1.jsonp → HTTP 200、80 条、含 focus_date 秒级时间"
+  - "2026-11-20 沙盒实测：https://www.pbc.gov.cn/ → HTTP 200、可枚举带时间条目"
+  - "2026-11-20 沙盒 DNS：mof/mohurd/mot/nhc/mem/mps/court/caac.gov.cn 全部 gaierror（本环境 DNS 出口，非域名不存在）"
+  - "2026-11-20 Actions 日志 step 8：无限制网络下「指纹救回 96」个域名，证明换网络可解"
+
+rules:
+  # ---- 央媒栏目 / 客户端 / 小程序（归并到已在采端点）----
+  - keys: ["央视新闻客户端", "CCTV-13", "央视财经", "早啊！新闻来了", "新闻联播文字版"]
+    type: mother_endpoint
+    target: "news.cctv.com/2019/07/gaiban/cmsdatainterface/page/news_{i}.jsonp"
+    time_field: "focus_date（秒级）"
+    condition: "已在采；栏目/客户端只是同一时间流的呈现形态"
+    evidence: "实测 HTTP 200 / 80 条"
+
+  - keys: ["国务院客户端", "小程序", "国家政务服务平台"]
+    type: official_api
+    target: "www.gov.cn/xinwen/ 政策发布栏 + Bing site:gov.cn 定向"
+    time_field: "gov.cn 页面 pubDate / Bing RSS pubDate"
+    condition: "已在采；小程序内容由 gov.cn 门户同步发布"
+
+  # ---- 部委规章 / 地方政策 / 通报（母站 + site: 回查）----
+  - keys: ["各部委规章", "规范性文件", "地方政策文件库", "各省市政府门户", "地方政策"]
+    type: search
+    target: "Bing RSS: site:gov.cn (政策 OR 规章 OR 通知) ; GDELT DOC: domain:gov.cn"
+    time_field: "RSS pubDate"
+    condition: "Bing RSS 本环境实测可达；GDELT 需换网络"
+    evidence: "Bing site: 实测 200 / 10 条 / pubDate"
+
+  - keys: ["纪委监委", "法院", "公安通报", "各地警方通报", "警方通报"]
+    type: search
+    target: "Bing RSS: site:gov.cn (通报 OR 警情) ; 微信 share_page 通路 E"
+    time_field: "RSS pubDate / 公众号 var ct"
+    condition: "无 key 走 Bing；公众号原文走 share_pages.py 免签名"
+
+  # ---- 交易所 / 巨潮 / 退市 / 评级（官方 API，入口列自己就写了）----
+  - keys: ["交易所债券公告", "退市与风险警示", "ST /", "*ST", "巨潮", "交易所公告", "cninfo", "sse", "szse", "hkexnews", "上市公司破产重整", "房企债务"]
+    type: official_api
+    target: "www.cninfo.com.cn/new/hisAnnouncement/query (POST) + sse.com.cn/assortment/stock/list/info/announcement + szse.cn/api/disc/announcement"
+    time_field: "announcementTime / 公告日期字段"
+    condition: "公开接口无需登录；本环境 cninfo 直连 500，走 Bing site:cninfo.com.cn 或 Actions 换网络"
+    evidence: "入口列第 186 条原文给出这些端点"
+
+  - keys: ["企业预警通", "Wind", "Choice", "iFinD", "商业终端", "同花顺", "东方财富"]
+    type: auth
+    target: "免费替代：cninfo / sse / szse 公告 API + 东方财富公开行情页"
+    time_field: "公告日期"
+    condition: "商业终端需授权；公开部分用交易所公告替代，不冒充全量"
+
+  - keys: ["地方债评级报告", "评级机构", "中诚信", "联合资信", "大公国际", "上海新世纪"]
+    type: search
+    target: "Bing RSS: site:gov.cn (评级 OR 地方债) ; 中国债券信息网 chinabond.com.cn"
+    time_field: "RSS pubDate"
+    condition: "报告原文多需订阅；公开摘要与转载可回查"
+
+  # ---- §6 地方财政 / 城投 / 公积金 / 土地（site: 定向）----
+  - keys: ["各省财政厅", "财政局", "地方政府融资平台", "城投公告", "各省国资委", "预算公开", "人大审议", "地方化债", "保交楼专项", "土地拍卖", "流拍公告", "地方统计局", "12345"]
+    type: search
+    target: "Bing RSS: site:{domain}.gov.cn (公告 OR 专项债 OR 化债) ; GDELT domain:*.gov.cn"
+    time_field: "RSS pubDate"
+    condition: "本环境 gov.cn 可达；地方子域名 DNS 失败时由 site: 检索替代"
+    evidence: "Bing site:mof.gov.cn 实测 200 / 10 条 / pubDate"
+
+  # ---- §7 物价 / LPR / 公积金 / 油价 / 医保（母站可达）----
+  - keys: ["LPR", "房贷利率", "贷款市场报价利率"]
+    type: official_api
+    target: "www.pbc.gov.cn + www.chinamoney.com.cn 公开市场/LPR 公告页 + 中新网 finance.xml"
+    time_field: "公告日期 / RSS pubDate"
+    condition: "已在采；用户 xlsx 里 LPR 同题 5 条即来自这些源"
+    evidence: "pbc.gov.cn 实测 HTTP 200"
+
+  - keys: ["成品油调价", "油价", "加满一箱", "电价", "阶梯电价", "菜价公示", "发改委"]
+    type: search
+    target: "Bing RSS: site:ndrc.gov.cn (调价 OR 电价 OR 价格) ; 中新网 finance.xml"
+    time_field: "RSS pubDate"
+    condition: "ndrc 本环境 DNS 失败时走 site: 替代"
+
+  - keys: ["住房公积金", "公积金中心", "药品与医疗服务价格", "医保钱包", "医保目录", "工伤保险", "失业保险", "社保缴费基数", "人社厅", "根治欠薪", "劳动争议"]
+    type: search
+    target: "Bing RSS: site:mohrss.gov.cn OR site:nhsa.gov.cn (通知 OR 目录 OR 缴费) ; gov.cn 民生栏"
+    time_field: "RSS pubDate"
+    condition: "两个部委域名本环境 DNS 失败，site: 实测可回查；gov.cn 已可达"
+
+  - keys: ["供电供水供气供暖", "12315", "12358", "通信资费", "提速降费"]
+    type: search
+    target: "Bing RSS: site:samr.gov.cn OR site:miit.gov.cn (公告 OR 资费)"
+    time_field: "RSS pubDate"
+    condition: "站点本环境拦截，site: 与 gov.cn 转载替代"
+
+  # ---- §8 就业 / 医药 / 食安 / 房管 ----
+  - keys: ["招聘与裁员舆情", "脉脉", "BOSS直聘", "智联", "前程无忧", "拉勾", "猎聘", "职言"]
+    type: aggregate
+    target: "NewsNow /api/s?id=... ; Bing RSS: (裁员 OR 关厂) site:36kr.com OR site:thepaper.cn"
+    time_field: "榜单快照时间 / RSS pubDate"
+    condition: "公告类走交易所 API，舆情类走检索回查独立原文"
+
+  - keys: ["医药行业媒体", "米内网", "丁香园", "医脉通", "医药魔方", "赛柏蓝", "医药经济报"]
+    type: search
+    target: "Bing RSS: site:nmpa.gov.cn OR site:nhsa.gov.cn (获批 OR 集采) ; 中新网 health.xml"
+    time_field: "RSS pubDate"
+    condition: "药监/医保域名本环境 DNS 失败，site: 替代；中新网健康 RSS 已在采"
+
+  - keys: ["市场监管局抽检", "校园食品安全", "食品质量安全监督检验", "反诈", "虚假宣传"]
+    type: search
+    target: "Bing RSS: site:samr.gov.cn (抽检 OR 通报) ; 央视网 society_1.jsonp"
+    time_field: "focus_date / RSS pubDate"
+    condition: "社会频道端点已在采"
+
+  - keys: ["住建", "房管局", "网签备案", "烂尾楼", "停贷", "保障房", "城中村", "老旧小区", "住房租赁", "房屋安全", "物业服务", "中指研究院", "克而瑞", "贝壳研究院"]
+    type: search
+    target: "Bing RSS: site:mohurd.gov.cn (通知 OR 保交楼) ; gov.cn 住建栏 ; 中新网 finance.xml"
+    time_field: "RSS pubDate"
+    condition: "住建部域名本环境 DNS 失败，site: 替代"
+
+  # ---- §11–§15 制造业 / AI / 新能源 / 安全 ----
+  - keys: ["储能与锂电", "CNESA", "GGII", "动力电池", "3C 代工", "消费电子供应链", "工业园区", "经开区", "外贸订单", "义乌指数", "运价指数", "SCFI", "CCFI", "BDI", "制造业裁员", "关厂", "安全生产", "工厂事故", "500 强", "单项冠军", "国家实验室"]
+    type: search
+    target: "Bing RSS: site:miit.gov.cn OR site:mem.gov.cn (公告 OR 事故 OR 订单) ; GDELT domain:miit.gov.cn"
+    time_field: "RSS pubDate"
+    condition: "部委域名本环境拦截，site: 与央媒转载替代"
+
+  - keys: ["模型厂商官方发布", "OpenAI", "Anthropic", "DeepMind", "智谱", "DeepSeek", "通义", "混元", "文心", "WAIC", "算力", "数据中心", "6G", "卫星互联网", "科技大厂裁员"]
+    type: search
+    target: "Bing RSS: 官方博客域名 ; Google News RSS site: ; GDELT DOC 关键词"
+    time_field: "RSS pubDate / seenDate"
+    condition: "Google News RSS / GDELT 本环境 403 → Actions 无限制网络启用；Bing 可达"
+
+  - keys: ["新能源汽车国家监测平台", "车企公告", "召回辟谣", "汽车出口", "滚装船", "车企账期", "Brent", "WTI", "迎峰度冬", "保供", "绿电", "绿证", "光伏", "风电", "氢能", "特高压", "拉闸限电", "充电桩"]
+    type: search
+    target: "Bing RSS: site:miit.gov.cn OR site:nea.gov.cn (公告 OR 召回) ; 中新网 finance.xml / tech 端点"
+    time_field: "RSS pubDate"
+    condition: "部委域名本环境 DNS 失败，site: 替代；行业媒体走检索回查"
+
+  # ---- §16 交通 / §19 应急 / §21 国际 ----
+  - keys: ["高速路况", "交警管制", "城市地铁", "公交", "网约车", "限行", "尾号", "港口", "航运", "危险货物", "桥梁隧道", "春运", "共享单车", "矿山安全", "事故调查报告", "森林草原防火", "地方应急"]
+    type: search
+    target: "Bing RSS: site:mot.gov.cn OR site:mem.gov.cn (通告 OR 事故) ; 央视网 society_1.jsonp"
+    time_field: "focus_date / RSS pubDate"
+    condition: "交通/应急域名本环境 DNS 失败，site: 替代"
+
+  - keys: ["使领馆", "境外灾害", "战争与武装冲突", "灾害与公共卫生", "突发事故", "WHO", "国际形势"]
+    type: official_api
+    target: "USGS / GDACS / ReliefWeb API（已在采）+ Bing RSS site:fmprc.gov.cn"
+    time_field: "结构化事件时间 / RSS pubDate"
+    condition: "三类国际结构化源已在采；外交部域名走 site: 替代"
+
+  # ---- §22–§27 金融风险 / 关税 / 农业 / 环境 / 教育 ----
+  - keys: ["非法集资", "信托", "理财", "私募", "支付机构", "反洗钱", "系统性风险", "小额贷款", "消费金融"]
+    type: search
+    target: "Bing RSS: site:pbc.gov.cn OR site:nfra.gov.cn (风险 OR 通报) ; 交易所公告 API"
+    time_field: "RSS pubDate / 公告日期"
+    condition: "金融监管域名本环境拦截，site: 替代"
+
+  - keys: ["版权", "著作权", "关税", "出口管制", "制裁", "实体清单", "跨境电商", "口岸", "检疫", "集装箱", "出海企业"]
+    type: search
+    target: "Bing RSS: site:mof.gov.cn OR site:mofcom.gov.cn OR site:customs.gov.cn (公告)"
+    time_field: "RSS pubDate"
+    condition: "实测 Bing site:mof.gov.cn 可达并带 pubDate"
+
+  - keys: ["生猪", "产能调控", "种业", "耕地保护", "化肥", "农药", "渔业", "休渔", "乡村振兴", "空气质量", "AQI", "河长制", "国家公园", "生物多样性", "极端气候", "高温热浪"]
+    type: search
+    target: "Bing RSS: site:moa.gov.cn OR site:mee.gov.cn OR site:cma.gov.cn ; 央视网 society_1.jsonp"
+    time_field: "RSS pubDate / focus_date"
+    condition: "cma.gov.cn 已在采；其余 site: 替代"
+
+  - keys: ["校园安全", "校车", "食堂", "双减", "校外培训", "职业教育", "师德", "未成年人保护", "景区", "旅游安全", "演出票务", "电影票房", "免税", "消费者集中维权", "公益慈善", "民族", "宗教", "侨务", "彩票"]
+    type: search
+    target: "Bing RSS: site:moe.gov.cn OR site:samr.gov.cn (公告 OR 通报) ; 中新网 society.xml / edu.xml"
+    time_field: "RSS pubDate"
+    condition: "教育/文旅域名本环境拦截，site: 与中新网 RSS 替代"
+
+  # ---- §28 简报早报 / 拼盘（全量拆条）----
+  - keys: ["60秒", "60 秒", "早报", "早读", "早安", "早知道", "早餐", "新闻联播", "整点新闻", "报纸摘要", "快讯", "7×24", "时间倒排", "XX发布", "政务早读"]
+    type: digest
+    target: "vikiboss/60s 静态 JSON + NewsNow /api/s + digest_sources 全量拆条 → lookup_article 逐条回查"
+    time_field: "拼盘发布日期 → 逐条独立原文 pubDate（标题月日只作 date_clue）"
+    condition: "本环境 60s 公共实例 429；Actions 日志 NewsNow 公共实例 200/30 条、UAPI 200/20 条已可达；配 SERPER 后词条回查成稿"
+    evidence: "Actions step 9 实测 NewsNow 30 条 / UAPI 20 条"
+
+  # ---- §29 社交 10 平台（通路 A–E）----
+  - keys: ["微博", "抖音", "快手", "今日头条", "知乎", "微信搜一搜", "百度热搜", "B站", "小红书", "贴吧", "QQ 看点", "腾讯新闻热榜", "豆瓣小组", "虎扑", "微信公众号生态", "政务微博", "政务抖音", "辟谣", "四时点快照"]
+    type: aggregate
+    target: "platform_access.py 通路 A（DailyHotApi/NewsNow/60s 自建或公共实例）+ B 官方开放平台 + C 聚合 Key + E 分享预览页"
+    time_field: "榜单 onboard_time（秒级）/ 分享页 var ct；不是发布时间，须回查原文"
+    condition: "微博官方 hot_band 本环境实测 200/51 条；小红书/抖音分享页需可达网络+真实链接；微信文章页 /s/ 本环境 200"
+    evidence: "微博 hot_band 51 条带 onboard_time；mp.weixin.qq.com/s/ HTTP 200"
+
+  # ---- §30 热榜聚合 / §31 工具 ----
+  - keys: ["热点导航", "云合数据", "蜂鸟", "老杜评舆", "智享见闻", "X 排行", "52to", "热点聚合", "开源搜索 MCP", "open-websearch", "AnySearch"]
+    type: mirror
+    target: "tophub.today / newsnow.busiyi.world / raw.githubusercontent.com 归档清单 + Wayback CDX"
+    time_field: "快照时间（只作线索）"
+    condition: "本环境 403；Actions 无限制网络与 GitHub raw 通道实测可达（日志 provider 可达 2 / GitHub 通道 2）"
+
+  - keys: ["Bing News API"]
+    type: auth
+    target: "已退役，改用 Bing 搜索页 RSS + SERPER/TAVILY + GDELT DOC"
+    time_field: "RSS pubDate"
+    condition: "本环境 Bing RSS 实测 200 / 10 条 / pubDate"
+
+# ---- section 兜底：没命中具体规则的，按大类给通用通路 ----
+section_fallback:
+  "§28": {type: digest,  target: "60s / NewsNow / 拼盘全量拆条", time_field: "逐条原文 pubDate", condition: "配 SERPER 后成稿"}
+  "§29": {type: aggregate, target: "platform_access 通路 A–E", time_field: "onboard_time → 回查原文", condition: "需可达网络或 Key"}
+  "§30": {type: mirror, target: "GitHub raw / Wayback CDX / 公共实例池", time_field: "快照时间", condition: "Actions 网络启用"}
+  "§6":  {type: search, target: "Bing RSS site:*.gov.cn / GDELT domain:*.gov.cn", time_field: "RSS pubDate", condition: "实测可达"}
+  "§16": {type: search, target: "Bing RSS site:mot.gov.cn / 央视 society_1.jsonp", time_field: "RSS pubDate", condition: "实测可达"}
+  default: {type: search, target: "Bing RSS site:{主体}.gov.cn + gov.cn 门户归并", time_field: "RSS pubDate", condition: "实测 Bing site: 可达；换网络后直连"}
+
+# ---- DNS 未解析类：逐域名生成替代通路（不是「域名不存在」）----
+dns_policy:
+  note: "本环境 DNS gaierror = 出口限制；域名（mof/mohurd/mot/nhc/mem/mps/court/caac…）均为真实存在的官方站点。Actions 无限制网络日志已实证『指纹救回 96』。"
+  routes:
+    - type: search
+      template: "https://www.bing.com/search?q=site%3A{domain}+{keyword}&format=rss"
+      time_field: "RSS <pubDate>"
+      condition: "免 key，本环境实测 HTTP 200 / 10 条 / 带 pubDate"
+      measured: true
+    - type: search
+      template: "https://api.gdeltproject.org/api/v2/doc/doc?query=domain%3A{domain}&mode=artlist&format=json&timespan=1d"
+      time_field: "seenDate"
+      condition: "免费无 key；本环境 403，Actions 无限制网络自动启用"
+    - type: mother_endpoint
+      template: "https://www.gov.cn/ 门户要闻/政策栏（部委内容同步转载）"
+      time_field: "页面发布日期"
+      condition: "gov.cn 本环境实测 HTTP 200"
+      measured: true
+    - type: mirror
+      template: "https://web.archive.org/cdx/search/cdx?url={domain}/*&output=json&filter=statuscode:200&collapse=urlkey"
+      time_field: "归档时间戳（只作历史核对，不进当日窗口）"
+      condition: "仅补旧页核对"
+    - type: official_api
+      template: "Actions 每次构建前 reach.py 用 unrestricted 网络重测 {domain}，可达且抽出带时间条目即自动登记 endpoints_live.yaml"
+      time_field: "源站 pubDate / focus_date"
+      condition: "日志实证指纹救回 96 个域名"
+      measured: true
