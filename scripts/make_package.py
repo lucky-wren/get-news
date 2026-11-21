@@ -74,6 +74,7 @@ REQUIRED = [
     "output/smoke_hang_budget.json",
     "资讯获取_15分钟超时事故复盘与真限时修复.md",
     "output/keyless_cn_verify.json", "scripts/verify_keyless_cn.py",
+    "scripts/verify_spec_ci.py", "output/spec_ci_verify.json",
     "data/keyless_noise_corpus.json",
     "data/latest_batch_regression.json", "data/hc_url_regression.json",
     "news_pipeline/url_resolve.py", "scripts/verify_url_resolve.py",
