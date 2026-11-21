@@ -5,6 +5,8 @@
 """
 from __future__ import annotations
 
+import time
+
 import copy
 from collections import Counter
 from pathlib import Path
@@ -53,8 +55,17 @@ def run_pipeline(cfg: dict, win: Window, base_dir: Path, out_path: Path) -> Dict
     from . import search_api
     search_api.reset()          # 每批独立配额 / 缓存 / 留痕，不跨批次污染
     collector = Collector(cfg, reg, win, base_dir)
-    raw = collector.run(cfg.get("source", {}).get("mode", "demo"),
-                        cfg.get("source", {}).get("inbox_path"))
+    # 2026-11-22：每层调用都由 budget.bounded 真限时（daemon 线程 + join(timeout)），
+    # 到点立即短路、主线程继续出表；旧版 gate() 只判断「能否开始」，从不限制跑多久。
+    _mode = cfg.get("source", {}).get("mode", "demo")
+    _inbox = cfg.get("source", {}).get("inbox_path")
+    # 超时不能丢已抓条目：Collector.run 内部遇 BudgetExpired 会保留 self.items，
+    # bounded 超时时后台线程可能仍在 append，这里取它的当前快照继续出表。
+    _rss_limit = budget.slice("rss")
+    budget.bounded("rss", collector.run, _mode, _inbox, fallback=None,
+                   grace=min(_rss_limit * 0.35, 2.0))
+    raw = list(collector.items)
+    budget.write_report(base_dir)   # 增量落盘：即使后续被硬杀也留得下逐层诊断
 
     # ---- 0-pre. 低质渠道跳采（用上一批生成的 channel_blocklist.yaml）----
     # 用户 2026-11-20：「把低质量和过滤数据多的渠道直接去掉」。
@@ -120,8 +131,10 @@ def run_pipeline(cfg: dict, win: Window, base_dir: Path, out_path: Path) -> Dict
             except Exception as exc:
                 runlog.log("WARN", "无Key线索扩充失败",
                            原因=f"{type(exc).__name__}: {str(exc)[:80]}")
-        kl_items, kl_traces, kl_stats = kc.batch_compose(clues, win=win, cfg=cfg,
-                                                         base_seq=len(raw))
+        kl_items, kl_traces, kl_stats = budget.bounded(
+            "keyless", kc.batch_compose, clues, win=win, cfg=cfg,
+            base_seq=len(raw),
+            fallback=([], [], {"启用": False, "原因": "层超时短路，主线程继续出表"}))
         for _it in kl_items:
             raw.append(_it)
         # 0a-0 已做事件级成稿（多源来源列 + 两段摘要），后续 search_api 的 keyless
@@ -137,8 +150,10 @@ def run_pipeline(cfg: dict, win: Window, base_dir: Path, out_path: Path) -> Dict
     _pa_conf = cfg.get("platform_access", {}) or {}
     _pa_on = (budget.gate("platform", cfg) and _live_mode_early(cfg)
               and _pa_conf.get("enabled", True))
-    pa = (run_platform_access(cfg, float(_pa_conf.get("timeout", 4))) if _pa_on
-          else {"平台": [], "线索": [], "结论": "离线模式或运行预算短路（不阻断出表）"})
+    _pa_default = {"平台": [], "线索": [], "结论": "离线模式或运行预算短路（不阻断出表）"}
+    pa = (budget.bounded("platform", run_platform_access, cfg,
+                         float(_pa_conf.get("timeout", 4)), fallback=_pa_default)
+          if _pa_on else _pa_default)
     pa_items: List[RawItem] = []
     for _pr in pa.get("平台", []):
         for _clue in _pr.get("线索", []):
@@ -181,12 +196,15 @@ def run_pipeline(cfg: dict, win: Window, base_dir: Path, out_path: Path) -> Dict
     sconf = cfg.get("search_api", {}) or {}
     free_rows: List[List[Any]] = []
     free_items: List[RawItem] = []
-    if (budget.gate("free_sources", cfg) and _live_mode_early(cfg)
-            and sconf.get("open_hot_sources", True)):
+    def _free_probe():
         from . import free_sources
+        from .budget import deadline_at_of
         routes = list(sconf.get("hot_routes", ["weibo", "zhihu", "toutiao", "thepaper", "36kr"]))
         per_route = int(sconf.get("clues_per_route", 6))
         for route in routes:
+            if deadline_at_of(cfg) and time.monotonic() > deadline_at_of(cfg):
+                free_rows.append([route, 0, "层 deadline 到达，剩余路由短路"])
+                break
             try:
                 clues, why = free_sources.collect_free(
                     route, float(sconf.get("hot_timeout", 4.0)))
@@ -220,6 +238,10 @@ def run_pipeline(cfg: dict, win: Window, base_dir: Path, out_path: Path) -> Dict
         runlog.log("INFO", "开源热榜源发现", 路由数=len(routes), 线索=len(free_items),
                    已移交多源成稿=len(free_items))
 
+    if (budget.gate("free_sources", cfg) and _live_mode_early(cfg)
+            and sconf.get("open_hot_sources", True)):
+        budget.bounded("free_sources", _free_probe, cfg)
+
     # ---- 0a-3. 多资源扩展（GDELT / Google News site: / 实例池 / 公众号镜像）----
     # 用户 2026-11-20：「想办法解决没获取到数据的渠道，全网搜索、多资源查找」。
     # 全部为公开无需签名的入口，失败逐路由留痕，不编造、不绕登录。
@@ -227,7 +249,11 @@ def run_pipeline(cfg: dict, win: Window, base_dir: Path, out_path: Path) -> Dict
     _live_mode = _live_mode_early(cfg)
     if (_live_mode and budget.gate("expansion", cfg)
             and (cfg.get("source_expansion", {}) or {}).get("enabled", True)):
-        exp_items, exp_rows, exp_stats = source_expansion.collect(cfg, win, len(raw))
+        exp_items, exp_rows, exp_stats = budget.bounded(
+            "expansion", source_expansion.collect, cfg, win, len(raw),
+            fallback=([], [["总开关", "-", "层超时短路",
+                            "多资源扩展层超过 budget.layer_seconds.expansion，主线程继续出表"]],
+                      {"启用": False, "原因": "层超时短路"}))
     else:
         exp_items, exp_rows, exp_stats = [], [["总开关", "-", "离线模式跳过",
                                                "source.mode=live 时启用多资源扩展（不联网的 demo 不发请求）"]], {"启用": False}
@@ -249,10 +275,11 @@ def run_pipeline(cfg: dict, win: Window, base_dir: Path, out_path: Path) -> Dict
     # ---- 0. 需求②：社交主干 + 快讯/拼盘全量拆条 + 逐条回查独立原文 ----
     social_snap = ((getattr(collector, "cn_meta", {}) or {}).get("社交热榜") or {})
     _soc_on = budget.gate("social", cfg) and _live_mode_early(cfg)         and (cfg.get("social_main", {}) or {}).get("enabled", True)
-    soc = (collect_social_main(cfg, win, raw, social_snap) if _soc_on else
-           {"items": [], "digest_rows": [], "platforms": [], "clues": [],
-            "stats": {"主干平台数": 0, "拼盘源数": 0, "拆出词条": 0, "母行数": 0},
-            "结论": "离线模式或运行预算短路（不阻断出表）"})
+    _soc_default = {"items": [], "digest_rows": [], "platforms": [], "clues": [],
+                    "stats": {"主干平台数": 0, "拼盘源数": 0, "拆出词条": 0, "母行数": 0},
+                    "结论": "离线模式或运行预算短路（不阻断出表）"}
+    soc = (budget.bounded("social", collect_social_main, cfg, win, raw, social_snap,
+                          fallback=_soc_default) if _soc_on else _soc_default)
     for _it in soc["items"]:
         _it.seq = len(raw) + 1
         raw.append(_it)
@@ -353,9 +380,10 @@ def run_pipeline(cfg: dict, win: Window, base_dir: Path, out_path: Path) -> Dict
     _sp_on = (budget.gate("second_pass", cfg)
               and cfg.get("source", {}).get("live", {}).get("second_pass_enabled", True)
               and _live_mode_early(cfg))
-    sp_stats = (rescue_abstracts(candidate, cfg) if _sp_on else
-                {"尝试": 0, "救回": 0, "仍空白": 0, "耗时秒": 0,
-                 "说明": "离线模式或运行预算短路（不阻断出表）"})
+    _sp_default = {"尝试": 0, "救回": 0, "仍空白": 0, "耗时秒": 0,
+                   "说明": "离线模式或运行预算短路（不阻断出表）"}
+    sp_stats = (budget.bounded("second_pass", rescue_abstracts, candidate, cfg,
+                               fallback=_sp_default) if _sp_on else _sp_default)
     if sp_stats.get("尝试"):
         runlog.log("INFO", "摘要二次补采", 尝试=sp_stats["尝试"], 救回=sp_stats["救回"],
                    仍空白=sp_stats.get("仍空白", 0), 耗时秒=sp_stats.get("耗时秒", 0))
@@ -594,6 +622,12 @@ def run_pipeline(cfg: dict, win: Window, base_dir: Path, out_path: Path) -> Dict
                    未达标="、".join(q["未达标项"]), 处置=q["结论"])
     export_excel(out_path, R)
     R["path"] = out_path
+    # 出表之后再覆盖写一次：报告里的「实际耗时秒」必须包含出表段，
+    # 否则会像线上那样「采集 10.2s 达标」而整批实际 664s / 15min 被硬杀。
+    # logs 里的 budget 快照也同步成最终值，避免 Excel 与 JSON 口径打架。
+    logs["budget"] = budget.report()
+    budget.write_report(base_dir)
+    budget.close()
     runlog.checkpoint("五工作表出表", 文件=out_path.name,
                       字节=out_path.stat().st_size if out_path.exists() else 0)
     runlog.log("INFO", "流水线完成", 主表=len(ordered), 候选池=len(candidate),
