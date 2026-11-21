@@ -12,7 +12,11 @@ run.py 测耗时，结果线上 15 分钟被硬杀（用户截图）。这个脚
 
 每个场景断言：真跑无异常 / Excel 落盘 / 总耗时 ≤ 全局预算+出表余量 /
 budget_report 写出 / 逐层实耗不超配额 / 主表非空。
-SCALE 默认 0.02：真实 600s → 12s，超时比例与线上一致，结论可等比放大。
+SCALE 默认 0.1：真实 600s → 60s。
+口径修正（2026-11-22）：上一轮还用 0.02 档，但**解析端点 yaml / LSH 聚类 / 五表出表
+这 8–10s 固定 CPU 不随 scale 缩放**，0.02 档把 12s 预算线性放大成「600s 等效」
+会得出 680s 的假超限；而真实 CI 里固定 CPU 只占 10s、600s 预算余量充足。
+故交付判据只用 0.1 档（与线上实测 353.7s / 600s 同量级），不再拿不自洽的档位凑数。
 """
 from __future__ import annotations
 
@@ -29,7 +33,7 @@ sys.path.insert(0, str(BASE))
 
 import yaml  # noqa: E402
 
-SCALE = 0.02
+SCALE = 0.1
 SCENARIO = "worst"
 TIME_KEYS = ("timeout", "deadline", "gap_seconds", "seconds", "total_collect", "reserve")
 
@@ -190,7 +194,10 @@ def run_one(scenario: str, scale: float) -> dict:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--scale", type=float, default=0.02)
+    # 2026-11-22：文档/证据/交付判据统一 0.1 档，argparse 默认必须跟 SCALE 一致。
+    # 上一轮只改了模块常量却漏了这里，导致「无参数跑包里脚本」仍按 0.02 档判，
+    # 固定 CPU 不缩放 → worst 假超限 680s → 用户解包自检 rc=1。
+    ap.add_argument("--scale", type=float, default=SCALE)
     ap.add_argument("--scenarios", default="worst,fast,hang")
     ap.add_argument("--out", default="output/smoke_report.json")
     args = ap.parse_args()
