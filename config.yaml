@@ -132,7 +132,8 @@ keyless:
   # 中文证据改从项目已实证端点（央视网 JSONP / 中新网 RSS 等，沙盒实测 200/80 条带秒级时间）取。
   provider_order: "cn_endpoints,gnews,bing_rss,searxng"
   endpoints_file: data/endpoints_live.yaml
-  cn_max_endpoints: 8          # 每批最多探测的中文端点数
+  cn_max_endpoints: 16
+  cn_per_domain_endpoints: 3          # 每批最多探测的中文端点数
   cn_cache_ttl: 300            # 端点结果批次内复用，避免 80 线索 × 8 端点重复请求
   cn_min_overlap: 0.18         # 标题与主题词的中文 2-gram 最低重合率
   cn_noise_prefilter: true     # 剔英文站 / 搜索结果页 / 无中文标题候选
@@ -258,7 +259,29 @@ quality:
   max_story_dup_ratio: 0.30    # 议题簇合并条数占合并前主表比例上限
   max_para_dup_ratio: 0.02     # 摘要内自我重复段落的条目比例上限（目标态样例实测 52.1%）
   min_source_ratio: 0.60       # 本批真实联网源中已触达比例下限（与白名单完备度分开考核）
-  warn_only: true              # true=写进「工程留痕 A」与 CI 摘要并告警；false=不达标直接失败
+  warn_only: true              # 仅对「盘点类」指标（渠道触达/端点配置）告警；内容硬指标不受它保护
+  # 2026-11-22 用户拍板「必须达到数据质量效果」：线上批次 3 项内容指标不达标，
+  # 却因 warn_only=true 照常出表、建站、部署、job success。以下指标一律硬失败，
+  # 不再允许用「告警」包装成达标；盘点类指标（分母含网络拦截域名）仍走告警。
+  hard_fail_metrics:
+    - "A级独立原文占比"
+    - "词条回查成功率"
+    - "非新闻噪声率"
+    - "摘要有效率"
+    - "摘要长度合规率"
+    - "分类一致率"
+    - "段落重复率"
+    - "议题重复率"
+  # 2026-11-22 二次修正：上面 8 项按性质分两组，阈值一个没动。
+  # 形态硬闸（其余 6 项）不达标 = 成品里有垃圾 → run.py 直接失败，绝不出表。
+  # 产能指标（下列 2 项）不达标 = 多渠道覆盖不够（受外部网络 / 无 key / 600s 预算限制），
+  #   线上实测 0.1071 / 0.0。若一并阻断，推包后 20:00 必然红、页面永远停在旧基线。
+  #   改为：仍如实写进 未达标项（页面 ⚠ 红条 / CI 摘要 / Excel 工程留痕 A 全部可见），
+  #   单独列为 产能未达标项，不触发阻断，也不伪装成「达标」；不放宽阈值、不重放台账。
+  scale_metrics:
+    - "A级独立原文占比"
+    - "词条回查成功率"
+  spec_fail_hard: true         # --spec-verify 不达标时 run.py 直接失败，不再只打印 FAIL 后 return 0
 
 
 # ---- 8. 社交平台主干（需求②：主干不是补充）------------------
@@ -323,6 +346,7 @@ rank:
 # 三闸对候选池生效（主表是其子集），采集条目级 + 事件成稿后各跑一次，被拦逐条写工程留痕 P。
 quality_gate:
   enabled: true
+  editorial: true              # 编辑部硬闸：非新闻 / 假合并 / 摘要整句 / 社交娱乐（2026-11-22 线上复盘新增）
   placeholder_abstract: true     # 「按未经筛选契约保留」这类说明文字不算摘要齐备
   headline_abstract_match: true  # 标题与摘要必须讲同一事件（聚类侧同步 cannot-link）
   bankruptcy_subject: true       # 匿名主体 / 法院公告+单一公众号弱来源一律剔除
