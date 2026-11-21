@@ -1,0 +1,62 @@
+{
+ "启用": true,
+ "总预算秒": 1.0,
+ "出表保留秒": 25.0,
+ "实际耗时秒": 0.1,
+ "剩余秒": 0.9,
+ "被短路的层": [
+  "keyless",
+  "platform",
+  "free_sources",
+  "social",
+  "second_pass"
+ ],
+ "参数裁剪": {
+  "_deadline_at": 1952.075378276,
+  "keyless_deadline": 1.0,
+  "gdelt_calls": 4,
+  "body_deadline": 1.0,
+  "second_pass_deadline": 1.0,
+  "max_calls": 160,
+  "max_lookup": 32,
+  "expansion_queries": 2
+ },
+ "逐层": [
+  {
+   "层": "keyless",
+   "配额秒": 185.0,
+   "剩余全局秒": 0.9,
+   "允许": false,
+   "实耗秒": 0.0
+  },
+  {
+   "层": "platform",
+   "配额秒": 25.0,
+   "剩余全局秒": 0.9,
+   "允许": false,
+   "实耗秒": 0.0
+  },
+  {
+   "层": "free_sources",
+   "配额秒": 15.0,
+   "剩余全局秒": 0.9,
+   "允许": false,
+   "实耗秒": 0.0
+  },
+  {
+   "层": "social",
+   "配额秒": 35.0,
+   "剩余全局秒": 0.9,
+   "允许": false,
+   "实耗秒": 0.0
+  },
+  {
+   "层": "second_pass",
+   "配额秒": 50.0,
+   "剩余全局秒": 0.9,
+   "允许": false,
+   "实耗秒": 0.0
+  }
+ ],
+ "结论": "预算耗尽，已短路 keyless、platform、free_sources、social、second_pass；采集层停止但本批仍出表"
+}
