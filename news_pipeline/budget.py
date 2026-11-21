@@ -5,30 +5,36 @@
 本模块再留 `export_reserve_seconds=25` 给筛选 / 评级 / 编排 / 五工作表出表。
 三者是同一条链：600s 预算先短路采集层 → 必定出表 → 15min 只是兜底硬杀。
 
-事故根因不是某一层慢，而是**每层各有一个独立 deadline，没有全局总预算**：
-  keyless 420s + 正文补采 110s + 二次补采 130s + search body 180s
-  + GDELT 20×5.2s + 10 平台×4 通路×7s + 社交逐条回查（max_lookup=0 不限）
-  + RSS 采集约 16 分钟 —— 叠加远超硬杀线。到点 SIGTERM 把 Python 杀在
-export_excel 之前，后面建站 / 提交 / 部署 6 个 step 全跳过，页面不更新。
+2026-11-22 事故根因（用户截图：采集 step 15min timed out）：
+  **旧版 gate() 只判断「此刻是否允许开始」，从不限制「这一层能跑多久」**。
+  slice(name) = min(层配额, 全局剩余)，每层配额都远小于当时的全局剩余，
+  于是 gate() 永远返回 True；配置里 510s 是「配额之和」，不是「实际耗时之和」。
+  source_expansion / platform_access / free_sources / social 的 digest 抓取
+  都是纯串行循环、没有整层 deadline，最坏按 timeout 累加到十几分钟；
+  只有 Collector.run 的 rss 层靠 _deadline_at 受控。SIGTERM 时 Excel 未落盘，
+  后面建站/提交/部署 6 步全跳过。
 
-本模块做三件事：
-  1. apply(cfg)：把各层 deadline / 调用上限**裁剪到全局总预算内**，并留出
-     export_reserve_seconds 给筛选、评级、编排、五工作表出表；
-  2. gate(name, cfg)：预算耗尽时把该层开关关掉，让模块快速返回，
-     **短路采集层但绝不终止整批**；
-  3. report()：逐层配额 / 实耗 / 状态写进 Excel「工程留痕 N」与
-     output/budget_report.json，可复跑核对。
+本版三道真闸（不再只是纸面配额）：
+  1. **全局硬墙**：daemon watchdog 在 total-reserve 秒置 expired；
+     gate()/slice() 立即返回 False/0，后续层全部短路，不再"允许开始"。
+  2. **每层真限时 bounded()**：把整层调用放进 daemon 线程，join(timeout=limit)，
+     到点立即返回 fallback、主线程继续筛选评级与出表；同时把
+     `_layer_deadline_at` 注入 cfg，让模块内部循环自行 break（不靠甩线程）。
+  3. **真实耗时口径**：report() 用 monotonic 实耗；出表之后由 pipeline
+     再覆盖写一次 budget_report.json，避免"采集结束快照"漏算出表段却自报达标。
 
 原则：宁可少抓几层，也必须按时出表。不调低质量阈值、不改摘要口径、不改评级。
 """
 from __future__ import annotations
 
 import copy
+import json
 import os
+import threading
 import time
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
-# 2026-11-22：与 config.yaml budget.layer_seconds 一致。总量 510s（原 540s），
+# 与 config.yaml budget.layer_seconds 一致。总量 510s（原 540s），
 # 单源 RSS 让位给生产多渠道事件的 keyless 主链路；总耗时上限反而下降 30s。
 DEFAULT_LAYERS = {
     "rss": 95,
@@ -60,6 +66,24 @@ class Budget:
         self.marks: List[Dict[str, Any]] = []
         self.skipped: List[str] = []
         self.applied: Dict[str, Any] = {}
+        self.cfg_ref: Dict[str, Any] = {}
+        self.expired = False
+        self.layer_deadlines: Dict[str, float] = {}
+        self._stop = threading.Event()
+        # 全局硬墙：到 total-reserve 秒强制 expired。daemon 不阻止进程退出。
+        self._watchdog = threading.Thread(target=self._watch, daemon=True,
+                                          name="budget-watchdog")
+        self._watchdog.start()
+
+    def _watch(self) -> None:
+        limit = max(0.1, self.total - self.reserve)
+        # 用 Event.wait 便于测试时提前结束，不占 CPU
+        self._stop.wait(limit)
+        if not self._stop.is_set():
+            self.expired = True
+
+    def close(self) -> None:
+        self._stop.set()
 
     # ---------------------------------------------------------------- 时间
     def elapsed(self) -> float:
@@ -74,6 +98,8 @@ class Budget:
 
     def slice(self, name: str) -> float:
         """该层此刻最多能用多少秒 = min(层配额, 全局剩余可用)。"""
+        if self.expired:
+            return 0.0
         if not self.enabled:
             return float(self.layers.get(name, 0))
         return max(0.0, min(float(self.layers.get(name, 0)), self.usable()))
@@ -82,6 +108,7 @@ class Budget:
     def apply(self, cfg: Dict[str, Any]) -> Dict[str, Any]:
         """深拷贝配置，把所有已知耗时参数裁剪到全局预算内。"""
         c = copy.deepcopy(cfg)
+        self.cfg_ref = c
         if not self.enabled:
             return c
         sl = lambda n: max(1.0, self.slice(n))  # noqa: E731
@@ -115,17 +142,24 @@ class Budget:
         se["gnews_max_sites"] = min(int(se.get("gnews_max_sites", 10)), 4)
         se["per_query"] = min(int(se.get("per_query", 12)), 6)
 
-        sm = c.setdefault("social_main", {})
-        # 0 = 不限是上一版为「更多 A」放的，但逐条回查无上限会把整批拖死；
-        # 改为按价值排序后的有限配额（见 social_main 的 _priority_words）。
-        sm["max_lookup"] = min(int(sm.get("max_lookup", 40)) or 40, 40)
-
+        # 2026-11-22：扩展层必须自带整层 deadline（旧版纯串行循环按 timeout 累加到数分钟）
+        se["layer_deadline_seconds"] = sl("expansion")
         pa = c.setdefault("platform_access", {})
-        pa["timeout"] = min(float(pa.get("timeout", 7)), 4.0)
+        pa["layer_deadline_seconds"] = sl("platform")
+
+        sm = c.setdefault("social_main", {})
+        sm["max_lookup"] = min(int(sm.get("max_lookup", 40)) or 40, 40)
+        sm["lookup_deadline_seconds"] = min(float(sm.get("lookup_deadline_seconds", 45)),
+                                            sl("social"))
+        sm["digest_deadline_seconds"] = sl("social")
+
+        pa2 = c.setdefault("platform_access", {})
+        pa2["timeout"] = min(float(pa2.get("timeout", 7)), 4.0)
 
         fs = c.setdefault("free_sources", {})
         fs["free_probe_timeout"] = min(float(fs.get("free_probe_timeout", 4)), 3.0)
         fs["jina_timeout"] = min(float(fs.get("jina_timeout", 3)), 3.0)
+        fs["layer_deadline_seconds"] = sl("free_sources")
 
         # 把采集层截止时刻传给 Collector（在 _get 里检查，抛出 BudgetExpired 即停）
         c.setdefault("budget", {})["_deadline_at"] = time.monotonic() + sl("rss")
@@ -135,7 +169,8 @@ class Budget:
             "second_pass_deadline": sp["deadline_seconds"],
             "max_calls": sa["max_calls"], "max_lookup": sm["max_lookup"],
             "expansion_queries": se["gdelt_max_queries"],
-        }
+            "expansion_deadline": se["layer_deadline_seconds"],
+            "platform_deadline": pa["layer_deadline_seconds"]}
         return c
 
     def gate(self, name: str, cfg: Dict[str, Any]) -> bool:
@@ -143,8 +178,10 @@ class Budget:
         now = time.monotonic()
         if self.marks:
             _prev = self.marks[-1]
-            _prev["实耗秒"] = round(now - _prev.get("_at", now), 1)
-        allowed = bool(self.enabled) and self.slice(name) > 1.0
+            if "实耗秒" not in _prev:
+                _prev["实耗秒"] = round(now - _prev.get("_at", now), 1)
+        # 全局硬墙：到点后所有后续层一律短路（旧版这里永远 True）
+        allowed = bool(self.enabled) and not self.expired and self.slice(name) > 1.0
         self.marks.append({"层": name, "配额秒": self.layers.get(name, 0),
                            "剩余全局秒": round(self.left(), 1), "允许": allowed,
                            "_at": now})
@@ -165,27 +202,121 @@ class Budget:
                 d[g[-1]] = False
         return allowed
 
+    # ---------------------------------------------------------------- 每层真限时
+    def bounded(self, name: str, fn, *args, fallback=None, grace=0.0, **kwargs):
+        """整层调用真限时：daemon 线程 + join(timeout=层配额)。
+
+        超时立即返回 fallback，主线程继续筛选/评级/出表；不再等后台跑完。
+        后台线程通过 cfg["budget"]["_layer_deadline_at"] 自行 break，
+        且 daemon 不阻止解释器退出（不会像 ThreadPoolExecutor 那样 join 拖死）。
+        """
+        limit = self.slice(name)
+        if not self.enabled:
+            limit = float(self.layers.get(name, 0))
+        if self.expired or limit <= 1.0:
+            self.skipped.append(name)
+            self.marks.append({"层": name, "配额秒": self.layers.get(name, 0),
+                               "实耗秒": 0.0, "允许": False, "短路": "全局硬墙/预算耗尽"})
+            return fallback
+        deadline_at = time.monotonic() + limit
+        self.layer_deadlines[name] = deadline_at
+        # 注入模块内部循环的检查点，让后台线程也能尽快停
+        for a in args:
+            if isinstance(a, dict):
+                a.setdefault("budget", {})["_layer_deadline_at"] = deadline_at
+                break
+        if self.cfg_ref:
+            self.cfg_ref.setdefault("budget", {})["_layer_deadline_at"] = deadline_at
+
+        box: Dict[str, Any] = {}
+        def _run():
+            try:
+                box["v"] = fn(*args, **kwargs)
+            except BaseException as e:      # noqa: BLE001
+                box["e"] = e
+        th = threading.Thread(target=_run, daemon=True, name=f"layer-{name}")
+        t_start = time.monotonic()
+        th.start()
+        # grace：给后台线程一小段宽限，让它走完内部的 BudgetExpired 路径、
+        # 把已抓条目落下来再被截断（rss 层专用，避免「出表了但是空表」）。
+        th.join(timeout=max(0.2, limit))
+        if th.is_alive() and grace > 0:
+            th.join(timeout=grace)
+        spent = round(time.monotonic() - t_start, 1)
+        # 写回 gate() 留下的同一条记录，避免逐层出现重复行
+        rec = next((m for m in reversed(self.marks)
+                    if m.get("层") == name and "实耗秒" not in m), None)
+        if rec is None:
+            rec = {"层": name, "配额秒": self.layers.get(name, 0), "允许": True,
+                   "_at": t_start}
+            self.marks.append(rec)
+        rec["实耗秒"] = spent
+        rec["短路"] = "" if not th.is_alive() else "层超时（主线程继续出表）"
+        if th.is_alive():
+            self.skipped.append(name)
+            # 后台仍在跑，但模块内部会读 _layer_deadline_at 自行退出；
+            # daemon 线程不阻止进程退出。主流程必须继续，绝不能 join。
+            return fallback
+        if "e" in box:
+            rec["异常"] = f"{type(box['e']).__name__}: {str(box['e'])[:100]}"
+            return fallback
+        return box.get("v", fallback)
+
     def deadline_at(self) -> float:
         return float((self.applied.get("_deadline_at") or 0))
 
     def report(self) -> Dict[str, Any]:
+        # 不再用「下一层 gate 的时间差」当实耗：bounded 已逐层写实耗秒。
         now = time.monotonic()
         rows = []
         for m in self.marks:
             r = {k: v for k, v in m.items() if not k.startswith("_")}
-            r.setdefault("实耗秒", round(now - m.get("_at", now), 1))
+            if "实耗秒" not in r:
+                # gate() 判「不允许」的层根本没执行，实耗必须是 0。
+                # 旧版用 now-_at 补算，把整段后续时间算到它头上（冒烟实测 2.9s / 配额 1s）。
+                r["实耗秒"] = (0.0 if not m.get("允许", True)
+                              else round(now - m.get("_at", now), 1))
             rows.append(r)
+        real = round(self.elapsed(), 1)
         return {
             "启用": self.enabled, "总预算秒": self.total, "出表保留秒": self.reserve,
-            "实际耗时秒": round(self.elapsed(), 1), "剩余秒": round(self.left(), 1),
+            "实际耗时秒": real, "剩余秒": round(self.left(), 1),
+            "全局硬墙": self.expired,
             "被短路的层": self.skipped, "参数裁剪": self.applied,
             "逐层": rows,
-            "结论": ("预算内完成" if not self.skipped else
-                     "预算耗尽，已短路 " + "、".join(self.skipped) + "；采集层停止但本批仍出表"),
+            "结论": ("预算内完成" if not self.skipped and not self.expired else
+                     "预算耗尽/层超时，已短路 " + "、".join(self.skipped) +
+                     "；采集层停止但本批仍出表"),
         }
+
+    def write_report(self, base_dir) -> None:
+        """增量落盘：每层由 pipeline 调用，超时被硬杀时也留得下诊断。"""
+        try:
+            p = os.path.join(str(base_dir), "output", "budget_report.json")
+            os.makedirs(os.path.dirname(p), exist_ok=True)
+            with open(p, "w", encoding="utf-8") as f:
+                json.dump(self.report(), f, ensure_ascii=False, indent=1)
+        except Exception:
+            pass
 
 
 def check(deadline_at: float) -> None:
     """给 Collector._get 用：到点抛 BudgetExpired，由 run() 捕获后继续出表。"""
     if deadline_at and time.monotonic() > deadline_at:
         raise BudgetExpired("采集层全局预算耗尽，保留已抓条目继续出表")
+
+
+def layer_expired(cfg: Dict[str, Any], key: str = "layer_deadline_seconds") -> bool:
+    """给模块内部循环用：读 config 的整层 deadline 或 budget 注入的绝对时刻。"""
+    dl = float((cfg.get("budget") or {}).get("_layer_deadline_at") or 0)
+    if dl and time.monotonic() > dl:
+        return True
+    for section in ("source_expansion", "platform_access", "social_main", "free_sources"):
+        v = float((cfg.get(section) or {}).get(key, 0) or 0)
+        if v and v > 0 and time.monotonic() > dl:
+            return True
+    return False
+
+
+def deadline_at_of(cfg: Dict[str, Any]) -> float:
+    return float((cfg.get("budget") or {}).get("_layer_deadline_at") or 0)
