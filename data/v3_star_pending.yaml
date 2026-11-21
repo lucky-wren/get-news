@@ -1,0 +1,570 @@
+generated_at: '2026-11-21'
+来源: 用户 v3 全行业分类版（/data/inputs/资讯渠道大全.md）
+说明: 21 个 ★ 必采缺口逐条带【真实可拉取候选端点】。原版只有文字「启用动作」、0 条 URL，本版补齐端点 + 时间字段依据 + 实测状态；由 news_pipeline/star_retest.py 真发请求验证，仅 HTTP 200
+  且解析出 >=1 条带时间字段条目才写回 data/endpoints_live.yaml，绝不预设成功。
+★必采总数: 41
+已有实证端点: 20
+待换网络重测: 21
+重测策略:
+  入口: python -m news_pipeline.star_retest
+  CI: .github/workflows/daily-news.yml 的「★ 必采缺口定向重测（21 条）」step，每次构建在 unrestricted 网络执行
+  判定: HTTP 200 + feedparser/JSON 解析出 >=1 条带时间字段条目；首页/导航页/无时间字段一律判失败
+  写回:
+  - data/endpoints_live.yaml 的 star_discovery 段（发现端点，不直接进候选池；endpoints 采集段保持纯净）
+  - 本文件每条的 实测状态 / 端点性质 / 实证端点 / 实测条目数 / 实测时间
+  - data/star_retest_result.json（21 条逐条留痕，含每个候选的 HTTP 状态与解析结果）
+  持久化: workflow 提交 step 已加入 git add 这些 data 文件；否则 runner 销毁后成果丢失，等于每次白测
+  诚实边界: 'site: RSS 是发现端点不是成稿端点；拿到的条目仍须逐条回查独立原文、补正文、校验发布时间落在窗口内才进候选池，回查不到进附录 15，不吃 snippet'
+  接入边界: 本模块只负责拿到可拉取通路；词条→独立原文→正文→窗口校验由 search_api/lookup_article 链路承担，回查不到进附录 15
+渠道:
+- channel_id: V3-央视网·央视频
+  渠道: 央视网·央视频
+  入口: ysxw.cctv.cn
+  级别: ★
+  状态: 本沙盒域名级 403 / 412（7 指纹 × 10 路径矩阵实测 0 救回）
+  启用动作: 归并：ysxw.cctv.cn 与 news.cctv.com 同属央视网，复用央视网 JSONP 端点
+  候选端点:
+  - url: https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/news_1.jsonp?cb=news
+    type: jsonp
+    用途: 归并：ysxw.cctv.cn 与 news.cctv.com 同属央视网，复用已实证 JSONP 时间流
+    时间字段依据: focus_date 秒级时间
+    沙盒实测: HTTP 200 / 80 条 / 带时间（已实证端点 CN-CCTV-NEWS）
+  - url: https://www.bing.com/search?q=site%3Aysxw.cctv.cn&format=rss&count=50
+    type: rss
+    用途: 词条/条目发现（非成稿端点），命中后仍须逐条回查独立原文
+    时间字段依据: RSS pubDate；仅作发布时间线索，标题月日不反推发布日
+    沙盒实测: 待 Actions 重测
+  - url: https://ysxw.cctv.cn/rss.xml
+    type: rss
+    用途: 官方站点时间流候选（路径需实测，不预设存在）
+    时间字段依据: pubDate / dc:date
+    沙盒实测: 待 Actions 重测
+  - url: https://ysxw.cctv.cn/
+    type: html
+    用途: 域名可达性验证；首页通常无可枚举时间条目，预计判失败并留痕
+    时间字段依据: 无（仅连通性）
+    沙盒实测: 待 Actions 重测
+  实测状态: 待重测
+  实证端点: null
+  实测条目数: 0
+  实测时间: null
+- channel_id: V3-中国互联网络信息中心
+  渠道: 中国互联网络信息中心
+  入口: cnnic.cn
+  级别: ★
+  状态: 本沙盒域名级 403 / 412（7 指纹 × 10 路径矩阵实测 0 救回）
+  启用动作: GitHub Actions 每次构建前在 unrestricted 网络重测；可达且能抽出带时间条目即自动登记端点；同步走开源聚合镜像 / GitHub 归档快照 / 央媒与政府网转载回查
+  候选端点:
+  - url: https://www.bing.com/search?q=site%3Acnnic.cn&format=rss&count=50
+    type: rss
+    用途: 词条/条目发现（非成稿端点），命中后仍须逐条回查独立原文
+    时间字段依据: RSS pubDate；仅作发布时间线索，标题月日不反推发布日
+    沙盒实测: 待 Actions 重测
+  - url: https://cnnic.cn/rss.xml
+    type: rss
+    用途: 官方站点时间流候选（路径需实测，不预设存在）
+    时间字段依据: pubDate / dc:date
+    沙盒实测: 待 Actions 重测
+  - url: https://cnnic.cn/
+    type: html
+    用途: 域名可达性验证；首页通常无可枚举时间条目，预计判失败并留痕
+    时间字段依据: 无（仅连通性）
+    沙盒实测: 待 Actions 重测
+  实测状态: 待重测
+  实证端点: null
+  实测条目数: 0
+  实测时间: null
+- channel_id: V3-赛迪网
+  渠道: 赛迪网
+  入口: ccidnet.com
+  级别: ★
+  状态: 本沙盒域名级 403 / 412（7 指纹 × 10 路径矩阵实测 0 救回）
+  启用动作: GitHub Actions 每次构建前在 unrestricted 网络重测；可达且能抽出带时间条目即自动登记端点；同步走开源聚合镜像 / GitHub 归档快照 / 央媒与政府网转载回查
+  候选端点:
+  - url: https://www.bing.com/search?q=site%3Accidnet.com&format=rss&count=50
+    type: rss
+    用途: 词条/条目发现（非成稿端点），命中后仍须逐条回查独立原文
+    时间字段依据: RSS pubDate；仅作发布时间线索，标题月日不反推发布日
+    沙盒实测: 待 Actions 重测
+  - url: https://ccidnet.com/rss.xml
+    type: rss
+    用途: 官方站点时间流候选（路径需实测，不预设存在）
+    时间字段依据: pubDate / dc:date
+    沙盒实测: 待 Actions 重测
+  - url: https://ccidnet.com/
+    type: html
+    用途: 域名可达性验证；首页通常无可枚举时间条目，预计判失败并留痕
+    时间字段依据: 无（仅连通性）
+    沙盒实测: 待 Actions 重测
+  实测状态: 待重测
+  实证端点: null
+  实测条目数: 0
+  实测时间: null
+- channel_id: V3-财政部
+  渠道: 财政部
+  入口: mof.gov.cn
+  级别: ★
+  状态: 本沙盒域名级 403 / 412（7 指纹 × 10 路径矩阵实测 0 救回）
+  启用动作: GitHub Actions 每次构建前在 unrestricted 网络重测；可达且能抽出带时间条目即自动登记端点；同步走开源聚合镜像 / GitHub 归档快照 / 央媒与政府网转载回查
+  候选端点:
+  - url: https://www.bing.com/search?q=site%3Amof.gov.cn&format=rss&count=50
+    type: rss
+    用途: 词条/条目发现（非成稿端点），命中后仍须逐条回查独立原文
+    时间字段依据: RSS pubDate；仅作发布时间线索，标题月日不反推发布日
+    沙盒实测: HTTP 200 / 10 条 / 带 pubDate
+  - url: https://mof.gov.cn/rss.xml
+    type: rss
+    用途: 官方站点时间流候选（路径需实测，不预设存在）
+    时间字段依据: pubDate / dc:date
+    沙盒实测: 待 Actions 重测
+  - url: https://mof.gov.cn/
+    type: html
+    用途: 域名可达性验证；首页通常无可枚举时间条目，预计判失败并留痕
+    时间字段依据: 无（仅连通性）
+    沙盒实测: 待 Actions 重测
+  实测状态: 待重测
+  实证端点: null
+  实测条目数: 0
+  实测时间: null
+- channel_id: V3-新华财经
+  渠道: 新华财经
+  入口: cnfin.com
+  级别: ★
+  状态: 本沙盒域名级 403 / 412（7 指纹 × 10 路径矩阵实测 0 救回）
+  启用动作: GitHub Actions 每次构建前在 unrestricted 网络重测；可达且能抽出带时间条目即自动登记端点；同步走开源聚合镜像 / GitHub 归档快照 / 央媒与政府网转载回查
+  候选端点:
+  - url: https://www.bing.com/search?q=site%3Acnfin.com&format=rss&count=50
+    type: rss
+    用途: 词条/条目发现（非成稿端点），命中后仍须逐条回查独立原文
+    时间字段依据: RSS pubDate；仅作发布时间线索，标题月日不反推发布日
+    沙盒实测: 待 Actions 重测
+  - url: https://cnfin.com/rss.xml
+    type: rss
+    用途: 官方站点时间流候选（路径需实测，不预设存在）
+    时间字段依据: pubDate / dc:date
+    沙盒实测: 待 Actions 重测
+  - url: https://cnfin.com/
+    type: html
+    用途: 域名可达性验证；首页通常无可枚举时间条目，预计判失败并留痕
+    时间字段依据: 无（仅连通性）
+    沙盒实测: 待 Actions 重测
+  实测状态: 待重测
+  实证端点: null
+  实测条目数: 0
+  实测时间: null
+- channel_id: V3-中汽协
+  渠道: 中汽协
+  入口: caam.org.cn
+  级别: ★
+  状态: 本沙盒域名级 403 / 412（7 指纹 × 10 路径矩阵实测 0 救回）
+  启用动作: GitHub Actions 每次构建前在 unrestricted 网络重测；可达且能抽出带时间条目即自动登记端点；同步走开源聚合镜像 / GitHub 归档快照 / 央媒与政府网转载回查
+  候选端点:
+  - url: https://www.bing.com/search?q=site%3Acaam.org.cn&format=rss&count=50
+    type: rss
+    用途: 词条/条目发现（非成稿端点），命中后仍须逐条回查独立原文
+    时间字段依据: RSS pubDate；仅作发布时间线索，标题月日不反推发布日
+    沙盒实测: 待 Actions 重测
+  - url: https://caam.org.cn/rss.xml
+    type: rss
+    用途: 官方站点时间流候选（路径需实测，不预设存在）
+    时间字段依据: pubDate / dc:date
+    沙盒实测: 待 Actions 重测
+  - url: https://caam.org.cn/
+    type: html
+    用途: 域名可达性验证；首页通常无可枚举时间条目，预计判失败并留痕
+    时间字段依据: 无（仅连通性）
+    沙盒实测: 待 Actions 重测
+  实测状态: 待重测
+  实证端点: null
+  实测条目数: 0
+  实测时间: null
+- channel_id: V3-乘联会
+  渠道: 乘联会
+  入口: cpcaauto.com
+  级别: ★
+  状态: 本沙盒域名级 403 / 412（7 指纹 × 10 路径矩阵实测 0 救回）
+  启用动作: GitHub Actions 每次构建前在 unrestricted 网络重测；可达且能抽出带时间条目即自动登记端点；同步走开源聚合镜像 / GitHub 归档快照 / 央媒与政府网转载回查
+  候选端点:
+  - url: https://www.bing.com/search?q=site%3Acpcaauto.com&format=rss&count=50
+    type: rss
+    用途: 词条/条目发现（非成稿端点），命中后仍须逐条回查独立原文
+    时间字段依据: RSS pubDate；仅作发布时间线索，标题月日不反推发布日
+    沙盒实测: 待 Actions 重测
+  - url: https://cpcaauto.com/rss.xml
+    type: rss
+    用途: 官方站点时间流候选（路径需实测，不预设存在）
+    时间字段依据: pubDate / dc:date
+    沙盒实测: 待 Actions 重测
+  - url: https://cpcaauto.com/
+    type: html
+    用途: 域名可达性验证；首页通常无可枚举时间条目，预计判失败并留痕
+    时间字段依据: 无（仅连通性）
+    沙盒实测: 待 Actions 重测
+  实测状态: 待重测
+  实证端点: null
+  实测条目数: 0
+  实测时间: null
+- channel_id: V3-国家能源局
+  渠道: 国家能源局
+  入口: nea.gov.cn
+  级别: ★
+  状态: 本沙盒域名级 403 / 412（7 指纹 × 10 路径矩阵实测 0 救回）
+  启用动作: GitHub Actions 每次构建前在 unrestricted 网络重测；可达且能抽出带时间条目即自动登记端点；同步走开源聚合镜像 / GitHub 归档快照 / 央媒与政府网转载回查
+  候选端点:
+  - url: https://www.bing.com/search?q=site%3Anea.gov.cn&format=rss&count=50
+    type: rss
+    用途: 词条/条目发现（非成稿端点），命中后仍须逐条回查独立原文
+    时间字段依据: RSS pubDate；仅作发布时间线索，标题月日不反推发布日
+    沙盒实测: 待 Actions 重测
+  - url: https://nea.gov.cn/rss.xml
+    type: rss
+    用途: 官方站点时间流候选（路径需实测，不预设存在）
+    时间字段依据: pubDate / dc:date
+    沙盒实测: 待 Actions 重测
+  - url: https://nea.gov.cn/
+    type: html
+    用途: 域名可达性验证；首页通常无可枚举时间条目，预计判失败并留痕
+    时间字段依据: 无（仅连通性）
+    沙盒实测: 待 Actions 重测
+  实测状态: 待重测
+  实证端点: null
+  实测条目数: 0
+  实测时间: null
+- channel_id: V3-中电联
+  渠道: 中电联
+  入口: cec.org.cn
+  级别: ★
+  状态: 本沙盒域名级 403 / 412（7 指纹 × 10 路径矩阵实测 0 救回）
+  启用动作: GitHub Actions 每次构建前在 unrestricted 网络重测；可达且能抽出带时间条目即自动登记端点；同步走开源聚合镜像 / GitHub 归档快照 / 央媒与政府网转载回查
+  候选端点:
+  - url: https://www.bing.com/search?q=site%3Acec.org.cn&format=rss&count=50
+    type: rss
+    用途: 词条/条目发现（非成稿端点），命中后仍须逐条回查独立原文
+    时间字段依据: RSS pubDate；仅作发布时间线索，标题月日不反推发布日
+    沙盒实测: 待 Actions 重测
+  - url: https://cec.org.cn/rss.xml
+    type: rss
+    用途: 官方站点时间流候选（路径需实测，不预设存在）
+    时间字段依据: pubDate / dc:date
+    沙盒实测: 待 Actions 重测
+  - url: https://cec.org.cn/
+    type: html
+    用途: 域名可达性验证；首页通常无可枚举时间条目，预计判失败并留痕
+    时间字段依据: 无（仅连通性）
+    沙盒实测: 待 Actions 重测
+  实测状态: 待重测
+  实证端点: null
+  实测条目数: 0
+  实测时间: null
+- channel_id: V3-中国气象局
+  渠道: 中国气象局
+  入口: cma.gov.cn
+  级别: ★
+  状态: 本沙盒域名级 403 / 412（7 指纹 × 10 路径矩阵实测 0 救回）
+  启用动作: GitHub Actions 每次构建前在 unrestricted 网络重测；可达且能抽出带时间条目即自动登记端点；同步走开源聚合镜像 / GitHub 归档快照 / 央媒与政府网转载回查
+  候选端点:
+  - url: https://www.bing.com/search?q=site%3Acma.gov.cn&format=rss&count=50
+    type: rss
+    用途: 词条/条目发现（非成稿端点），命中后仍须逐条回查独立原文
+    时间字段依据: RSS pubDate；仅作发布时间线索，标题月日不反推发布日
+    沙盒实测: 待 Actions 重测
+  - url: https://cma.gov.cn/rss.xml
+    type: rss
+    用途: 官方站点时间流候选（路径需实测，不预设存在）
+    时间字段依据: pubDate / dc:date
+    沙盒实测: 待 Actions 重测
+  - url: https://cma.gov.cn/
+    type: html
+    用途: 域名可达性验证；首页通常无可枚举时间条目，预计判失败并留痕
+    时间字段依据: 无（仅连通性）
+    沙盒实测: 待 Actions 重测
+  实测状态: 待重测
+  实证端点: null
+  实测条目数: 0
+  实测时间: null
+- channel_id: V3-国家药监局
+  渠道: 国家药监局
+  入口: nmpa.gov.cn
+  级别: ★
+  状态: 本沙盒域名级 403 / 412（7 指纹 × 10 路径矩阵实测 0 救回）
+  启用动作: GitHub Actions 每次构建前在 unrestricted 网络重测；可达且能抽出带时间条目即自动登记端点；同步走开源聚合镜像 / GitHub 归档快照 / 央媒与政府网转载回查
+  候选端点:
+  - url: https://www.bing.com/search?q=site%3Anmpa.gov.cn&format=rss&count=50
+    type: rss
+    用途: 词条/条目发现（非成稿端点），命中后仍须逐条回查独立原文
+    时间字段依据: RSS pubDate；仅作发布时间线索，标题月日不反推发布日
+    沙盒实测: 待 Actions 重测
+  - url: https://nmpa.gov.cn/rss.xml
+    type: rss
+    用途: 官方站点时间流候选（路径需实测，不预设存在）
+    时间字段依据: pubDate / dc:date
+    沙盒实测: 待 Actions 重测
+  - url: https://nmpa.gov.cn/
+    type: html
+    用途: 域名可达性验证；首页通常无可枚举时间条目，预计判失败并留痕
+    时间字段依据: 无（仅连通性）
+    沙盒实测: 待 Actions 重测
+  实测状态: 待重测
+  实证端点: null
+  实测条目数: 0
+  实测时间: null
+- channel_id: V3-卫健委
+  渠道: 卫健委
+  入口: nhc.gov.cn
+  级别: ★
+  状态: 本沙盒域名级 403 / 412（7 指纹 × 10 路径矩阵实测 0 救回）
+  启用动作: GitHub Actions 每次构建前在 unrestricted 网络重测；可达且能抽出带时间条目即自动登记端点；同步走开源聚合镜像 / GitHub 归档快照 / 央媒与政府网转载回查
+  候选端点:
+  - url: https://www.bing.com/search?q=site%3Anhc.gov.cn&format=rss&count=50
+    type: rss
+    用途: 词条/条目发现（非成稿端点），命中后仍须逐条回查独立原文
+    时间字段依据: RSS pubDate；仅作发布时间线索，标题月日不反推发布日
+    沙盒实测: HTTP 200 / 10 条 / 带 pubDate
+  - url: https://nhc.gov.cn/rss.xml
+    type: rss
+    用途: 官方站点时间流候选（路径需实测，不预设存在）
+    时间字段依据: pubDate / dc:date
+    沙盒实测: 待 Actions 重测
+  - url: https://nhc.gov.cn/
+    type: html
+    用途: 域名可达性验证；首页通常无可枚举时间条目，预计判失败并留痕
+    时间字段依据: 无（仅连通性）
+    沙盒实测: 待 Actions 重测
+  实测状态: 待重测
+  实证端点: null
+  实测条目数: 0
+  实测时间: null
+- channel_id: V3-国家医保局
+  渠道: 国家医保局
+  入口: nhsa.gov.cn
+  级别: ★
+  状态: 本沙盒域名级 403 / 412（7 指纹 × 10 路径矩阵实测 0 救回）
+  启用动作: GitHub Actions 每次构建前在 unrestricted 网络重测；可达且能抽出带时间条目即自动登记端点；同步走开源聚合镜像 / GitHub 归档快照 / 央媒与政府网转载回查
+  候选端点:
+  - url: https://www.bing.com/search?q=site%3Anhsa.gov.cn&format=rss&count=50
+    type: rss
+    用途: 词条/条目发现（非成稿端点），命中后仍须逐条回查独立原文
+    时间字段依据: RSS pubDate；仅作发布时间线索，标题月日不反推发布日
+    沙盒实测: 待 Actions 重测
+  - url: https://nhsa.gov.cn/rss.xml
+    type: rss
+    用途: 官方站点时间流候选（路径需实测，不预设存在）
+    时间字段依据: pubDate / dc:date
+    沙盒实测: 待 Actions 重测
+  - url: https://nhsa.gov.cn/
+    type: html
+    用途: 域名可达性验证；首页通常无可枚举时间条目，预计判失败并留痕
+    时间字段依据: 无（仅连通性）
+    沙盒实测: 待 Actions 重测
+  实测状态: 待重测
+  实证端点: null
+  实测条目数: 0
+  实测时间: null
+- channel_id: V3-国家疾控局
+  渠道: 国家疾控局
+  入口: ndcpa.gov.cn
+  级别: ★
+  状态: 本沙盒域名级 403 / 412（7 指纹 × 10 路径矩阵实测 0 救回）
+  启用动作: GitHub Actions 每次构建前在 unrestricted 网络重测；可达且能抽出带时间条目即自动登记端点；同步走开源聚合镜像 / GitHub 归档快照 / 央媒与政府网转载回查
+  候选端点:
+  - url: https://www.bing.com/search?q=site%3Andcpa.gov.cn&format=rss&count=50
+    type: rss
+    用途: 词条/条目发现（非成稿端点），命中后仍须逐条回查独立原文
+    时间字段依据: RSS pubDate；仅作发布时间线索，标题月日不反推发布日
+    沙盒实测: 待 Actions 重测
+  - url: https://ndcpa.gov.cn/rss.xml
+    type: rss
+    用途: 官方站点时间流候选（路径需实测，不预设存在）
+    时间字段依据: pubDate / dc:date
+    沙盒实测: 待 Actions 重测
+  - url: https://ndcpa.gov.cn/
+    type: html
+    用途: 域名可达性验证；首页通常无可枚举时间条目，预计判失败并留痕
+    时间字段依据: 无（仅连通性）
+    沙盒实测: 待 Actions 重测
+  实测状态: 待重测
+  实证端点: null
+  实测条目数: 0
+  实测时间: null
+- channel_id: V3-住建部
+  渠道: 住建部
+  入口: mohurd.gov.cn
+  级别: ★
+  状态: 本沙盒域名级 403 / 412（7 指纹 × 10 路径矩阵实测 0 救回）
+  启用动作: GitHub Actions 每次构建前在 unrestricted 网络重测；可达且能抽出带时间条目即自动登记端点；同步走开源聚合镜像 / GitHub 归档快照 / 央媒与政府网转载回查
+  候选端点:
+  - url: https://www.bing.com/search?q=site%3Amohurd.gov.cn&format=rss&count=50
+    type: rss
+    用途: 词条/条目发现（非成稿端点），命中后仍须逐条回查独立原文
+    时间字段依据: RSS pubDate；仅作发布时间线索，标题月日不反推发布日
+    沙盒实测: HTTP 200 / 10 条 / 带 pubDate
+  - url: https://mohurd.gov.cn/rss.xml
+    type: rss
+    用途: 官方站点时间流候选（路径需实测，不预设存在）
+    时间字段依据: pubDate / dc:date
+    沙盒实测: 待 Actions 重测
+  - url: https://mohurd.gov.cn/
+    type: html
+    用途: 域名可达性验证；首页通常无可枚举时间条目，预计判失败并留痕
+    时间字段依据: 无（仅连通性）
+    沙盒实测: 待 Actions 重测
+  实测状态: 待重测
+  实证端点: null
+  实测条目数: 0
+  实测时间: null
+- channel_id: V3-交通运输部
+  渠道: 交通运输部
+  入口: mot.gov.cn
+  级别: ★
+  状态: 本沙盒域名级 403 / 412（7 指纹 × 10 路径矩阵实测 0 救回）
+  启用动作: GitHub Actions 每次构建前在 unrestricted 网络重测；可达且能抽出带时间条目即自动登记端点；同步走开源聚合镜像 / GitHub 归档快照 / 央媒与政府网转载回查
+  候选端点:
+  - url: https://www.bing.com/search?q=site%3Amot.gov.cn&format=rss&count=50
+    type: rss
+    用途: 词条/条目发现（非成稿端点），命中后仍须逐条回查独立原文
+    时间字段依据: RSS pubDate；仅作发布时间线索，标题月日不反推发布日
+    沙盒实测: 待 Actions 重测
+  - url: https://mot.gov.cn/rss.xml
+    type: rss
+    用途: 官方站点时间流候选（路径需实测，不预设存在）
+    时间字段依据: pubDate / dc:date
+    沙盒实测: 待 Actions 重测
+  - url: https://mot.gov.cn/
+    type: html
+    用途: 域名可达性验证；首页通常无可枚举时间条目，预计判失败并留痕
+    时间字段依据: 无（仅连通性）
+    沙盒实测: 待 Actions 重测
+  实测状态: 待重测
+  实证端点: null
+  实测条目数: 0
+  实测时间: null
+- channel_id: V3-公安部
+  渠道: 公安部
+  入口: mps.gov.cn
+  级别: ★
+  状态: 本沙盒域名级 403 / 412（7 指纹 × 10 路径矩阵实测 0 救回）
+  启用动作: GitHub Actions 每次构建前在 unrestricted 网络重测；可达且能抽出带时间条目即自动登记端点；同步走开源聚合镜像 / GitHub 归档快照 / 央媒与政府网转载回查
+  候选端点:
+  - url: https://www.bing.com/search?q=site%3Amps.gov.cn&format=rss&count=50
+    type: rss
+    用途: 词条/条目发现（非成稿端点），命中后仍须逐条回查独立原文
+    时间字段依据: RSS pubDate；仅作发布时间线索，标题月日不反推发布日
+    沙盒实测: 待 Actions 重测
+  - url: https://mps.gov.cn/rss.xml
+    type: rss
+    用途: 官方站点时间流候选（路径需实测，不预设存在）
+    时间字段依据: pubDate / dc:date
+    沙盒实测: 待 Actions 重测
+  - url: https://mps.gov.cn/
+    type: html
+    用途: 域名可达性验证；首页通常无可枚举时间条目，预计判失败并留痕
+    时间字段依据: 无（仅连通性）
+    沙盒实测: 待 Actions 重测
+  实测状态: 待重测
+  实证端点: null
+  实测条目数: 0
+  实测时间: null
+- channel_id: V3-应急管理部
+  渠道: 应急管理部
+  入口: mem.gov.cn
+  级别: ★
+  状态: 本沙盒域名级 403 / 412（7 指纹 × 10 路径矩阵实测 0 救回）
+  启用动作: GitHub Actions 每次构建前在 unrestricted 网络重测；可达且能抽出带时间条目即自动登记端点；同步走开源聚合镜像 / GitHub 归档快照 / 央媒与政府网转载回查
+  候选端点:
+  - url: https://www.bing.com/search?q=site%3Amem.gov.cn&format=rss&count=50
+    type: rss
+    用途: 词条/条目发现（非成稿端点），命中后仍须逐条回查独立原文
+    时间字段依据: RSS pubDate；仅作发布时间线索，标题月日不反推发布日
+    沙盒实测: 待 Actions 重测
+  - url: https://mem.gov.cn/rss.xml
+    type: rss
+    用途: 官方站点时间流候选（路径需实测，不预设存在）
+    时间字段依据: pubDate / dc:date
+    沙盒实测: 待 Actions 重测
+  - url: https://mem.gov.cn/
+    type: html
+    用途: 域名可达性验证；首页通常无可枚举时间条目，预计判失败并留痕
+    时间字段依据: 无（仅连通性）
+    沙盒实测: 待 Actions 重测
+  实测状态: 待重测
+  实证端点: null
+  实测条目数: 0
+  实测时间: null
+- channel_id: V3-气象局
+  渠道: 气象局
+  入口: cma.gov.cn
+  级别: ★
+  状态: 本沙盒域名级 403 / 412（7 指纹 × 10 路径矩阵实测 0 救回）
+  启用动作: GitHub Actions 每次构建前在 unrestricted 网络重测；可达且能抽出带时间条目即自动登记端点；同步走开源聚合镜像 / GitHub 归档快照 / 央媒与政府网转载回查
+  候选端点:
+  - url: https://www.bing.com/search?q=site%3Acma.gov.cn&format=rss&count=50
+    type: rss
+    用途: 词条/条目发现（非成稿端点），命中后仍须逐条回查独立原文
+    时间字段依据: RSS pubDate；仅作发布时间线索，标题月日不反推发布日
+    沙盒实测: 待 Actions 重测
+  - url: https://cma.gov.cn/rss.xml
+    type: rss
+    用途: 官方站点时间流候选（路径需实测，不预设存在）
+    时间字段依据: pubDate / dc:date
+    沙盒实测: 待 Actions 重测
+  - url: https://cma.gov.cn/
+    type: html
+    用途: 域名可达性验证；首页通常无可枚举时间条目，预计判失败并留痕
+    时间字段依据: 无（仅连通性）
+    沙盒实测: 待 Actions 重测
+  实测状态: 待重测
+  实证端点: null
+  实测条目数: 0
+  实测时间: null
+- channel_id: V3-中国航天科技集团
+  渠道: 中国航天科技集团
+  入口: spacechina.com
+  级别: ★
+  状态: 本沙盒域名级 403 / 412（7 指纹 × 10 路径矩阵实测 0 救回）
+  启用动作: GitHub Actions 每次构建前在 unrestricted 网络重测；可达且能抽出带时间条目即自动登记端点；同步走开源聚合镜像 / GitHub 归档快照 / 央媒与政府网转载回查
+  候选端点:
+  - url: https://www.bing.com/search?q=site%3Aspacechina.com&format=rss&count=50
+    type: rss
+    用途: 词条/条目发现（非成稿端点），命中后仍须逐条回查独立原文
+    时间字段依据: RSS pubDate；仅作发布时间线索，标题月日不反推发布日
+    沙盒实测: 待 Actions 重测
+  - url: https://spacechina.com/rss.xml
+    type: rss
+    用途: 官方站点时间流候选（路径需实测，不预设存在）
+    时间字段依据: pubDate / dc:date
+    沙盒实测: 待 Actions 重测
+  - url: https://spacechina.com/
+    type: html
+    用途: 域名可达性验证；首页通常无可枚举时间条目，预计判失败并留痕
+    时间字段依据: 无（仅连通性）
+    沙盒实测: 待 Actions 重测
+  实测状态: 待重测
+  实证端点: null
+  实测条目数: 0
+  实测时间: null
+- channel_id: V3-中国商飞
+  渠道: 中国商飞
+  入口: comac.cc
+  级别: ★
+  状态: 本沙盒域名级 403 / 412（7 指纹 × 10 路径矩阵实测 0 救回）
+  启用动作: GitHub Actions 每次构建前在 unrestricted 网络重测；可达且能抽出带时间条目即自动登记端点；同步走开源聚合镜像 / GitHub 归档快照 / 央媒与政府网转载回查
+  候选端点:
+  - url: https://www.bing.com/search?q=site%3Acomac.cc&format=rss&count=50
+    type: rss
+    用途: 词条/条目发现（非成稿端点），命中后仍须逐条回查独立原文
+    时间字段依据: RSS pubDate；仅作发布时间线索，标题月日不反推发布日
+    沙盒实测: 待 Actions 重测
+  - url: https://comac.cc/rss.xml
+    type: rss
+    用途: 官方站点时间流候选（路径需实测，不预设存在）
+    时间字段依据: pubDate / dc:date
+    沙盒实测: 待 Actions 重测
+  - url: https://comac.cc/
+    type: html
+    用途: 域名可达性验证；首页通常无可枚举时间条目，预计判失败并留痕
+    时间字段依据: 无（仅连通性）
+    沙盒实测: 待 Actions 重测
+  实测状态: 待重测
+  实证端点: null
+  实测条目数: 0
+  实测时间: null
