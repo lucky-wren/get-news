@@ -16,6 +16,8 @@ data/platform_credentials.example.yaml。
 """
 from __future__ import annotations
 
+import time
+
 import json
 import os
 import re
@@ -416,8 +418,19 @@ def run_platform_access(cfg: dict, timeout: float = 7.0) -> Dict[str, Any]:
     if not conf.get("enabled", True):
         return {"启用": False, "平台": [], "矩阵": [], "说明": "config 关闭"}
     platforms = conf.get("platforms") or list(PLATFORMS)
-    results = [fetch_platform(p, {**conf, **{"tier_order": conf.get("tier_order", "A,C,B,D")}}, timeout)
-               for p in platforms if p in PLATFORMS]
+    from .budget import deadline_at_of
+    _dl = deadline_at_of(cfg)
+    results = []
+    for p in platforms:
+        if p not in PLATFORMS:
+            continue
+        # 2026-11-22：10 平台 × 4 通路 × timeout 最坏 280s，层配额只有 25s。
+        # 到点立即停，不再把剩余平台逐个撞完。
+        if _dl and time.monotonic() > _dl:
+            results.append({"平台": p, "线索": [], "线索数": 0,
+                            "命中通路": "", "逐通路": [{"通路": "-", "结论": "层 deadline 到达，短路"}]})
+            continue
+        results.append(fetch_platform(p, {**conf, **{"tier_order": conf.get("tier_order", "A,C,B,D")}}, timeout))
     creds = {k: ("已配置" if os.environ.get(k) else "未配置") for k in ENV_MAP}
     from . import free_sources
     fs = free_sources.probe_all(float(conf.get("free_probe_timeout", 4.0)))
