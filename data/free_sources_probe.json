@@ -1,0 +1,379 @@
+{
+ "generated_at": "2026-11-21T10:57:43",
+ "探针": "weibo",
+ "超时": 7.0,
+ "可达": [],
+ "实例": [
+  {
+   "id": "dailyhot_official",
+   "name": "DailyHotApi 官方演示实例",
+   "url": "https://api-hot.imsyy.top/weibo",
+   "code": 0,
+   "bytes": 0,
+   "error": "URLError",
+   "clues": 0,
+   "ok": false,
+   "kind": "开源项目公共实例",
+   "license": "MIT",
+   "note": "作者个人实例，证书/可用性不稳；建议自建"
+  },
+  {
+   "id": "dailyhot_vercel",
+   "name": "DailyHotApi Vercel 实例",
+   "url": "https://daily-hot.vercel.app/weibo",
+   "code": 403,
+   "bytes": 0,
+   "error": "HTTP 403",
+   "clues": 0,
+   "ok": false,
+   "kind": "开源项目公共实例",
+   "license": "MIT",
+   "note": "免费额度共享，可能被限流"
+  },
+  {
+   "id": "newsnow_public",
+   "name": "NewsNow 公共实例 /api/s",
+   "url": "https://newsnow.busiyi.world/api/s?id=weibo&latest",
+   "code": 403,
+   "bytes": 0,
+   "error": "HTTP 403",
+   "clues": 0,
+   "ok": false,
+   "kind": "开源项目公共实例",
+   "license": "MIT",
+   "note": "返回 {status,items:[{title,url}]}；公共实例 30 分钟缓存"
+  },
+  {
+   "id": "vvhan",
+   "name": "韩小韩 / vvhan 热榜 API（开源）",
+   "url": "https://api.vvhan.com/api/hotlist/wbHot",
+   "code": 0,
+   "bytes": 0,
+   "error": "URLError",
+   "clues": 0,
+   "ok": false,
+   "kind": "免费公共 API",
+   "license": "开源",
+   "note": "需把 route 映射成 wbHot/douyinHot/zhihuHot/baiduRD 等"
+  },
+  {
+   "id": "tenapi",
+   "name": "TenAPI 热榜",
+   "url": "https://tenapi.cn/v2/weibohot",
+   "code": 403,
+   "bytes": 0,
+   "error": "HTTP 403",
+   "clues": 0,
+   "ok": false,
+   "kind": "免费公共 API",
+   "license": "开源",
+   "note": "路径按平台命名，响应 {data:[...]}"
+  },
+  {
+   "id": "tophub_fun",
+   "name": "tophub.fun 聚合",
+   "url": "https://api.tophub.fun/api/hot/weibo",
+   "code": 403,
+   "bytes": 0,
+   "error": "HTTP 403",
+   "clues": 0,
+   "ok": false,
+   "kind": "免费公共 API",
+   "license": "—",
+   "note": "第三方实例，稳定性未知"
+  },
+  {
+   "id": "uapis",
+   "name": "UAPI 热榜",
+   "url": "https://uapis.cn/api/v1/misc/hotboard?type=weibo",
+   "code": 403,
+   "bytes": 0,
+   "error": "HTTP 403",
+   "clues": 0,
+   "ok": false,
+   "kind": "免费公共 API",
+   "license": "—",
+   "note": "无需 key"
+  },
+  {
+   "id": "oioweb",
+   "name": "OIOWeb 热榜",
+   "url": "https://api.oioweb.cn/api/common/HotList?type=weibo",
+   "code": 403,
+   "bytes": 0,
+   "error": "HTTP 403",
+   "clues": 0,
+   "ok": false,
+   "kind": "免费公共 API",
+   "license": "—",
+   "note": "无需 key"
+  },
+  {
+   "id": "pearktrue",
+   "name": "PearkTrue DailyHot",
+   "url": "https://api.pearktrue.cn/api/dailyhot/?title=%E5%BE%AE%E5%8D%9A",
+   "code": 0,
+   "bytes": 0,
+   "error": "URLError",
+   "clues": 0,
+   "ok": false,
+   "kind": "免费公共 API",
+   "license": "—",
+   "note": "title 传中文平台名"
+  },
+  {
+   "id": "60s_viki",
+   "name": "vikiboss/60s 公共实例（开源）",
+   "url": "https://60s.viki.moe/v2/weibo",
+   "code": 403,
+   "bytes": 0,
+   "error": "HTTP 403",
+   "clues": 0,
+   "ok": false,
+   "kind": "开源项目公共实例",
+   "license": "开源",
+   "note": "静态 JSON + CDN，每日更新；可自建 Cloudflare Workers"
+  },
+  {
+   "id": "60s_api_viki",
+   "name": "60s 备用实例",
+   "url": "https://60s-api.viki.moe/v2/weibo",
+   "code": 403,
+   "bytes": 0,
+   "error": "HTTP 403",
+   "clues": 0,
+   "ok": false,
+   "kind": "开源项目公共实例",
+   "license": "开源",
+   "note": "备用域名"
+  },
+  {
+   "id": "rsshub_official",
+   "name": "RSSHub 官方实例",
+   "url": "https://rsshub.app/weibo/search/hot",
+   "code": 403,
+   "bytes": 0,
+   "error": "HTTP 403",
+   "clues": 0,
+   "ok": false,
+   "kind": "开源项目公共实例",
+   "license": "AGPL-3.0",
+   "note": "路由 /weibo/search/hot、/douyin/hot、/zhihu/hot、/toutiao/hot"
+  },
+  {
+   "id": "gmit",
+   "name": "GMIT 抖音热榜",
+   "url": "https://api.gmit.vip/Api/DouyinHot",
+   "code": 403,
+   "bytes": 0,
+   "error": "HTTP 403",
+   "clues": 0,
+   "ok": false,
+   "kind": "免费公共 API",
+   "license": "—",
+   "note": "仅抖音，无需 key"
+  },
+  {
+   "id": "hot_imsyy",
+   "name": "DailyHot 前端站 API",
+   "url": "https://hot.imsyy.top/api/weibo",
+   "code": 403,
+   "bytes": 0,
+   "error": "HTTP 403",
+   "clues": 0,
+   "ok": false,
+   "kind": "开源项目公共实例",
+   "license": "MIT",
+   "note": "与官方实例互为备份"
+  }
+ ],
+ "开源项目": [
+  {
+   "repo": "imsyy/DailyHotApi",
+   "stars": 4100,
+   "license": "MIT",
+   "pushed": "2026-03-11",
+   "lang": "TypeScript",
+   "定位": "热榜 JSON/RSS API，20+ 路由",
+   "部署": "Docker / Vercel / Node",
+   "建议": "通路 A 主选；路由随上游改版失效，须逐路由实测",
+   "meta": "搜索资料"
+  },
+  {
+   "repo": "ourongxing/newsnow",
+   "stars": 21900,
+   "license": "MIT",
+   "pushed": "2026-11",
+   "lang": "TypeScript",
+   "定位": "50+ 实时热榜阅读器，自带 /api/s JSON",
+   "部署": "Cloudflare Pages（免费 10 万次/天）/ Vercel / Docker",
+   "建议": "比 DailyHotApi 更适合当常驻源；建议自建避免公共实例限流",
+   "meta": "GitHub API 实测"
+  },
+  {
+   "repo": "DIYgod/RSSHub",
+   "stars": 47105,
+   "license": "AGPL-3.0",
+   "pushed": "2026-11-19",
+   "lang": "TypeScript",
+   "定位": "万物皆 RSS，路由最多",
+   "部署": "Docker / Vercel / Zeabur",
+   "建议": "降级神器；注意 AGPL-3.0，嵌入自家产品前评估许可",
+   "meta": "GitHub API 实测"
+  },
+  {
+   "repo": "sansan0/TrendRadar",
+   "stars": 63732,
+   "license": "GPL-3.0",
+   "pushed": "2026-11-15",
+   "lang": "Python",
+   "定位": "35 平台热榜 + 关键词筛选 + 推送 + MCP + SQLite 历史",
+   "部署": "GitHub Actions / Docker",
+   "建议": "只可参考架构，GPL-3.0 不可嵌入本项目代码；数据源仍是 newsnow /api/s",
+   "meta": "GitHub API 实测"
+  },
+  {
+   "repo": "vikiboss/60s",
+   "stars": null,
+   "license": "开源",
+   "pushed": "—",
+   "lang": "TypeScript",
+   "定位": "60 秒早报 + 微博/抖音/知乎/B站/小红书热搜静态 JSON",
+   "部署": "Cloudflare Workers / Deno / Bun / Node / Docker",
+   "建议": "每天 60 秒读报这类拼盘源可直接用它；GitHub Actions 定时生成静态 JSON",
+   "meta": "搜索资料"
+  },
+  {
+   "repo": "NanmiCoder/MediaCrawler",
+   "stars": 71359,
+   "license": "NOASSERTION",
+   "pushed": "2026-11-17",
+   "lang": "Python",
+   "定位": "小红书/抖音/快手/B站/微博 关键词采集（playwright + stealth）",
+   "部署": "本地 / 服务器，需登录态",
+   "建议": "属通路 D，不是热榜 API；需 Cookie/代理/无头浏览器，别放进日报主链路",
+   "meta": "GitHub API 实测"
+  },
+  {
+   "repo": "ikenxuan/amagi",
+   "stars": null,
+   "license": "—",
+   "pushed": "—",
+   "lang": "Node.js",
+   "定位": "多平台 Node SDK，封装抖音/B站/快手/小红书核心接口",
+   "部署": "npm 本地",
+   "建议": "通路 D 的可选签名适配层，需自持环境",
+   "meta": "搜索资料"
+  },
+  {
+   "repo": "Johnserf-Seed/f2",
+   "stars": 2742,
+   "license": "Apache-2.0",
+   "pushed": "2026-10-19",
+   "lang": "Python",
+   "定位": "抖音 a_bogus / X-Bogus 签名与会话令牌管理",
+   "部署": "本地",
+   "建议": "通路 D 的参考实现；本项目不内置 JS VM 逆向",
+   "meta": "GitHub API 实测"
+  },
+  {
+   "repo": "ReaJason/xhs",
+   "stars": 2239,
+   "license": "MIT",
+   "pushed": "2025-07-01",
+   "lang": "Python",
+   "定位": "小红书 x-s/x-t 签名封装（需 playwright）",
+   "部署": "本地",
+   "建议": "通路 D；最后提交已一年多，改版风险高",
+   "meta": "GitHub API 实测"
+  },
+  {
+   "repo": "imsyy/DailyHot",
+   "stars": 913,
+   "license": "MIT",
+   "pushed": "2024-11-05",
+   "lang": "Vue",
+   "定位": "DailyHotApi 配套前端",
+   "部署": "静态站",
+   "建议": "只要 API，前端非必需",
+   "meta": "GitHub API 实测"
+  },
+  {
+   "repo": "searxng/searxng",
+   "stars": null,
+   "license": "AGPL-3.0",
+   "pushed": "—",
+   "lang": "Python",
+   "定位": "免费元搜索聚合，可自建无 key 全网检索",
+   "部署": "Docker",
+   "建议": "可做 Bing 站内回查的自建替代，解决词条→独立原文",
+   "meta": "搜索资料"
+  }
+ ],
+ "免费额度": [
+  {
+   "用途": "词条→独立原文回查",
+   "服务": "Serper",
+   "免费额度": "2,500 次一次性（无需信用卡）",
+   "环境变量": "SERPER_API_KEY",
+   "说明": "本项目已对接 lookup_article；一次跑批约几十次，够用很久"
+  },
+  {
+   "用途": "词条→独立原文回查",
+   "服务": "Tavily",
+   "免费额度": "1,000 credits/月",
+   "环境变量": "TAVILY_API_KEY",
+   "说明": "已对接；返回自带清洗后正文"
+  },
+  {
+   "用途": "独立原文正文补采",
+   "服务": "Jina Reader r.jina.ai",
+   "免费额度": "无 key 20 RPM；注册 10M tokens",
+   "环境变量": "JINA_API_KEY（可选）",
+   "说明": "本轮已接入 fetch_article_text 降级链，trafilatura 抽不到时自动试"
+  },
+  {
+   "用途": "正文/网页转 Markdown",
+   "服务": "Jina Reader",
+   "免费额度": "10M tokens 一次性",
+   "环境变量": "JINA_API_KEY",
+   "说明": "ReaderLM-v2 自托管为 CC-BY-NC 4.0，商用需许可"
+  },
+  {
+   "用途": "抖音/小红书/微信热榜",
+   "服务": "DataXAPI",
+   "免费额度": "新用户 50 次；最多 333 次试用",
+   "环境变量": "HOT_API_KEY",
+   "说明": "通路 C；失败不收费"
+  },
+  {
+   "用途": "多平台热榜/搜一搜",
+   "服务": "TikHub",
+   "免费额度": "部分端点 allow_free_credit",
+   "环境变量": "HOT_API_KEY",
+   "说明": "榜单系列 31 个接口均可用免费额度"
+  },
+  {
+   "用途": "热榜免费看（网页）",
+   "服务": "Okdata",
+   "免费额度": "11 个平台实时热榜免费看",
+   "环境变量": "—",
+   "说明": "API 调用按次计费；免费页只适合人工抽查"
+  },
+  {
+   "用途": "SERP 搜索",
+   "服务": "SerpApi / Bright Data / Apify / Exa",
+   "免费额度": "250 次/月 · 5,000 次/月 · $5/月 · $10/月",
+   "环境变量": "（自定义）",
+   "说明": "可按项目替换 Bing 站内回查；注意是否需信用卡"
+  },
+  {
+   "用途": "免费部署",
+   "服务": "Cloudflare Pages / Vercel / GitHub Actions",
+   "免费额度": "10 万 Functions 调用/天 / 免费额度 / 2,000 分钟/月",
+   "环境变量": "—",
+   "说明": "NewsNow / DailyHotApi / 60s 都能白嫖常驻，比 Notebook 稳"
+  }
+ ],
+ "结论": "本网络下全部免费公共实例被拦/超时（代码不编数据）；换 unrestricted 网络或自建 Cloudflare Pages 即自动启用"
+}
