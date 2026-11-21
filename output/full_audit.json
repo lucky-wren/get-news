@@ -1,7 +1,7 @@
 {
- "generated_at": "2026-11-21T23:20:15+08:00",
- "硬项": 53,
- "PASS": 53,
+ "generated_at": "2026-11-22T00:21:32+08:00",
+ "硬项": 54,
+ "PASS": 54,
  "FAIL": 0,
  "失败项": [],
  "全部": [
@@ -258,6 +258,12 @@
    "硬项": true
   },
   {
+   "项": "线上 CI 截图三条规格 FAIL 全部修掉（56/59 不再由自检口径造成）",
+   "结果": "PASS",
+   "证据": "裸域名映射 / 编号正则 / 口径表逐平台 10 行 / 单个 xlsx 只数期次产物 / 验收通过后才覆盖固定地址；verify_spec_ci.py 真出表 + 子进程拦截 copyfile 验证",
+   "硬项": true
+  },
+  {
    "项": "㉜ 质量门禁按最终成品/真实回查复算（硬闸越严不再越容易红）",
    "结果": "PASS",
    "证据": "线上 353.7s/600s 剩余 246.3s 误报预算耗尽 → 只补 6 篇 → evidence 全 B 封顶 → A 恒空",
@@ -308,7 +314,7 @@
   {
    "项": "⑧ 全套既有 verify 脚本 rc=0",
    "结果": "PASS",
-   "证据": "scripts/verify_spec.py=0; scripts/verify_rules.py=0; scripts/verify_search_quality.py=0; scripts/verify_workflow.py=0; scripts/verify_deploy.py=0; scripts/verify_channel_resolve.py=0; scripts/verify_quality_v3.py=0; scripts/check_keys.py=0; scripts/verify_branding.py=0; scripts/verify_budget.py=0; scripts/verify_runtime_budget.py=0; scripts/verify_quality_gate.py=0; scripts/verify_share_pages.py=0; scripts/smoke_run.py=0; scripts/verify_quality_metric_scope.py=0; scripts/rejudge_online_batch.py=0",
+   "证据": "scripts/verify_spec.py=0; scripts/verify_rules.py=0; scripts/verify_search_quality.py=0; scripts/verify_workflow.py=0; scripts/verify_deploy.py=0; scripts/verify_channel_resolve.py=0; scripts/verify_quality_v3.py=0; scripts/check_keys.py=0; scripts/verify_branding.py=0; scripts/verify_budget.py=0; scripts/verify_runtime_budget.py=0; scripts/verify_quality_gate.py=0; scripts/verify_share_pages.py=0; scripts/smoke_run.py=0; scripts/verify_quality_metric_scope.py=0; scripts/rejudge_online_batch.py=0; scripts/verify_spec_ci.py=0",
    "硬项": true,
    "明细": [
     {
@@ -406,6 +412,12 @@
      "rc": 0,
      "尾行": "14/14 PASS → /data/workspace/news_daily/output/online_batch_rejudge.json | /data/workspace/news_daily/output/线上批次新规则重判对照.xlsx",
      "一次rc": 0
+    },
+    {
+     "脚本": "scripts/verify_spec_ci.py",
+     "rc": 0,
+     "尾行": "9/9 PASS → /data/workspace/news_daily/output/spec_ci_verify.json",
+     "一次rc": 0
     }
    ]
   },
@@ -418,10 +430,10 @@
   {
    "项": "⑨ 项目包完整性（隐藏目录 / 证据 / 中文名 / 单份 xlsx）",
    "结果": "PASS",
-   "证据": "207 条目",
+   "证据": "210 条目",
    "硬项": true,
    "明细": {
-    "条目数": 207,
+    "条目数": 210,
     "问题": [],
     "PASS": true
    }
