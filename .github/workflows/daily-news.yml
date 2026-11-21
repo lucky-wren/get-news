@@ -1,0 +1,431 @@
+name: 资讯获取（定时 + 覆盖式 Pages）
+
+# ─────────────────────────────────────────────────────────────
+# 固定页面地址：https://<owner>.github.io/<repo>/
+# 每次运行覆盖同一份 docs/data/latest.json + docs/downloads/latest.xlsx，
+# index.html 不变，页面地址永不随批次变化。
+#
+# 「几点跑 / 窗口期」只在 config.yaml 里配：
+#   python scripts/set_schedule.py 20:00 --window 24
+# 该脚本会把 UTC cron 同步到下面这一行（cron 必须是静态字面量）。
+# UTC 12:00 = 北京时间 20:00（中国无夏令时，全年固定）。
+# ─────────────────────────────────────────────────────────────
+on:
+  schedule:
+    - cron: '0 12 * * *'
+  workflow_dispatch:
+    inputs:
+      source:
+        description: '数据源（留空用 config.yaml 的 source.mode）'
+        required: false
+        default: ''
+        type: choice
+        options: ['', live, hybrid, demo, inbox]
+      window_start:
+        description: '窗口左界（留空用 config.yaml 的 relative 窗口）'
+        required: false
+        default: ''
+      window_end:
+        description: '窗口右界（留空用 config.yaml 的 relative 窗口）'
+        required: false
+        default: ''
+      window_interval:
+        description: '端点开闭（留空用 config.yaml，默认 lo-ro 左开右开）'
+        required: false
+        default: ''
+        type: choice
+        options: ['', lo-ro, lo-rc, lc-ro, lc-rc]
+      output_suffix:
+        description: '产物名后缀（同日多次补跑避免覆盖）'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: news-daily-pages
+  cancel-in-progress: false
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      TZ: Asia/Shanghai
+      INPUT_SOURCE: ${{ inputs.source }}
+      INPUT_START: ${{ inputs.window_start }}
+      INPUT_END: ${{ inputs.window_end }}
+      INPUT_INTERVAL: ${{ inputs.window_interval }}
+      INPUT_SUFFIX: ${{ inputs.output_suffix }}
+      SERPER_API_KEY: ${{ secrets.SERPER_API_KEY }}
+      TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
+      # 通路 C（已授权聚合 Key，可选）：配了就自动覆盖小红书 / 微信搜一搜
+      HOT_API_PROVIDER: ${{ secrets.HOT_API_PROVIDER }}
+      HOT_API_KEY: ${{ secrets.HOT_API_KEY }}
+      HOT_API_BASE_URL: ${{ secrets.HOT_API_BASE_URL }}
+      HOT_API_KEYWORDS: ${{ secrets.HOT_API_KEYWORDS }}
+      # 自建 NewsNow 时可显式指定风格；留空则自动双格式探测
+      HOT_API_STYLE: ${{ secrets.HOT_API_STYLE }}
+      # Jina Reader 免费 key（可选）：把无 key 20 RPM 提到 500 RPM
+      JINA_API_KEY: ${{ secrets.JINA_API_KEY }}
+
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 准备日志目录（排障前置）
+        shell: bash
+        run: |
+          # logs/ 未被 git 跟踪，checkout 后必然不存在。放在最前面，
+          # 保证后续任何 tee / 重定向与 always() 摘要都有落脚点。
+          mkdir -p logs
+          echo "run_id=${{ github.run_id }}" > logs/run-meta.txt
+
+      - name: 准备 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: pip
+
+      - name: 安装依赖
+        run: pip install -r requirements.txt
+
+      - name: 解析单点配置（config.yaml + 手动覆盖）
+        id: cfg
+        shell: bash
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import os, sys, yaml
+          from datetime import datetime, timedelta
+          from zoneinfo import ZoneInfo
+          c = yaml.safe_load(open('config.yaml', encoding='utf-8')) or {}
+          s, w, o = c.get('schedule', {}), c.get('window', {}), c.get('output', {})
+          src = os.environ.get('INPUT_SOURCE', '').strip() or c.get('source', {}).get('mode', 'demo')
+          interval = os.environ.get('INPUT_INTERVAL', '').strip() or w.get('interval', 'lo-ro')
+          start = os.environ.get('INPUT_START', '').strip()
+          end = os.environ.get('INPUT_END', '').strip()
+          suffix = os.environ.get('INPUT_SUFFIX', '').strip()
+          run_at = str(s.get('run_at', '20:00'))
+          cron_utc = str(s.get('cron_utc', '0 12 * * *'))
+          if not (start and end):
+              if w.get('mode') == 'relative':
+                  tz = ZoneInfo(w.get('timezone', 'Asia/Shanghai'))
+                  now = datetime.now(tz).replace(second=0, microsecond=0)
+                  # 2026-11-20 实测：23:10 手动补跑时 relative 窗口跟着 now 漂成
+                  # (前一日23:10, 当日23:10)，与定稿 20:00 锚点差 3h10m。
+                  # anchor_to_run_at=true 时锁到「最近一个已过去的 run_at」。
+                  if w.get('anchor_to_run_at', True):
+                      hh, mm = (int(x) for x in run_at.split(':'))
+                      base = now.replace(hour=hh, minute=mm)
+                      if base > now:
+                          base -= timedelta(days=1)
+                  else:
+                      base = now
+                  start = (base + timedelta(hours=float(w.get('start_offset_hours', -24)))).strftime('%Y-%m-%d %H:%M')
+                  end = (base + timedelta(hours=float(w.get('end_offset_hours', 0)))).strftime('%Y-%m-%d %H:%M')
+              else:
+                  start, end = w.get('start'), w.get('end')
+          date = end.split(' ')[0].replace('-', '_')
+          stem = o.get('name', '{date}_窗口期.xlsx').replace('{date}', date)
+          name = stem.replace('.xlsx', suffix + '.xlsx') if suffix else stem
+          for k, v in (('source', src), ('start', start), ('end', end),
+                       ('interval', interval), ('suffix', suffix), ('xlsx_name', name),
+                       ('run_at', run_at), ('cron_utc', cron_utc),
+                       ('schedule_enabled', str(s.get('enabled', True)).lower())):
+              print(f'{k}={v}')
+          # 同一个 step 内引用 ${{ steps.cfg.outputs.* }} 恒为空（outputs 要下个 step 才注入）；
+          # 改成写 stderr，日志里直接能看到正确值。
+          print(f'[配置] 每天 {run_at} | cron {cron_utc} | 窗口 {start} → {end} ({interval}) | 产物 {name}',
+                file=sys.stderr)
+          PY
+
+      - name: 并行预探测（一次完成全部扩源实测，总闸 150 秒）
+        # 2026-11-21 超时事故：原先 6 个增强 step 各自串行做一轮全网探测，
+        # 最坏 10+10+8+8+8+5 = 49 分钟，且反复测同一批域名。
+        # 现在一个进程内并行跑完，逐项独立超时、独立留痕，失败只降级复用已有结果。
+        continue-on-error: true
+        timeout-minutes: 5
+        shell: bash
+        run: |
+          mkdir -p logs
+          python scripts/preflight.py --total 150 2>&1 | tee logs/preflight.log || true
+          echo "[预探测] 后续 6 个增强 step 只读结果打印，不再重复发网络请求"
+
+      - name: 端点自动发现（读预探测结果）
+        continue-on-error: true
+        timeout-minutes: 2
+        shell: bash
+        run: |
+          mkdir -p logs
+          python - <<'PY' 2>&1 | tee -a logs/discover-endpoints.log || true
+          import json, pathlib
+          p = pathlib.Path('data/preflight_result.json')
+          d = json.loads(p.read_text(encoding='utf-8')) if p.exists() else {}
+          r = next((x for x in d.get('逐项', []) if x['项'] == '端点自动发现'), {})
+          print(f"端点自动发现：{r.get('状态', '预探测未产出，复用仓库已有清单')} "
+                f"({r.get('耗时秒', 0)}s) | 预探测总耗时 {d.get('实际耗时秒', '—')}s")
+          q = pathlib.Path('data/endpoints_live.yaml')
+          import yaml
+          e = yaml.safe_load(q.read_text(encoding='utf-8')) or {} if q.exists() else {}
+          print(f"实证端点 {len(e.get('endpoints', []))} 个（网络不可达时如实复用，不编造）")
+          PY
+
+      - name: 全渠道可达性矩阵（读预探测结果）
+        continue-on-error: true
+        timeout-minutes: 2
+        shell: bash
+        run: |
+          mkdir -p logs
+          python - <<'PY' 2>&1 | tee -a logs/reach.log || true
+          import json, pathlib
+          p = pathlib.Path('data/channel_reach.json')
+          d = json.loads(p.read_text(encoding='utf-8'))['汇总'] if p.exists() else {}
+          print(f"白名单 {d.get('白名单', '—')} 渠道 | 实证端点 {d.get('实证端点渠道', '—')} | "
+                f"指纹救回 {d.get('指纹救回', '—')} | 逐渠道启用动作 {d.get('有启用动作', '—')}")
+          r = d.get('两类逐条解析', {})
+          print(f"非独立站点 / DNS 未解析两类：{r.get('原两类合计', '—')} → "
+                f"已解析 {r.get('已解析条数', '—')} | 零通路 {r.get('零通路条数', '—')}")
+          PY
+
+      - name: 两类渠道逐条解析（读预探测结果）
+        continue-on-error: true
+        timeout-minutes: 2
+        shell: bash
+        run: |
+          mkdir -p logs
+          python - <<'PY' 2>&1 | tee -a logs/channel-resolve.log || true
+          import json, pathlib
+          p = pathlib.Path('data/channel_resolved.json')
+          d = json.loads(p.read_text(encoding='utf-8')) if p.exists() else {}
+          if d.get('原两类合计', 0) == 0:
+              print("::warning::两类渠道解析为 0 条（主白名单结构属性异常），不得判成功")
+          print(f"[结论] {d.get('结论', '预探测未产出，复用上一版结果')}")
+          print(f"[实测] {d.get('实测', {})}")
+          PY
+
+      - name: ★ 必采缺口定向重测（21 条，读预探测结果）
+        # 预探测阶段已真发请求调用 news_pipeline.star_retest 并写回端点清单；
+        # 这里只打印逐条结论，绝不重复联网（截图里 35 分钟超时的来源之一）。
+        continue-on-error: true
+        timeout-minutes: 2
+        shell: bash
+        run: |
+          mkdir -p logs
+          python - <<'PY' 2>&1 | tee logs/star-retest.log || true
+          import json, pathlib
+          p = pathlib.Path('data/star_retest_result.json')
+          d = json.loads(p.read_text(encoding='utf-8')) if p.exists() else {}
+          print(f"★ 缺口重测：通过 {d.get('通过渠道数', '—')}/{d.get('渠道数', '—')} 个渠道 | "
+                f"新增发现端点 {d.get('新增发现端点数', '—')} 个 | "
+                f"采集端点保持 {d.get('采集端点总数', '—')} 个不变")
+          for r in d.get('逐条', [])[:25]:
+              print(f"  {r.get('判定', '—'):4s} {r.get('渠道', '—')}")
+          print(f"[边界] {d.get('诚实边界', '预探测未产出，复用上一版清单')}")
+          print("star_retest_result.json 由预探测调用 news_pipeline.star_retest 一次性生成")
+          print("本 step 只读结果打印，不二次请求")
+          PY
+
+      - name: 免费源池实测（读预探测结果）
+        continue-on-error: true
+        timeout-minutes: 2
+        shell: bash
+        run: |
+          mkdir -p logs
+          python - <<'PY' 2>&1 | tee -a logs/free-sources.log || true
+          import json, pathlib
+          p = pathlib.Path('data/free_sources_probe.json')
+          d = json.loads(p.read_text(encoding='utf-8')) if p.exists() else {}
+          print(f"免费公共实例 {len(d.get('实例', []))} 个 | 可达 {len(d.get('可达', []))} 个 | "
+                f"{d.get('结论', '预探测未产出')}")
+          PY
+
+      - name: 无 Key 检索通道实测（读预探测结果）
+        continue-on-error: true
+        timeout-minutes: 2
+        shell: bash
+        run: |
+          mkdir -p logs
+          python - <<'PY' 2>&1 | tee -a logs/keyless-probe.log || true
+          import json, pathlib
+          p = pathlib.Path('data/preflight_result.json')
+          d = json.loads(p.read_text(encoding='utf-8')) if p.exists() else {}
+          r = next((x for x in d.get('逐项', []) if x['项'] == '无 Key 检索通道实测'), {})
+          print(f"无 Key 检索通道：{r.get('状态', '预探测未产出')} ({r.get('耗时秒', 0)}s)")
+          print("Google News RSS / Bing RSS / GDELT / SearXNG 真实探测见 logs/keyless-probe.log")
+          PY
+
+      - name: 采集 → 筛选评级 → 五工作表 Excel
+        # 15min 硬杀会 SIGTERM 掉 Python，Excel 未落盘、后面 6 步全跳过。
+        # 脚本自带 600s 全局预算（NEWS_BUDGET_TOTAL / config.yaml budget），
+        # 到点短路采集层但必定出表；15 分钟只是兜底，正常 8–10 分钟返回。
+        timeout-minutes: 15
+        shell: bash
+        env:
+          WIN_START: ${{ steps.cfg.outputs.start }}
+          WIN_END: ${{ steps.cfg.outputs.end }}
+          SEARXNG_URL: ${{ secrets.SEARXNG_URL }}
+          DAILYHOT_BASE_URL: ${{ secrets.DAILYHOT_BASE_URL || 'http://127.0.0.1:7860' }}
+          NEWS_BUDGET_TOTAL: "600"
+        run: |
+          set -o pipefail
+          mkdir -p logs
+          HOT_PID=""
+          if [[ "$DAILYHOT_BASE_URL" == *127.0.0.1* ]]; then
+            python scripts/modelscope_notebook.py --serve --port 7860               > logs/hotapi.log 2>&1 &
+            HOT_PID=$!
+            trap 'kill "$HOT_PID" 2>/dev/null || true' EXIT
+            for i in $(seq 1 5); do
+              if curl -fsS http://127.0.0.1:7860/health >/dev/null 2>&1; then
+                echo "通路 A 聚合端点就绪（runner 内自建）"; break
+              fi
+              sleep 1
+            done
+            # 逐平台连通性由「并行预探测」一次性产出，这里只读结果，不重复发请求
+            if [ -f logs/hot_probe.json ]; then
+              python - <<'PY'
+          import json
+          d = json.load(open('logs/hot_probe.json', encoding='utf-8'))
+          print(f"[预探测] 可取得 {len(d.get('可取得', []))} 个平台：{'、'.join(d.get('可取得', [])) or '无'}")
+          print(f"[预探测] 不可取得 {len(d.get('不可取得', []))} 个平台（逐路径见 logs/hot-probe.log）")
+          PY
+            else
+              echo "logs/hot_probe.json 未产出（预探测降级），本批按已有端点继续，不阻断出表"
+            fi
+          else
+            echo "通路 A 使用外部聚合端点：$DAILYHOT_BASE_URL"
+          fi
+          ARGS=(--source "${{ steps.cfg.outputs.source }}" \
+                --start "$WIN_START" --end "$WIN_END" \
+                --interval "${{ steps.cfg.outputs.interval }}" \
+                --rss --apis --html --json-summary --spec-verify)
+          if [ -n "${{ steps.cfg.outputs.suffix }}" ]; then
+            ARGS+=(--suffix "${{ steps.cfg.outputs.suffix }}")
+          fi
+          python run.py "${ARGS[@]}" 2>&1 | tee logs/ci-run.log
+          XLSX="output/${{ steps.cfg.outputs.xlsx_name }}"
+          if [ ! -f "$XLSX" ]; then XLSX="$(ls -t output/*_窗口期*.xlsx | head -1)"; fi
+          test -n "$XLSX" && test -f "$XLSX" || { echo '未生成 Excel 产物'; exit 1; }
+          echo "XLSX=$XLSX" >> "$GITHUB_ENV"
+          echo "本期产物：$XLSX"
+          if [ -f output/budget_report.json ]; then
+            python - <<'PY' || true
+          import json
+          d = json.load(open('output/budget_report.json', encoding='utf-8'))
+          print(f"[运行预算] {d['实际耗时秒']}s / {d['总预算秒']}s | 剩余 {d['剩余秒']}s | {d['结论']}")
+          for r in d['逐层']:
+              print(f"  {r['层']:<12} 配额 {r['配额秒']}s 实耗 {r['实耗秒']}s 允许={r['允许']}")
+          PY
+          fi
+
+      - name: 构建固定站点（覆盖原文档）
+        shell: bash
+        run: |
+          python build_site.py \
+            --xlsx "$XLSX" \
+            --summary "${XLSX%.xlsx}.json" \
+            --mode "${{ steps.cfg.outputs.source }}" \
+            --overwrite
+          echo "固定文件："
+          ls -lh docs/data/latest.json docs/downloads/latest.xlsx docs/assets/news-data.js
+
+      - name: 渠道端点体检（可行动清单）
+        continue-on-error: true
+        shell: bash
+        run: |
+          mkdir -p logs
+          python scripts/check_endpoints.py --offline 2>&1 | tee logs/endpoints.txt
+
+      - name: 覆盖提交回仓库（页面地址不变）
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # -A 同时记录「旧期次文件被删除」，保证仓库里只剩固定地址那一份
+          # 2026-11-21 修复：原只 add docs/，端点重测 / ★ 缺口重测 / 覆盖报告等 data/
+          # 成果随 runner 销毁全部丢失，导致「每次构建自动重测」实际每次都从零开始。
+          git add -A docs/ \
+            data/endpoints_live.yaml \
+            data/v3_star_pending.yaml \
+            data/star_retest_result.json \
+            data/channel_coverage.json \
+            data/channel_reach.json \
+            data/channel_resolved.json \
+            data/channel_health.json \
+            data/free_sources_probe.json
+          if git diff --staged --quiet; then
+            echo "本期数据与上一版一致，跳过提交"
+          else
+            git commit -m "chore: 覆盖资讯获取数据 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M') [skip ci]"
+            git push
+          fi
+
+      - name: 配置 GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: 上传站点产物
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+      - name: 部署到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: CI 运行摘要（供排查）
+        if: always()
+        shell: bash
+        run: |
+          # 必须自己建目录：上一步可能失败 / 被跳过，logs/ 在 checkout 后本就不存在。
+          # 2026-11-20 事故里这个「供排查」的 step 反而因缺目录先崩了，排查信息全丢。
+          mkdir -p logs
+          {
+            echo "Actions run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            echo "job 状态: ${{ job.status }}"
+            echo "固定页面地址: ${{ steps.deployment.outputs.page_url }}"
+            echo "commit: ${{ github.sha }}"
+            echo "定时: 每天 ${{ steps.cfg.outputs.run_at }} Asia/Shanghai (cron ${{ steps.cfg.outputs.cron_utc }})"
+            echo "窗口: ${{ steps.cfg.outputs.start }} → ${{ steps.cfg.outputs.end }} (${{ steps.cfg.outputs.interval }})"
+            echo "数据源: ${{ steps.cfg.outputs.source }}"
+            echo "产物: docs/downloads/latest.xlsx"
+            echo "完成时间: $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M:%S')"
+            echo "说明: 端点重测 / 可达性矩阵 / 免费源池 / 端点体检均为增强项，"
+            echo "      失败只告警不阻断；主链路（采集 → 建站 → 提交 → 部署）失败才使本 job 红。"
+          } > logs/ci-summary.txt || true
+          python - <<'PY' >> logs/ci-summary.txt 2>/dev/null || true
+          import json, glob, os
+          fs = sorted(glob.glob('output/*.json'), key=os.path.getmtime, reverse=True)
+          if not fs:
+              print('质量门禁：未找到运行摘要 JSON（前置步骤可能未跑到出表）')
+          else:
+              q = (json.load(open(fs[0], encoding='utf-8')) or {}).get('采集质量', {})
+              print('质量门禁结论：' + str(q.get('结论', '—')))
+              print('未达标项：' + ('、'.join(q.get('未达标项', [])) or '无'))
+              print('待配置端点渠道数：' + str(q.get('待配置端点', '—')))
+              for k, v in (q.get('指标') or {}).items():
+                  print('  %s: %s (%s %s) %s' % (k, v.get('实测'),
+                        '下限' if v.get('方向') == 'min' else '上限',
+                        v.get('下限', v.get('上限')), '达标' if v.get('达标') else '未达标'))
+          PY
+          if [ -f logs/runs.jsonl ]; then
+            echo "--- 最近一次运行索引 ---" >> logs/ci-summary.txt || true
+            tail -1 logs/runs.jsonl >> logs/ci-summary.txt || true
+          fi
+          echo "--- 本 job 已生成的排障文件 ---" >> logs/ci-summary.txt || true
+          ls -1 logs/ >> logs/ci-summary.txt 2>/dev/null || true
+          cat logs/ci-summary.txt || true
+
+      - name: 上传运行日志（保留 7 天）
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: news-run-logs-${{ github.run_id }}
+          path: logs/
+          if-no-files-found: warn
+          retention-days: 7
