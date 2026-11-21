@@ -1,0 +1,3741 @@
+generated_at: '2026-11-18 20:55:25'
+source: scripts/discover_endpoints.py 真实请求 + 真实解析（非人工登记）
+rule: 仅保留 HTTP 200 且解析出 >=1 条带时间字段条目的端点；其余逐条申报失败原因
+endpoints:
+- id: CN-CCTV-NEWS
+  channel: 央视网新闻
+  type: jsonp
+  url: https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/news_1.jsonp?cb=news
+  pages: 7
+  section: 中央媒体 / 频道级 JSONP 时间倒排
+  note: 频道接口实测存在，非 news 频道仅探测前 3 页
+  url_tpl: https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/news_{i}.jsonp?cb=news
+  verified_items: 500
+  time_samples: 500
+  latest_pub: '2026-11-18 20:28:57'
+  oldest_pub: '2026-11-14 15:19:46'
+  level: ★
+  requires: none
+- id: CN-CCTV-CHINA
+  channel: 央视网新闻
+  type: jsonp
+  url: https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/china_1.jsonp?cb=news
+  pages: 3
+  section: 中央媒体 / 频道级 JSONP 时间倒排
+  note: 频道接口实测存在，非 news 频道仅探测前 3 页
+  url_tpl: https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/china_{i}.jsonp?cb=news
+  verified_items: 240
+  time_samples: 240
+  latest_pub: '2026-11-18 20:28:57'
+  oldest_pub: '2026-11-16 09:52:44'
+  level: ★
+  requires: none
+- id: CN-CCTV-WORLD
+  channel: 央视网新闻
+  type: jsonp
+  url: https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/world_1.jsonp?cb=news
+  pages: 3
+  section: 中央媒体 / 频道级 JSONP 时间倒排
+  note: 频道接口实测存在，非 news 频道仅探测前 3 页
+  url_tpl: https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/world_{i}.jsonp?cb=news
+  verified_items: 240
+  time_samples: 240
+  latest_pub: '2026-11-18 14:33:13'
+  oldest_pub: '2026-11-04 06:32:29'
+  level: ★
+  requires: none
+- id: CN-CCTV-SOCIETY
+  channel: 央视网新闻
+  type: jsonp
+  url: https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/society_1.jsonp?cb=news
+  pages: 3
+  section: 中央媒体 / 频道级 JSONP 时间倒排
+  note: 频道接口实测存在，非 news 频道仅探测前 3 页
+  url_tpl: https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/society_{i}.jsonp?cb=news
+  verified_items: 240
+  time_samples: 240
+  latest_pub: '2026-11-18 13:52:59'
+  oldest_pub: '2026-10-28 00:33:53'
+  level: ★
+  requires: none
+- id: CN-CCTV-TECH
+  channel: 央视网新闻
+  type: jsonp
+  url: https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/tech_1.jsonp?cb=news
+  pages: 3
+  section: 中央媒体 / 频道级 JSONP 时间倒排
+  note: 频道接口实测存在，非 news 频道仅探测前 3 页
+  url_tpl: https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/tech_{i}.jsonp?cb=news
+  verified_items: 240
+  time_samples: 240
+  latest_pub: '2026-11-18 11:53:05'
+  oldest_pub: '2026-09-21 04:10:23'
+  level: ★
+  requires: none
+- id: CN-CCTV-ENT
+  channel: 央视网新闻
+  type: jsonp
+  url: https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/ent_1.jsonp?cb=news
+  pages: 3
+  section: 中央媒体 / 频道级 JSONP 时间倒排
+  note: 频道接口实测存在，非 news 频道仅探测前 3 页
+  url_tpl: https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/ent_{i}.jsonp?cb=news
+  verified_items: 228
+  time_samples: 228
+  latest_pub: '2026-11-18 17:50:06'
+  oldest_pub: '2026-09-19 04:31:03'
+  level: ★
+  requires: none
+- id: CN-CNS-RSS-SCROLL-NEWS
+  channel: 中新网
+  type: rss
+  url: https://www.chinanews.com.cn/rss/scroll-news.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS（RFC822 +0800）
+  note: ''
+  verified_items: 30
+  time_samples: 30
+  latest_pub: Wed, 18 Nov 2026 20:45:20 +0800
+  oldest_pub: Wed, 18 Nov 2026 19:58:14 +0800
+  level: ★
+  requires: none
+- id: CN-CNS-RSS-CHINA
+  channel: 中新网
+  type: rss
+  url: https://www.chinanews.com.cn/rss/china.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS（RFC822 +0800）
+  note: ''
+  verified_items: 30
+  time_samples: 30
+  latest_pub: Wed, 18 Nov 2026 20:39:18 +0800
+  oldest_pub: Wed, 18 Nov 2026 16:54:48 +0800
+  level: ★
+  requires: none
+- id: CN-CNS-RSS-WORLD
+  channel: 中新网
+  type: rss
+  url: https://www.chinanews.com.cn/rss/world.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS（RFC822 +0800）
+  note: ''
+  verified_items: 30
+  time_samples: 30
+  latest_pub: Wed, 18 Nov 2026 20:33:48 +0800
+  oldest_pub: Wed, 18 Nov 2026 08:00:29 +0800
+  level: ★
+  requires: none
+- id: CN-CNS-RSS-SOCIETY
+  channel: 中新网
+  type: rss
+  url: https://www.chinanews.com.cn/rss/society.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS（RFC822 +0800）
+  note: ''
+  verified_items: 30
+  time_samples: 30
+  latest_pub: Wed, 18 Nov 2026 20:45:20 +0800
+  oldest_pub: Wed, 18 Nov 2026 16:50:00 +0800
+  level: ★
+  requires: none
+- id: CN-CNS-RSS-SPORTS
+  channel: 中新网
+  type: rss
+  url: https://www.chinanews.com.cn/rss/sports.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS（RFC822 +0800）
+  note: ''
+  verified_items: 30
+  time_samples: 30
+  latest_pub: Wed, 18 Nov 2026 19:37:19 +0800
+  oldest_pub: Sun, 15 Nov 2026 21:05:33 +0800
+  level: ★
+  requires: none
+- id: CN-CNS-RSS-IMPORTNEWS
+  channel: 中新网
+  type: rss
+  url: https://www.chinanews.com.cn/rss/importnews.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS（RFC822 +0800）
+  note: ''
+  verified_items: 30
+  time_samples: 30
+  latest_pub: Wed, 18 Nov 2026 18:28:39 +0800
+  oldest_pub: Tue, 17 Nov 2026 19:25:51 +0800
+  level: ★
+  requires: none
+- id: CN-CNS-RSS-PHOTO
+  channel: 中新网
+  type: rss
+  url: https://www.chinanews.com.cn/rss/photo.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS（RFC822 +0800）
+  note: ''
+  verified_items: 30
+  time_samples: 30
+  latest_pub: Wed, 18 Nov 2026 20:48:59 +0800
+  oldest_pub: Wed, 18 Nov 2026 10:25:53 +0800
+  level: ★
+  requires: none
+- id: CN-CNS-RSS-VIDEO
+  channel: 中新网
+  type: rss
+  url: https://www.chinanews.com.cn/rss/video.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS（RFC822 +0800）
+  note: ''
+  verified_items: 30
+  time_samples: 30
+  latest_pub: Mon, 9 Dec 2024 14:07:37 +0800
+  oldest_pub: Fri, 6 Dec 2024 11:19:34 +0800
+  level: ★
+  requires: none
+- id: CN-CNS-RSS-EDU
+  channel: 中新网
+  type: rss
+  url: https://www.chinanews.com.cn/rss/edu.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS（RFC822 +0800）
+  note: ''
+  verified_items: 16
+  time_samples: 16
+  latest_pub: Wed, 18 Nov 2026 14:20:19 +0800
+  oldest_pub: Sun, 15 Nov 2026 08:40:17 +0800
+  level: ★
+  requires: none
+- id: CN-CNS-RSS-FINANCE
+  channel: 中新网
+  type: rss
+  url: https://www.chinanews.com.cn/rss/finance.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS（RFC822 +0800）
+  note: ''
+  verified_items: 30
+  time_samples: 30
+  latest_pub: Wed, 18 Nov 2026 20:39:56 +0800
+  oldest_pub: Wed, 18 Nov 2026 15:36:12 +0800
+  level: ★
+  requires: none
+- id: CN-CNS-RSS-HEALTH
+  channel: 中新网
+  type: rss
+  url: https://www.chinanews.com.cn/rss/health.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS（RFC822 +0800）
+  note: ''
+  verified_items: 29
+  time_samples: 29
+  latest_pub: Wed, 18 Nov 2026 16:06:15 +0800
+  oldest_pub: Sat, 14 Nov 2026 08:40:06 +0800
+  level: ★
+  requires: none
+- id: CN-CNS-ROLL-1
+  channel: 中新网滚动
+  type: html_cns
+  url: https://www.chinanews.com.cn/scroll-news/news1.html
+  encoding: utf-8
+  pages: 1
+  section: 中央媒体 / 站内时间倒排页
+  note: ''
+  verified_items: 72
+  time_samples: 72
+  latest_pub: 2026-11-18 20:46
+  oldest_pub: 2026-11-18 17:57
+  level: ★
+  requires: none
+- id: CN-CNS-ROLL-2
+  channel: 中新网滚动
+  type: html_cns
+  url: https://www.chinanews.com.cn/scroll-news/news2.html
+  encoding: utf-8
+  pages: 1
+  section: 中央媒体 / 站内时间倒排页
+  note: ''
+  verified_items: 79
+  time_samples: 79
+  latest_pub: 2026-11-18 17:54
+  oldest_pub: 2026-11-18 16:07
+  level: ★
+  requires: none
+- id: CN-CNS-ROLL-3
+  channel: 中新网滚动
+  type: html_cns
+  url: https://www.chinanews.com.cn/scroll-news/news3.html
+  encoding: utf-8
+  pages: 1
+  section: 中央媒体 / 站内时间倒排页
+  note: ''
+  verified_items: 69
+  time_samples: 69
+  latest_pub: 2026-11-18 16:06
+  oldest_pub: 2026-11-18 13:47
+  level: ★
+  requires: none
+- id: CN-CNS-ROLL-4
+  channel: 中新网滚动
+  type: html_cns
+  url: https://www.chinanews.com.cn/scroll-news/news4.html
+  encoding: utf-8
+  pages: 1
+  section: 中央媒体 / 站内时间倒排页
+  note: ''
+  verified_items: 69
+  time_samples: 69
+  latest_pub: 2026-11-18 13:46
+  oldest_pub: 2026-11-18 10:20
+  level: ★
+  requires: none
+- id: CN-CNS-ROLL-5
+  channel: 中新网滚动
+  type: html_cns
+  url: https://www.chinanews.com.cn/scroll-news/news5.html
+  encoding: utf-8
+  pages: 1
+  section: 中央媒体 / 站内时间倒排页
+  note: ''
+  verified_items: 67
+  time_samples: 67
+  latest_pub: 2026-11-18 10:20
+  oldest_pub: 2026-11-18 00:33
+  level: ★
+  requires: none
+- id: CN-PEOPLE-RSS-POLITICS
+  channel: 人民网
+  type: rss
+  url: http://www.people.com.cn/rss/politics.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS
+  note: 实测多数为往年归档，窗口过滤如实剔除
+  verified_items: 100
+  time_samples: 100
+  latest_pub: '2025-06-05'
+  oldest_pub: '2025-06-03'
+  level: ★
+  requires: none
+- id: CN-PEOPLE-RSS-FINANCE
+  channel: 人民网
+  type: rss
+  url: http://www.people.com.cn/rss/finance.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS
+  note: 实测多数为往年归档，窗口过滤如实剔除
+  verified_items: 100
+  time_samples: 100
+  latest_pub: '2025-06-05'
+  oldest_pub: '2025-06-04'
+  level: ★
+  requires: none
+- id: CN-PEOPLE-RSS-SOCIETY
+  channel: 人民网
+  type: rss
+  url: http://www.people.com.cn/rss/society.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS
+  note: 实测多数为往年归档，窗口过滤如实剔除
+  verified_items: 100
+  time_samples: 100
+  latest_pub: '2025-06-05'
+  oldest_pub: '2025-06-03'
+  level: ★
+  requires: none
+- id: CN-PEOPLE-RSS-WORLD
+  channel: 人民网
+  type: rss
+  url: http://www.people.com.cn/rss/world.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS
+  note: 实测多数为往年归档，窗口过滤如实剔除
+  verified_items: 100
+  time_samples: 100
+  latest_pub: '2025-06-05'
+  oldest_pub: '2025-06-04'
+  level: ★
+  requires: none
+- id: CN-PEOPLE-RSS-EDU
+  channel: 人民网
+  type: rss
+  url: http://www.people.com.cn/rss/edu.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS
+  note: 实测多数为往年归档，窗口过滤如实剔除
+  verified_items: 50
+  time_samples: 50
+  latest_pub: '2016-04-05 08:54:33'
+  oldest_pub: '2016-03-30 18:05:18'
+  level: ★
+  requires: none
+- id: CN-PEOPLE-RSS-HEALTH
+  channel: 人民网
+  type: rss
+  url: http://www.people.com.cn/rss/health.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS
+  note: 实测多数为往年归档，窗口过滤如实剔除
+  verified_items: 100
+  time_samples: 100
+  latest_pub: '2025-06-05'
+  oldest_pub: '2025-05-30'
+  level: ★
+  requires: none
+- id: CN-PEOPLE-RSS-IT
+  channel: 人民网
+  type: rss
+  url: http://www.people.com.cn/rss/it.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS
+  note: 实测多数为往年归档，窗口过滤如实剔除
+  verified_items: 100
+  time_samples: 100
+  latest_pub: '2024-07-03'
+  oldest_pub: '2021-02-04'
+  level: ★
+  requires: none
+- id: CN-PEOPLE-RSS-ENV
+  channel: 人民网
+  type: rss
+  url: http://www.people.com.cn/rss/env.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS
+  note: 实测多数为往年归档，窗口过滤如实剔除
+  verified_items: 100
+  time_samples: 100
+  latest_pub: '2025-06-05'
+  oldest_pub: '2025-05-12'
+  level: ★
+  requires: none
+- id: CN-PEOPLE-RSS-LEGAL
+  channel: 人民网
+  type: rss
+  url: http://www.people.com.cn/rss/legal.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS
+  note: 实测多数为往年归档，窗口过滤如实剔除
+  verified_items: 100
+  time_samples: 100
+  latest_pub: '2025-06-05'
+  oldest_pub: '2025-05-30'
+  level: ★
+  requires: none
+- id: CN-PEOPLE-RSS-MILITARY
+  channel: 人民网
+  type: rss
+  url: http://www.people.com.cn/rss/military.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS
+  note: 实测多数为往年归档，窗口过滤如实剔除
+  verified_items: 100
+  time_samples: 100
+  latest_pub: '2025-06-05'
+  oldest_pub: '2025-05-26'
+  level: ★
+  requires: none
+- id: CN-PEOPLE-RSS-OPINION
+  channel: 人民网
+  type: rss
+  url: http://www.people.com.cn/rss/opinion.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS
+  note: 实测多数为往年归档，窗口过滤如实剔除
+  verified_items: 100
+  time_samples: 100
+  latest_pub: '2025-06-05'
+  oldest_pub: '2025-05-24'
+  level: ★
+  requires: none
+- id: CN-PEOPLE-RSS-THEORY
+  channel: 人民网
+  type: rss
+  url: http://www.people.com.cn/rss/theory.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS
+  note: 实测多数为往年归档，窗口过滤如实剔除
+  verified_items: 100
+  time_samples: 100
+  latest_pub: '2025-06-05'
+  oldest_pub: '2025-05-29'
+  level: ★
+  requires: none
+- id: CN-PEOPLE-RSS-CULTURE
+  channel: 人民网
+  type: rss
+  url: http://www.people.com.cn/rss/culture.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS
+  note: 实测多数为往年归档，窗口过滤如实剔除
+  verified_items: 100
+  time_samples: 100
+  latest_pub: '2025-05-25'
+  oldest_pub: '2023-07-05'
+  level: ★
+  requires: none
+- id: CN-PEOPLE-RSS-SPORTS
+  channel: 人民网
+  type: rss
+  url: http://www.people.com.cn/rss/sports.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS
+  note: 实测多数为往年归档，窗口过滤如实剔除
+  verified_items: 100
+  time_samples: 100
+  latest_pub: '2025-05-10'
+  oldest_pub: '2021-02-09'
+  level: ★
+  requires: none
+- id: CN-PEOPLE-RSS-TRAVEL
+  channel: 人民网
+  type: rss
+  url: http://www.people.com.cn/rss/travel.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS
+  note: 实测多数为往年归档，窗口过滤如实剔除
+  verified_items: 100
+  time_samples: 100
+  latest_pub: '2024-11-15'
+  oldest_pub: '2021-02-01'
+  level: ★
+  requires: none
+- id: CN-PEOPLE-RSS-AUTO
+  channel: 人民网
+  type: rss
+  url: http://www.people.com.cn/rss/auto.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS
+  note: 实测多数为往年归档，窗口过滤如实剔除
+  verified_items: 100
+  time_samples: 100
+  latest_pub: '2021-12-10'
+  oldest_pub: '2021-01-18'
+  level: ★
+  requires: none
+- id: CN-PEOPLE-RSS-HOUSE
+  channel: 人民网
+  type: rss
+  url: http://www.people.com.cn/rss/house.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS
+  note: 实测多数为往年归档，窗口过滤如实剔除
+  verified_items: 100
+  time_samples: 100
+  latest_pub: '2024-08-13'
+  oldest_pub: '2021-07-29'
+  level: ★
+  requires: none
+- id: CN-PEOPLE-RSS-TV
+  channel: 人民网
+  type: rss
+  url: http://www.people.com.cn/rss/tv.xml
+  pages: 1
+  section: 中央媒体 / 频道 RSS
+  note: 实测多数为往年归档，窗口过滤如实剔除
+  verified_items: 100
+  time_samples: 100
+  latest_pub: '2024-08-06'
+  oldest_pub: '2019-01-13'
+  level: ★
+  requires: none
+- id: CN-PEOPLE-NEWS
+  channel: 人民网首页
+  type: html_people
+  url: http://www.people.com.cn/GB/59476/index.html
+  pages: 1
+  section: 中央媒体 / 站内列表
+  note: ''
+  verified_items: 20
+  time_samples: 20
+  latest_pub: '2026-11-18'
+  oldest_pub: '2026-11-18'
+  level: ★
+  requires: none
+- id: CN-XINHUA
+  channel: 新华网
+  type: html_generic
+  url: https://www.xinhuanet.com/
+  pages: 1
+  section: 中央媒体 / 站内时间倒排页
+  note: ''
+  verified_items: 181
+  time_samples: 181
+  latest_pub: '2026-11-18'
+  oldest_pub: '2008-02-22'
+  level: ★
+  requires: none
+- id: CN-NEWS-CN
+  channel: 新华网·news.cn
+  type: html_generic
+  url: https://www.news.cn/
+  pages: 1
+  section: 中央媒体 / 站内时间倒排页
+  note: ''
+  verified_items: 181
+  time_samples: 181
+  latest_pub: '2026-11-18'
+  oldest_pub: '2008-02-22'
+  level: ★
+  requires: none
+- id: CN-XINHUA-LOCAL
+  channel: 新华网地方
+  type: html_generic
+  url: https://www.news.cn/local/
+  pages: 1
+  section: 中央媒体 / 站内时间倒排页
+  note: ''
+  verified_items: 31
+  time_samples: 31
+  latest_pub: '2026-11-17'
+  oldest_pub: '2021-01-14'
+  level: ★
+  requires: none
+- id: CN-GMW
+  channel: 光明网
+  type: html_generic
+  url: https://www.gmw.cn/
+  pages: 1
+  section: 中央媒体 / 站内时间倒排页
+  note: ''
+  verified_items: 170
+  time_samples: 170
+  latest_pub: '2026-10-20'
+  oldest_pub: '2010-09-08'
+  level: ★
+  requires: none
+- id: CN-CE
+  channel: 中国经济网
+  type: html_generic
+  url: https://www.ce.cn/
+  pages: 1
+  section: 中央媒体 / 站内时间倒排页
+  note: ''
+  verified_items: 136
+  time_samples: 136
+  latest_pub: '2026-11-17'
+  oldest_pub: '2025-02-11'
+  level: ★
+  requires: none
+- id: CN-CE-NEWS
+  channel: 中国经济网新闻
+  type: html_generic
+  url: https://www.ce.cn/xwzx/
+  pages: 1
+  section: 中央媒体 / 站内时间倒排页
+  note: ''
+  verified_items: 94
+  time_samples: 94
+  latest_pub: '2026-11-18'
+  oldest_pub: '2025-09-26'
+  level: ★
+  requires: none
+- id: CN-CYOL
+  channel: 中国青年报
+  type: html_generic
+  url: https://www.cyol.com/
+  pages: 1
+  section: 中央媒体 / 站内时间倒排页
+  note: ''
+  verified_items: 107
+  time_samples: 107
+  latest_pub: '2026-11-18'
+  oldest_pub: '2026-11-16'
+  level: ★
+  requires: none
+- id: CN-CCTV-HOME
+  channel: 央视网首页
+  type: html_cctv
+  url: https://news.cctv.com/
+  pages: 1
+  section: 中央媒体 / 站内时间倒排页
+  note: ''
+  verified_items: 6
+  time_samples: 6
+  latest_pub: '2026-11-18'
+  oldest_pub: '2026-11-18'
+  level: ★
+  requires: none
+- id: CN-MEE
+  channel: 生态环境部
+  type: html_generic
+  url: https://www.mee.gov.cn/
+  pages: 1
+  section: 部委与政务 / 站内公告列表
+  note: ''
+  verified_items: 157
+  time_samples: 157
+  latest_pub: '2026-11-17'
+  oldest_pub: '2026-11-13'
+  level: ★
+  requires: none
+- id: CN-NDRC
+  channel: 国家发展改革委
+  type: html_generic
+  url: https://www.ndrc.gov.cn/
+  pages: 1
+  section: 部委与政务 / 站内公告列表
+  note: ''
+  verified_items: 91
+  time_samples: 91
+  latest_pub: '2026-11-17'
+  oldest_pub: '2026-05-29'
+  level: ★
+  requires: none
+- id: CN-MIIT
+  channel: 工业和信息化部
+  type: html_generic
+  url: https://www.miit.gov.cn/
+  pages: 1
+  section: 部委与政务 / 站内公告列表
+  note: ''
+  verified_items: 78
+  time_samples: 78
+  latest_pub: '2026-11-18'
+  oldest_pub: '2026-01-30'
+  level: ★
+  requires: none
+- id: CN-PBC
+  channel: 中国人民银行
+  type: html_generic
+  url: http://www.pbc.gov.cn/
+  pages: 1
+  section: 部委与政务 / 站内公告列表
+  note: ''
+  verified_items: 61
+  time_samples: 61
+  latest_pub: '2026-11-18'
+  oldest_pub: '2026-11-18'
+  level: ★
+  requires: none
+- id: CN-MOFCOM
+  channel: 商务部
+  type: html_generic
+  url: http://www.mofcom.gov.cn/
+  pages: 1
+  section: 部委与政务 / 站内公告列表
+  note: ''
+  verified_items: 14
+  time_samples: 14
+  latest_pub: '2026-11-18'
+  oldest_pub: '2026-10-26'
+  level: ★
+  requires: none
+- id: CN-CSRC
+  channel: 中国证监会
+  type: html_generic
+  url: http://www.csrc.gov.cn/
+  pages: 1
+  section: 部委与政务 / 站内公告列表
+  note: ''
+  verified_items: 1
+  time_samples: 1
+  latest_pub: '2026-11-16'
+  oldest_pub: '2026-11-16'
+  level: ★
+  requires: none
+- id: WL-SPPGOVCN
+  channel: 最高检
+  type: html_generic
+  url: https://www.spp.gov.cn/rss.xml
+  section: 白名单入口派生 / 站内时间倒排页
+  note: 域名 spp.gov.cn 深度探测命中 https://www.spp.gov.cn/rss.xml，83 条带日期条目
+  verified_items: 83
+  time_samples: 83
+  latest_pub: '2026-11-18'
+  oldest_pub: ''
+  level: ★
+  requires: none
+  derived: true
+rejected:
+- id: CN-GOV-YAOWEN
+  channel: 中国政府网要闻
+  url: https://www.gov.cn/yaowen/liebiao/
+  reason: 解析出 0 条带时间条目
+- id: INTL-GNEWS
+  channel: Google News RSS
+  url: https://news.google.com/rss/search?q=%E8%A6%81%E9%97%BB%20when:1d&hl=zh-CN&gl=CN&ceid=CN:zh-Hans
+  reason: HTTP 403
+- id: INTL-USGS
+  channel: USGS 显著地震
+  url: https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_day.geojson
+  reason: HTTP 403
+- id: INTL-GDACS
+  channel: GDACS 灾害预警
+  url: https://www.gdacs.org/xml/rss.xml
+  reason: HTTP 403
+- id: INTL-RELIEF
+  channel: ReliefWeb 灾害报告
+  url: https://api.reliefweb.int/v1/reports?appname=news-daily&limit=40
+  reason: HTTP 403
+- id: INTL-GDELT
+  channel: GDELT DOC 2.0
+  url: https://api.gdeltproject.org/api/v2/doc/doc?query=china&mode=artlist&format=json&maxrecords=60
+  reason: HTTP 403
+- id: INTL-BBC
+  channel: BBC News RSS
+  url: https://feeds.bbci.co.uk/news/rss.xml
+  reason: HTTP 403
+domain_probe:
+- ok: false
+  domain: news.cctv.cn
+  url: https://news.cctv.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://news.cctv.cn/
+    status: 403
+    items: 0
+  - url: http://news.cctv.cn/
+    status: 403
+    items: 0
+  - url: https://www.news.cctv.cn/rss.xml
+    status: URLError
+    items: 0
+  - url: https://www.news.cctv.cn/rss/
+    status: URLError
+    items: 0
+  - url: https://www.news.cctv.cn/news/
+    status: URLError
+    items: 0
+  - url: https://www.news.cctv.cn/xwzx/
+    status: URLError
+    items: 0
+  - url: https://www.news.cctv.cn/yaowen/
+    status: URLError
+    items: 0
+  - url: https://www.news.cctv.cn/zhengce/zuixin.htm
+    status: URLError
+    items: 0
+- ok: false
+  domain: ysxw.cctv.cn
+  url: https://ysxw.cctv.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://ysxw.cctv.cn/
+    status: 403
+    items: 0
+  - url: http://ysxw.cctv.cn/
+    status: 403
+    items: 0
+  - url: https://www.ysxw.cctv.cn/rss.xml
+    status: URLError
+    items: 0
+  - url: https://www.ysxw.cctv.cn/rss/
+    status: URLError
+    items: 0
+  - url: https://www.ysxw.cctv.cn/news/
+    status: URLError
+    items: 0
+  - url: https://www.ysxw.cctv.cn/xwzx/
+    status: URLError
+    items: 0
+  - url: https://www.ysxw.cctv.cn/yaowen/
+    status: URLError
+    items: 0
+  - url: https://www.ysxw.cctv.cn/zhengce/zuixin.htm
+    status: URLError
+    items: 0
+- ok: false
+  domain: news.cn
+  url: https://news.cn/
+  reason: 可打开但各形态均未抽到 ≥3 条带日期条目
+  attempts:
+  - url: https://news.cn/
+    status: 403
+    items: 0
+  - url: http://news.cn/
+    status: 403
+    items: 0
+  - url: https://www.news.cn/rss.xml
+    status: 404
+    items: 0
+  - url: https://www.news.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.news.cn/news/
+    status: 200
+    items: 0
+    latest: ''
+  - url: https://www.news.cn/xwzx/
+    status: 404
+    items: 0
+  - url: https://www.news.cn/yaowen/
+    status: 200
+    items: 0
+    latest: ''
+  - url: https://www.news.cn/zhengce/zuixin.htm
+    status: 404
+    items: 0
+- ok: false
+  domain: xinhuanet.com
+  url: https://xinhuanet.com/
+  reason: 可打开但各形态均未抽到 ≥3 条带日期条目
+  attempts:
+  - url: https://xinhuanet.com/
+    status: 403
+    items: 0
+  - url: http://xinhuanet.com/
+    status: 403
+    items: 0
+  - url: https://www.xinhuanet.com/rss.xml
+    status: 404
+    items: 0
+  - url: https://www.xinhuanet.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.xinhuanet.com/news/
+    status: 200
+    items: 0
+    latest: ''
+  - url: https://www.xinhuanet.com/xwzx/
+    status: 404
+    items: 0
+  - url: https://www.xinhuanet.com/yaowen/
+    status: 200
+    items: 0
+    latest: ''
+  - url: https://www.xinhuanet.com/zhengce/zuixin.htm
+    status: 404
+    items: 0
+- ok: true
+  domain: chinanews.com.cn
+  url: https://www.chinanews.com.cn/rss/
+  channel: 中新网
+  items: 3
+  latest: '2024-09-24'
+  attempts:
+  - url: https://chinanews.com.cn/
+    status: URLError
+    items: 0
+  - url: http://chinanews.com.cn/
+    status: URLError
+    items: 0
+  - url: https://www.chinanews.com.cn/rss.xml
+    status: 404
+    items: 0
+  - url: https://www.chinanews.com.cn/rss/
+    status: 200
+    items: 3
+    latest: '2024-09-24'
+  - url: https://www.chinanews.com.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.chinanews.com.cn/xwzx/
+    status: 404
+    items: 0
+  - url: https://www.chinanews.com.cn/yaowen/
+    status: 404
+    items: 0
+  - url: https://www.chinanews.com.cn/zhengce/zuixin.htm
+    status: 404
+    items: 0
+- ok: false
+  domain: people.com.cn
+  url: https://people.com.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://people.com.cn/
+    status: 403
+    items: 0
+  - url: http://people.com.cn/
+    status: 403
+    items: 0
+  - url: https://www.people.com.cn/rss.xml
+    status: 404
+    items: 0
+  - url: https://www.people.com.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.people.com.cn/news/
+    status: 404
+    items: 0
+  - url: https://www.people.com.cn/xwzx/
+    status: 404
+    items: 0
+  - url: https://www.people.com.cn/yaowen/
+    status: 404
+    items: 0
+  - url: https://www.people.com.cn/zhengce/zuixin.htm
+    status: 404
+    items: 0
+- ok: false
+  domain: cnr.cn
+  url: https://cnr.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://cnr.cn/
+    status: 403
+    items: 0
+  - url: http://cnr.cn/
+    status: 403
+    items: 0
+  - url: https://www.cnr.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.cnr.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.cnr.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.cnr.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.cnr.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.cnr.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: china.com.cn
+  url: https://china.com.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://china.com.cn/
+    status: 403
+    items: 0
+  - url: http://china.com.cn/
+    status: 403
+    items: 0
+  - url: https://www.china.com.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.china.com.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.china.com.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.china.com.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.china.com.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.china.com.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: cnnic.cn
+  url: https://cnnic.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://cnnic.cn/
+    status: 403
+    items: 0
+  - url: http://cnnic.cn/
+    status: 403
+    items: 0
+  - url: https://www.cnnic.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.cnnic.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.cnnic.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.cnnic.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.cnnic.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.cnnic.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: ccidnet.com
+  url: https://ccidnet.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://ccidnet.com/
+    status: 403
+    items: 0
+  - url: http://ccidnet.com/
+    status: 403
+    items: 0
+  - url: https://www.ccidnet.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.ccidnet.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.ccidnet.com/news/
+    status: 403
+    items: 0
+  - url: https://www.ccidnet.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.ccidnet.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.ccidnet.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: miit.gov.cn
+  url: https://miit.gov.cn/
+  reason: HTTP 404（候选路径不存在，需补该站正确 RSS / 列表页 URL）
+  attempts:
+  - url: https://miit.gov.cn/
+    status: URLError
+    items: 0
+  - url: http://miit.gov.cn/
+    status: URLError
+    items: 0
+  - url: https://www.miit.gov.cn/rss.xml
+    status: 404
+    items: 0
+  - url: https://www.miit.gov.cn/rss/
+    status: 404
+    items: 0
+  - url: https://www.miit.gov.cn/news/
+    status: 404
+    items: 0
+  - url: https://www.miit.gov.cn/xwzx/
+    status: 404
+    items: 0
+  - url: https://www.miit.gov.cn/yaowen/
+    status: 404
+    items: 0
+  - url: https://www.miit.gov.cn/zhengce/zuixin.htm
+    status: 404
+    items: 0
+- ok: false
+  domain: cas.cn
+  url: https://cas.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://cas.cn/
+    status: 403
+    items: 0
+  - url: http://cas.cn/
+    status: 403
+    items: 0
+  - url: https://www.cas.cn/rss.xml
+    status: 404
+    items: 0
+  - url: https://www.cas.cn/rss/
+    status: 404
+    items: 0
+  - url: https://www.cas.cn/news/
+    status: 404
+    items: 0
+  - url: https://www.cas.cn/xwzx/
+    status: 404
+    items: 0
+  - url: https://www.cas.cn/yaowen/
+    status: 404
+    items: 0
+  - url: https://www.cas.cn/zhengce/zuixin.htm
+    status: 404
+    items: 0
+- ok: false
+  domain: 36kr.com
+  url: https://36kr.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://36kr.com/
+    status: 403
+    items: 0
+  - url: http://36kr.com/
+    status: 403
+    items: 0
+  - url: https://www.36kr.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.36kr.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.36kr.com/news/
+    status: 403
+    items: 0
+  - url: https://www.36kr.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.36kr.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.36kr.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: huxiu.com
+  url: https://huxiu.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://huxiu.com/
+    status: 403
+    items: 0
+  - url: http://huxiu.com/
+    status: 403
+    items: 0
+  - url: https://www.huxiu.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.huxiu.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.huxiu.com/news/
+    status: 403
+    items: 0
+  - url: https://www.huxiu.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.huxiu.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.huxiu.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: tmtpost.com
+  url: https://tmtpost.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://tmtpost.com/
+    status: 403
+    items: 0
+  - url: http://tmtpost.com/
+    status: 403
+    items: 0
+  - url: https://www.tmtpost.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.tmtpost.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.tmtpost.com/news/
+    status: 403
+    items: 0
+  - url: https://www.tmtpost.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.tmtpost.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.tmtpost.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: geekpark.net
+  url: https://geekpark.net/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://geekpark.net/
+    status: 403
+    items: 0
+  - url: http://geekpark.net/
+    status: 403
+    items: 0
+  - url: https://www.geekpark.net/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.geekpark.net/rss/
+    status: 403
+    items: 0
+  - url: https://www.geekpark.net/news/
+    status: 403
+    items: 0
+  - url: https://www.geekpark.net/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.geekpark.net/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.geekpark.net/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: qbitai.com
+  url: https://qbitai.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://qbitai.com/
+    status: 403
+    items: 0
+  - url: http://qbitai.com/
+    status: 403
+    items: 0
+  - url: https://www.qbitai.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.qbitai.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.qbitai.com/news/
+    status: 403
+    items: 0
+  - url: https://www.qbitai.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.qbitai.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.qbitai.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: jiqizhixin.com
+  url: https://jiqizhixin.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://jiqizhixin.com/
+    status: 403
+    items: 0
+  - url: http://jiqizhixin.com/
+    status: 403
+    items: 0
+  - url: https://www.jiqizhixin.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.jiqizhixin.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.jiqizhixin.com/news/
+    status: 403
+    items: 0
+  - url: https://www.jiqizhixin.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.jiqizhixin.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.jiqizhixin.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: aiera.com.cn
+  url: https://aiera.com.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://aiera.com.cn/
+    status: 403
+    items: 0
+  - url: http://aiera.com.cn/
+    status: 403
+    items: 0
+  - url: https://www.aiera.com.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.aiera.com.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.aiera.com.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.aiera.com.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.aiera.com.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.aiera.com.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: leiphone.com
+  url: https://leiphone.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://leiphone.com/
+    status: 403
+    items: 0
+  - url: http://leiphone.com/
+    status: 403
+    items: 0
+  - url: https://www.leiphone.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.leiphone.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.leiphone.com/news/
+    status: 403
+    items: 0
+  - url: https://www.leiphone.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.leiphone.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.leiphone.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: pingwest.com
+  url: https://pingwest.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://pingwest.com/
+    status: 403
+    items: 0
+  - url: http://pingwest.com/
+    status: 403
+    items: 0
+  - url: https://www.pingwest.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.pingwest.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.pingwest.com/news/
+    status: 403
+    items: 0
+  - url: https://www.pingwest.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.pingwest.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.pingwest.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: cyzone.cn
+  url: https://cyzone.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://cyzone.cn/
+    status: 403
+    items: 0
+  - url: http://cyzone.cn/
+    status: 403
+    items: 0
+  - url: https://www.cyzone.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.cyzone.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.cyzone.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.cyzone.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.cyzone.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.cyzone.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: tech.sina.com.cn
+  url: https://tech.sina.com.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://tech.sina.com.cn/
+    status: 403
+    items: 0
+  - url: http://tech.sina.com.cn/
+    status: 403
+    items: 0
+  - url: https://www.tech.sina.com.cn/rss.xml
+    status: URLError
+    items: 0
+  - url: https://www.tech.sina.com.cn/rss/
+    status: URLError
+    items: 0
+  - url: https://www.tech.sina.com.cn/news/
+    status: URLError
+    items: 0
+  - url: https://www.tech.sina.com.cn/xwzx/
+    status: URLError
+    items: 0
+  - url: https://www.tech.sina.com.cn/yaowen/
+    status: URLError
+    items: 0
+  - url: https://www.tech.sina.com.cn/zhengce/zuixin.htm
+    status: URLError
+    items: 0
+- ok: false
+  domain: it.sohu.com
+  url: https://it.sohu.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://it.sohu.com/
+    status: 403
+    items: 0
+  - url: http://it.sohu.com/
+    status: 403
+    items: 0
+  - url: https://www.it.sohu.com/rss.xml
+    status: URLError
+    items: 0
+  - url: https://www.it.sohu.com/rss/
+    status: URLError
+    items: 0
+  - url: https://www.it.sohu.com/news/
+    status: URLError
+    items: 0
+  - url: https://www.it.sohu.com/xwzx/
+    status: URLError
+    items: 0
+  - url: https://www.it.sohu.com/yaowen/
+    status: URLError
+    items: 0
+  - url: https://www.it.sohu.com/zhengce/zuixin.htm
+    status: URLError
+    items: 0
+- ok: false
+  domain: techweb.com.cn
+  url: https://techweb.com.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://techweb.com.cn/
+    status: 403
+    items: 0
+  - url: http://techweb.com.cn/
+    status: 403
+    items: 0
+  - url: https://www.techweb.com.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.techweb.com.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.techweb.com.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.techweb.com.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.techweb.com.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.techweb.com.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: ithome.com
+  url: https://ithome.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://ithome.com/
+    status: 403
+    items: 0
+  - url: http://ithome.com/
+    status: 403
+    items: 0
+  - url: https://www.ithome.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.ithome.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.ithome.com/news/
+    status: 403
+    items: 0
+  - url: https://www.ithome.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.ithome.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.ithome.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: ifanr.com
+  url: https://ifanr.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://ifanr.com/
+    status: 403
+    items: 0
+  - url: http://ifanr.com/
+    status: 403
+    items: 0
+  - url: https://www.ifanr.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.ifanr.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.ifanr.com/news/
+    status: 403
+    items: 0
+  - url: https://www.ifanr.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.ifanr.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.ifanr.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: sspai.com
+  url: https://sspai.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://sspai.com/
+    status: 403
+    items: 0
+  - url: http://sspai.com/
+    status: 403
+    items: 0
+  - url: https://www.sspai.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.sspai.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.sspai.com/news/
+    status: 403
+    items: 0
+  - url: https://www.sspai.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.sspai.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.sspai.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: mydrivers.com
+  url: https://mydrivers.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://mydrivers.com/
+    status: 403
+    items: 0
+  - url: http://mydrivers.com/
+    status: 403
+    items: 0
+  - url: https://www.mydrivers.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.mydrivers.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.mydrivers.com/news/
+    status: 403
+    items: 0
+  - url: https://www.mydrivers.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.mydrivers.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.mydrivers.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: zol.com.cn
+  url: https://zol.com.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://zol.com.cn/
+    status: 403
+    items: 0
+  - url: http://zol.com.cn/
+    status: 403
+    items: 0
+  - url: https://www.zol.com.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.zol.com.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.zol.com.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.zol.com.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.zol.com.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.zol.com.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: pconline.com.cn
+  url: https://pconline.com.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://pconline.com.cn/
+    status: 403
+    items: 0
+  - url: http://pconline.com.cn/
+    status: 403
+    items: 0
+  - url: https://www.pconline.com.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.pconline.com.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.pconline.com.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.pconline.com.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.pconline.com.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.pconline.com.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: stats.gov.cn
+  url: https://stats.gov.cn/
+  reason: HTTP 404（候选路径不存在，需补该站正确 RSS / 列表页 URL）
+  attempts:
+  - url: https://stats.gov.cn/
+    status: URLError
+    items: 0
+  - url: http://stats.gov.cn/
+    status: URLError
+    items: 0
+  - url: https://www.stats.gov.cn/rss.xml
+    status: 404
+    items: 0
+  - url: https://www.stats.gov.cn/rss/
+    status: 404
+    items: 0
+  - url: https://www.stats.gov.cn/news/
+    status: 404
+    items: 0
+  - url: https://www.stats.gov.cn/xwzx/
+    status: 404
+    items: 0
+  - url: https://www.stats.gov.cn/yaowen/
+    status: 404
+    items: 0
+  - url: https://www.stats.gov.cn/zhengce/zuixin.htm
+    status: 404
+    items: 0
+- ok: false
+  domain: ndrc.gov.cn
+  url: https://ndrc.gov.cn/
+  reason: HTTP 404（候选路径不存在，需补该站正确 RSS / 列表页 URL）
+  attempts:
+  - url: https://ndrc.gov.cn/
+    status: URLError
+    items: 0
+  - url: http://ndrc.gov.cn/
+    status: URLError
+    items: 0
+  - url: https://www.ndrc.gov.cn/rss.xml
+    status: 404
+    items: 0
+  - url: https://www.ndrc.gov.cn/rss/
+    status: 404
+    items: 0
+  - url: https://www.ndrc.gov.cn/news/
+    status: 404
+    items: 0
+  - url: https://www.ndrc.gov.cn/xwzx/
+    status: 404
+    items: 0
+  - url: https://www.ndrc.gov.cn/yaowen/
+    status: 404
+    items: 0
+  - url: https://www.ndrc.gov.cn/zhengce/zuixin.htm
+    status: 404
+    items: 0
+- ok: false
+  domain: pbc.gov.cn
+  url: https://pbc.gov.cn/
+  reason: HTTP 404（候选路径不存在，需补该站正确 RSS / 列表页 URL）
+  attempts:
+  - url: https://pbc.gov.cn/
+    status: URLError
+    items: 0
+  - url: http://pbc.gov.cn/
+    status: URLError
+    items: 0
+  - url: https://www.pbc.gov.cn/rss.xml
+    status: 404
+    items: 0
+  - url: https://www.pbc.gov.cn/rss/
+    status: 404
+    items: 0
+  - url: https://www.pbc.gov.cn/news/
+    status: 404
+    items: 0
+  - url: https://www.pbc.gov.cn/xwzx/
+    status: 404
+    items: 0
+  - url: https://www.pbc.gov.cn/yaowen/
+    status: 404
+    items: 0
+  - url: https://www.pbc.gov.cn/zhengce/zuixin.htm
+    status: 404
+    items: 0
+- ok: false
+  domain: chinatax.gov.cn
+  url: https://chinatax.gov.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://chinatax.gov.cn/
+    status: URLError
+    items: 0
+  - url: http://chinatax.gov.cn/
+    status: URLError
+    items: 0
+  - url: https://www.chinatax.gov.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.chinatax.gov.cn/rss/
+    status: 404
+    items: 0
+  - url: https://www.chinatax.gov.cn/news/
+    status: 404
+    items: 0
+  - url: https://www.chinatax.gov.cn/xwzx/
+    status: 404
+    items: 0
+  - url: https://www.chinatax.gov.cn/yaowen/
+    status: 404
+    items: 0
+  - url: https://www.chinatax.gov.cn/zhengce/zuixin.htm
+    status: 404
+    items: 0
+- ok: false
+  domain: csrc.gov.cn
+  url: https://csrc.gov.cn/
+  reason: 可打开但各形态均未抽到 ≥3 条带日期条目
+  attempts:
+  - url: https://csrc.gov.cn/
+    status: URLError
+    items: 0
+  - url: http://csrc.gov.cn/
+    status: URLError
+    items: 0
+  - url: https://www.csrc.gov.cn/rss.xml
+    status: 200
+    items: 1
+    latest: '2026-11-16'
+  - url: https://www.csrc.gov.cn/rss/
+    status: 200
+    items: 1
+    latest: '2026-11-16'
+  - url: https://www.csrc.gov.cn/news/
+    status: 200
+    items: 1
+    latest: '2026-11-16'
+  - url: https://www.csrc.gov.cn/xwzx/
+    status: 200
+    items: 1
+    latest: '2026-11-16'
+  - url: https://www.csrc.gov.cn/yaowen/
+    status: 200
+    items: 1
+    latest: '2026-11-16'
+  - url: https://www.csrc.gov.cn/zhengce/zuixin.htm
+    status: 200
+    items: 1
+    latest: '2026-11-16'
+- ok: false
+  domain: mof.gov.cn
+  url: https://mof.gov.cn/
+  reason: HTTP 404（候选路径不存在，需补该站正确 RSS / 列表页 URL）
+  attempts:
+  - url: https://mof.gov.cn/
+    status: URLError
+    items: 0
+  - url: http://mof.gov.cn/
+    status: URLError
+    items: 0
+  - url: https://www.mof.gov.cn/rss.xml
+    status: 404
+    items: 0
+  - url: https://www.mof.gov.cn/rss/
+    status: 404
+    items: 0
+  - url: https://www.mof.gov.cn/news/
+    status: 404
+    items: 0
+  - url: https://www.mof.gov.cn/xwzx/
+    status: 404
+    items: 0
+  - url: https://www.mof.gov.cn/yaowen/
+    status: 404
+    items: 0
+  - url: https://www.mof.gov.cn/zhengce/zuixin.htm
+    status: 404
+    items: 0
+- ok: false
+  domain: mofcom.gov.cn
+  url: https://mofcom.gov.cn/
+  reason: HTTP 404（候选路径不存在，需补该站正确 RSS / 列表页 URL）
+  attempts:
+  - url: https://mofcom.gov.cn/
+    status: URLError
+    items: 0
+  - url: http://mofcom.gov.cn/
+    status: URLError
+    items: 0
+  - url: https://www.mofcom.gov.cn/rss.xml
+    status: 404
+    items: 0
+  - url: https://www.mofcom.gov.cn/rss/
+    status: 404
+    items: 0
+  - url: https://www.mofcom.gov.cn/news/
+    status: 404
+    items: 0
+  - url: https://www.mofcom.gov.cn/xwzx/
+    status: 404
+    items: 0
+  - url: https://www.mofcom.gov.cn/yaowen/
+    status: 404
+    items: 0
+  - url: https://www.mofcom.gov.cn/zhengce/zuixin.htm
+    status: 404
+    items: 0
+- ok: false
+  domain: yicai.com
+  url: https://yicai.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://yicai.com/
+    status: 403
+    items: 0
+  - url: http://yicai.com/
+    status: 403
+    items: 0
+  - url: https://www.yicai.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.yicai.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.yicai.com/news/
+    status: 403
+    items: 0
+  - url: https://www.yicai.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.yicai.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.yicai.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: caixin.com
+  url: https://caixin.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://caixin.com/
+    status: 403
+    items: 0
+  - url: http://caixin.com/
+    status: 403
+    items: 0
+  - url: https://www.caixin.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.caixin.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.caixin.com/news/
+    status: 403
+    items: 0
+  - url: https://www.caixin.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.caixin.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.caixin.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: cls.cn
+  url: https://cls.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://cls.cn/
+    status: 403
+    items: 0
+  - url: http://cls.cn/
+    status: 403
+    items: 0
+  - url: https://www.cls.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.cls.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.cls.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.cls.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.cls.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.cls.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: jiemian.com
+  url: https://jiemian.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://jiemian.com/
+    status: 403
+    items: 0
+  - url: http://jiemian.com/
+    status: 403
+    items: 0
+  - url: https://www.jiemian.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.jiemian.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.jiemian.com/news/
+    status: 403
+    items: 0
+  - url: https://www.jiemian.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.jiemian.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.jiemian.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: nbd.com.cn
+  url: https://nbd.com.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://nbd.com.cn/
+    status: 403
+    items: 0
+  - url: http://nbd.com.cn/
+    status: 403
+    items: 0
+  - url: https://www.nbd.com.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.nbd.com.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.nbd.com.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.nbd.com.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.nbd.com.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.nbd.com.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: eeo.com.cn
+  url: https://eeo.com.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://eeo.com.cn/
+    status: 403
+    items: 0
+  - url: http://eeo.com.cn/
+    status: 403
+    items: 0
+  - url: https://www.eeo.com.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.eeo.com.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.eeo.com.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.eeo.com.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.eeo.com.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.eeo.com.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: 21jingji.com
+  url: https://21jingji.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://21jingji.com/
+    status: 403
+    items: 0
+  - url: http://21jingji.com/
+    status: 403
+    items: 0
+  - url: https://www.21jingji.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.21jingji.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.21jingji.com/news/
+    status: 403
+    items: 0
+  - url: https://www.21jingji.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.21jingji.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.21jingji.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: stcn.com
+  url: https://stcn.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://stcn.com/
+    status: 403
+    items: 0
+  - url: http://stcn.com/
+    status: 403
+    items: 0
+  - url: https://www.stcn.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.stcn.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.stcn.com/news/
+    status: 403
+    items: 0
+  - url: https://www.stcn.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.stcn.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.stcn.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: cs.com.cn
+  url: https://cs.com.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://cs.com.cn/
+    status: 403
+    items: 0
+  - url: http://cs.com.cn/
+    status: 403
+    items: 0
+  - url: https://www.cs.com.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.cs.com.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.cs.com.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.cs.com.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.cs.com.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.cs.com.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: cnstock.com
+  url: https://cnstock.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://cnstock.com/
+    status: 403
+    items: 0
+  - url: http://cnstock.com/
+    status: 403
+    items: 0
+  - url: https://www.cnstock.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.cnstock.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.cnstock.com/news/
+    status: 403
+    items: 0
+  - url: https://www.cnstock.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.cnstock.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.cnstock.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: zqrb.cn
+  url: https://zqrb.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://zqrb.cn/
+    status: 403
+    items: 0
+  - url: http://zqrb.cn/
+    status: 403
+    items: 0
+  - url: https://www.zqrb.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.zqrb.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.zqrb.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.zqrb.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.zqrb.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.zqrb.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: jrj.com.cn
+  url: https://jrj.com.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://jrj.com.cn/
+    status: 403
+    items: 0
+  - url: http://jrj.com.cn/
+    status: 403
+    items: 0
+  - url: https://www.jrj.com.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.jrj.com.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.jrj.com.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.jrj.com.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.jrj.com.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.jrj.com.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: hexun.com
+  url: https://hexun.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://hexun.com/
+    status: 403
+    items: 0
+  - url: http://hexun.com/
+    status: 403
+    items: 0
+  - url: https://www.hexun.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.hexun.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.hexun.com/news/
+    status: 403
+    items: 0
+  - url: https://www.hexun.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.hexun.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.hexun.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: eastmoney.com
+  url: https://eastmoney.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://eastmoney.com/
+    status: 403
+    items: 0
+  - url: http://eastmoney.com/
+    status: 403
+    items: 0
+  - url: https://www.eastmoney.com/rss.xml
+    status: 404
+    items: 0
+  - url: https://www.eastmoney.com/rss/
+    status: 404
+    items: 0
+  - url: https://www.eastmoney.com/news/
+    status: 404
+    items: 0
+  - url: https://www.eastmoney.com/xwzx/
+    status: 404
+    items: 0
+  - url: https://www.eastmoney.com/yaowen/
+    status: 404
+    items: 0
+  - url: https://www.eastmoney.com/zhengce/zuixin.htm
+    status: 404
+    items: 0
+- ok: false
+  domain: xueqiu.com
+  url: https://xueqiu.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://xueqiu.com/
+    status: 403
+    items: 0
+  - url: http://xueqiu.com/
+    status: 403
+    items: 0
+  - url: https://www.xueqiu.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.xueqiu.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.xueqiu.com/news/
+    status: 403
+    items: 0
+  - url: https://www.xueqiu.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.xueqiu.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.xueqiu.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: wallstreetcn.com
+  url: https://wallstreetcn.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://wallstreetcn.com/
+    status: 403
+    items: 0
+  - url: http://wallstreetcn.com/
+    status: 403
+    items: 0
+  - url: https://www.wallstreetcn.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.wallstreetcn.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.wallstreetcn.com/news/
+    status: 403
+    items: 0
+  - url: https://www.wallstreetcn.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.wallstreetcn.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.wallstreetcn.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: guancha.cn
+  url: https://guancha.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://guancha.cn/
+    status: 403
+    items: 0
+  - url: http://guancha.cn/
+    status: 403
+    items: 0
+  - url: https://www.guancha.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.guancha.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.guancha.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.guancha.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.guancha.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.guancha.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: thepaper.cn
+  url: https://thepaper.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://thepaper.cn/
+    status: 403
+    items: 0
+  - url: http://thepaper.cn/
+    status: 403
+    items: 0
+  - url: https://www.thepaper.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.thepaper.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.thepaper.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.thepaper.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.thepaper.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.thepaper.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: jwview.com
+  url: https://jwview.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://jwview.com/
+    status: URLError
+    items: 0
+  - url: http://jwview.com/
+    status: URLError
+    items: 0
+  - url: https://www.jwview.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.jwview.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.jwview.com/news/
+    status: 403
+    items: 0
+  - url: https://www.jwview.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.jwview.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.jwview.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: cnfin.com
+  url: https://cnfin.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://cnfin.com/
+    status: 403
+    items: 0
+  - url: http://cnfin.com/
+    status: 403
+    items: 0
+  - url: https://www.cnfin.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.cnfin.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.cnfin.com/news/
+    status: 403
+    items: 0
+  - url: https://www.cnfin.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.cnfin.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.cnfin.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: caam.org.cn
+  url: https://caam.org.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://caam.org.cn/
+    status: URLError
+    items: 0
+  - url: http://caam.org.cn/
+    status: URLError
+    items: 0
+  - url: https://www.caam.org.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.caam.org.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.caam.org.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.caam.org.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.caam.org.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.caam.org.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: cpcaauto.com
+  url: https://cpcaauto.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://cpcaauto.com/
+    status: 403
+    items: 0
+  - url: http://cpcaauto.com/
+    status: 403
+    items: 0
+  - url: https://www.cpcaauto.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.cpcaauto.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.cpcaauto.com/news/
+    status: 403
+    items: 0
+  - url: https://www.cpcaauto.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.cpcaauto.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.cpcaauto.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: mee.gov.cn
+  url: https://mee.gov.cn/
+  reason: 可打开但各形态均未抽到 ≥3 条带日期条目
+  attempts:
+  - url: https://mee.gov.cn/
+    status: 403
+    items: 0
+  - url: http://mee.gov.cn/
+    status: 403
+    items: 0
+  - url: https://www.mee.gov.cn/rss.xml
+    status: 200
+    items: 1
+    latest: '2018-06-22'
+  - url: https://www.mee.gov.cn/rss/
+    status: 200
+    items: 1
+    latest: '2018-06-22'
+  - url: https://www.mee.gov.cn/news/
+    status: 200
+    items: 1
+    latest: '2018-06-22'
+  - url: https://www.mee.gov.cn/xwzx/
+    status: 200
+    items: 1
+    latest: '2018-06-22'
+  - url: https://www.mee.gov.cn/yaowen/
+    status: 200
+    items: 1
+    latest: '2018-06-22'
+  - url: https://www.mee.gov.cn/zhengce/zuixin.htm
+    status: 200
+    items: 1
+    latest: '2018-06-22'
+- ok: false
+  domain: nea.gov.cn
+  url: https://nea.gov.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://nea.gov.cn/
+    status: URLError
+    items: 0
+  - url: http://nea.gov.cn/
+    status: URLError
+    items: 0
+  - url: https://www.nea.gov.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.nea.gov.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.nea.gov.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.nea.gov.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.nea.gov.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.nea.gov.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: cardailys.com
+  url: https://cardailys.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://cardailys.com/
+    status: 403
+    items: 0
+  - url: http://cardailys.com/
+    status: 403
+    items: 0
+  - url: https://www.cardailys.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.cardailys.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.cardailys.com/news/
+    status: 403
+    items: 0
+  - url: https://www.cardailys.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.cardailys.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.cardailys.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: d1ev.com
+  url: https://d1ev.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://d1ev.com/
+    status: 403
+    items: 0
+  - url: http://d1ev.com/
+    status: 403
+    items: 0
+  - url: https://www.d1ev.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.d1ev.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.d1ev.com/news/
+    status: 403
+    items: 0
+  - url: https://www.d1ev.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.d1ev.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.d1ev.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: xchuxing.com
+  url: https://xchuxing.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://xchuxing.com/
+    status: 403
+    items: 0
+  - url: http://xchuxing.com/
+    status: 403
+    items: 0
+  - url: https://www.xchuxing.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.xchuxing.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.xchuxing.com/news/
+    status: 403
+    items: 0
+  - url: https://www.xchuxing.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.xchuxing.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.xchuxing.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: autohome.com.cn
+  url: https://autohome.com.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://autohome.com.cn/
+    status: 403
+    items: 0
+  - url: http://autohome.com.cn/
+    status: 403
+    items: 0
+  - url: https://www.autohome.com.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.autohome.com.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.autohome.com.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.autohome.com.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.autohome.com.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.autohome.com.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: pcauto.com.cn
+  url: https://pcauto.com.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://pcauto.com.cn/
+    status: 403
+    items: 0
+  - url: http://pcauto.com.cn/
+    status: 403
+    items: 0
+  - url: https://www.pcauto.com.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.pcauto.com.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.pcauto.com.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.pcauto.com.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.pcauto.com.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.pcauto.com.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: bitauto.com
+  url: https://bitauto.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://bitauto.com/
+    status: 403
+    items: 0
+  - url: http://bitauto.com/
+    status: 403
+    items: 0
+  - url: https://www.bitauto.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.bitauto.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.bitauto.com/news/
+    status: 403
+    items: 0
+  - url: https://www.bitauto.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.bitauto.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.bitauto.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: dongchedi.com
+  url: https://dongchedi.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://dongchedi.com/
+    status: 403
+    items: 0
+  - url: http://dongchedi.com/
+    status: 403
+    items: 0
+  - url: https://www.dongchedi.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.dongchedi.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.dongchedi.com/news/
+    status: 403
+    items: 0
+  - url: https://www.dongchedi.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.dongchedi.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.dongchedi.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: 42hao.cn
+  url: https://42hao.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://42hao.cn/
+    status: 403
+    items: 0
+  - url: http://42hao.cn/
+    status: 403
+    items: 0
+  - url: https://www.42hao.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.42hao.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.42hao.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.42hao.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.42hao.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.42hao.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: diandong.com
+  url: https://diandong.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://diandong.com/
+    status: 403
+    items: 0
+  - url: http://diandong.com/
+    status: 403
+    items: 0
+  - url: https://www.diandong.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.diandong.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.diandong.com/news/
+    status: 403
+    items: 0
+  - url: https://www.diandong.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.diandong.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.diandong.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: evpartner.com
+  url: https://evpartner.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://evpartner.com/
+    status: 403
+    items: 0
+  - url: http://evpartner.com/
+    status: 403
+    items: 0
+  - url: https://www.evpartner.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.evpartner.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.evpartner.com/news/
+    status: 403
+    items: 0
+  - url: https://www.evpartner.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.evpartner.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.evpartner.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: cec.org.cn
+  url: https://cec.org.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://cec.org.cn/
+    status: 403
+    items: 0
+  - url: http://cec.org.cn/
+    status: 403
+    items: 0
+  - url: https://www.cec.org.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.cec.org.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.cec.org.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.cec.org.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.cec.org.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.cec.org.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: sgcc.com.cn
+  url: https://sgcc.com.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://sgcc.com.cn/
+    status: URLError
+    items: 0
+  - url: http://sgcc.com.cn/
+    status: URLError
+    items: 0
+  - url: https://www.sgcc.com.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.sgcc.com.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.sgcc.com.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.sgcc.com.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.sgcc.com.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.sgcc.com.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: csg.cn
+  url: https://csg.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://csg.cn/
+    status: 403
+    items: 0
+  - url: http://csg.cn/
+    status: 403
+    items: 0
+  - url: https://www.csg.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.csg.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.csg.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.csg.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.csg.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.csg.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: cma.gov.cn
+  url: https://cma.gov.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://cma.gov.cn/
+    status: URLError
+    items: 0
+  - url: http://cma.gov.cn/
+    status: URLError
+    items: 0
+  - url: https://www.cma.gov.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.cma.gov.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.cma.gov.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.cma.gov.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.cma.gov.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.cma.gov.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: nmpa.gov.cn
+  url: https://nmpa.gov.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://nmpa.gov.cn/
+    status: URLError
+    items: 0
+  - url: http://nmpa.gov.cn/
+    status: URLError
+    items: 0
+  - url: https://www.nmpa.gov.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.nmpa.gov.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.nmpa.gov.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.nmpa.gov.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.nmpa.gov.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.nmpa.gov.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: nhc.gov.cn
+  url: https://nhc.gov.cn/
+  reason: HTTP 404/412（候选路径不存在，需补该站正确 RSS / 列表页 URL）
+  attempts:
+  - url: https://nhc.gov.cn/
+    status: URLError
+    items: 0
+  - url: http://nhc.gov.cn/
+    status: URLError
+    items: 0
+  - url: https://www.nhc.gov.cn/rss.xml
+    status: 404
+    items: 0
+  - url: https://www.nhc.gov.cn/rss/
+    status: 412
+    items: 0
+  - url: https://www.nhc.gov.cn/news/
+    status: 412
+    items: 0
+  - url: https://www.nhc.gov.cn/xwzx/
+    status: 412
+    items: 0
+  - url: https://www.nhc.gov.cn/yaowen/
+    status: 412
+    items: 0
+  - url: https://www.nhc.gov.cn/zhengce/zuixin.htm
+    status: 412
+    items: 0
+- ok: false
+  domain: nhsa.gov.cn
+  url: https://nhsa.gov.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://nhsa.gov.cn/
+    status: 403
+    items: 0
+  - url: http://nhsa.gov.cn/
+    status: 403
+    items: 0
+  - url: https://www.nhsa.gov.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.nhsa.gov.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.nhsa.gov.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.nhsa.gov.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.nhsa.gov.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.nhsa.gov.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: ndcpa.gov.cn
+  url: https://ndcpa.gov.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://ndcpa.gov.cn/
+    status: URLError
+    items: 0
+  - url: http://ndcpa.gov.cn/
+    status: URLError
+    items: 0
+  - url: https://www.ndcpa.gov.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.ndcpa.gov.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.ndcpa.gov.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.ndcpa.gov.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.ndcpa.gov.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.ndcpa.gov.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: health-china.com
+  url: https://health-china.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://health-china.com/
+    status: 403
+    items: 0
+  - url: http://health-china.com/
+    status: 403
+    items: 0
+  - url: https://www.health-china.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.health-china.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.health-china.com/news/
+    status: 403
+    items: 0
+  - url: https://www.health-china.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.health-china.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.health-china.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: cpi.ac.cn
+  url: https://cpi.ac.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://cpi.ac.cn/
+    status: 403
+    items: 0
+  - url: http://cpi.ac.cn/
+    status: 403
+    items: 0
+  - url: https://www.cpi.ac.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.cpi.ac.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.cpi.ac.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.cpi.ac.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.cpi.ac.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.cpi.ac.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: dayi.org.cn
+  url: https://dayi.org.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://dayi.org.cn/
+    status: 403
+    items: 0
+  - url: http://dayi.org.cn/
+    status: 403
+    items: 0
+  - url: https://www.dayi.org.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.dayi.org.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.dayi.org.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.dayi.org.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.dayi.org.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.dayi.org.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: news.qq.com
+  url: https://news.qq.com/
+  reason: 可打开但各形态均未抽到 ≥3 条带日期条目
+  attempts:
+  - url: https://news.qq.com/
+    status: 200
+    items: 0
+    latest: ''
+  - url: http://news.qq.com/
+    status: 200
+    items: 0
+    latest: ''
+  - url: https://www.news.qq.com/rss.xml
+    status: TimeoutError
+    items: 0
+  - url: https://www.news.qq.com/rss/
+    status: TimeoutError
+    items: 0
+  - url: https://www.news.qq.com/news/
+    status: TimeoutError
+    items: 0
+  - url: https://www.news.qq.com/xwzx/
+    status: TimeoutError
+    items: 0
+  - url: https://www.news.qq.com/yaowen/
+    status: TimeoutError
+    items: 0
+  - url: https://www.news.qq.com/zhengce/zuixin.htm
+    status: TimeoutError
+    items: 0
+- ok: false
+  domain: moe.gov.cn
+  url: https://moe.gov.cn/
+  reason: HTTP 404（候选路径不存在，需补该站正确 RSS / 列表页 URL）
+  attempts:
+  - url: https://moe.gov.cn/
+    status: URLError
+    items: 0
+  - url: http://moe.gov.cn/
+    status: URLError
+    items: 0
+  - url: https://www.moe.gov.cn/rss.xml
+    status: 404
+    items: 0
+  - url: https://www.moe.gov.cn/rss/
+    status: 404
+    items: 0
+  - url: https://www.moe.gov.cn/news/
+    status: 404
+    items: 0
+  - url: https://www.moe.gov.cn/xwzx/
+    status: 404
+    items: 0
+  - url: https://www.moe.gov.cn/yaowen/
+    status: 404
+    items: 0
+  - url: https://www.moe.gov.cn/zhengce/zuixin.htm
+    status: 404
+    items: 0
+- ok: false
+  domain: jyb.cn
+  url: https://jyb.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://jyb.cn/
+    status: 403
+    items: 0
+  - url: http://jyb.cn/
+    status: 403
+    items: 0
+  - url: https://www.jyb.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.jyb.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.jyb.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.jyb.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.jyb.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.jyb.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: mohrss.gov.cn
+  url: https://mohrss.gov.cn/
+  reason: 可打开但各形态均未抽到 ≥3 条带日期条目
+  attempts:
+  - url: https://mohrss.gov.cn/
+    status: URLError
+    items: 0
+  - url: http://mohrss.gov.cn/
+    status: URLError
+    items: 0
+  - url: https://www.mohrss.gov.cn/rss.xml
+    status: 404
+    items: 0
+  - url: https://www.mohrss.gov.cn/rss/
+    status: 200
+    items: 0
+    latest: ''
+  - url: https://www.mohrss.gov.cn/news/
+    status: 200
+    items: 0
+    latest: ''
+  - url: https://www.mohrss.gov.cn/xwzx/
+    status: 200
+    items: 0
+    latest: ''
+  - url: https://www.mohrss.gov.cn/yaowen/
+    status: 200
+    items: 0
+    latest: ''
+  - url: https://www.mohrss.gov.cn/zhengce/zuixin.htm
+    status: 404
+    items: 0
+- ok: false
+  domain: cncaprc.gov.cn
+  url: https://cncaprc.gov.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://cncaprc.gov.cn/
+    status: 403
+    items: 0
+  - url: http://cncaprc.gov.cn/
+    status: 403
+    items: 0
+  - url: https://www.cncaprc.gov.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.cncaprc.gov.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.cncaprc.gov.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.cncaprc.gov.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.cncaprc.gov.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.cncaprc.gov.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: mohurd.gov.cn
+  url: https://mohurd.gov.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://mohurd.gov.cn/
+    status: URLError
+    items: 0
+  - url: http://mohurd.gov.cn/
+    status: URLError
+    items: 0
+  - url: https://www.mohurd.gov.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.mohurd.gov.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.mohurd.gov.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.mohurd.gov.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.mohurd.gov.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.mohurd.gov.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: mot.gov.cn
+  url: https://mot.gov.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://mot.gov.cn/
+    status: URLError
+    items: 0
+  - url: http://mot.gov.cn/
+    status: URLError
+    items: 0
+  - url: https://www.mot.gov.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.mot.gov.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.mot.gov.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.mot.gov.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.mot.gov.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.mot.gov.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: sport.gov.cn
+  url: https://sport.gov.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://sport.gov.cn/
+    status: URLError
+    items: 0
+  - url: http://sport.gov.cn/
+    status: URLError
+    items: 0
+  - url: https://www.sport.gov.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.sport.gov.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.sport.gov.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.sport.gov.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.sport.gov.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.sport.gov.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: samr.gov.cn
+  url: https://samr.gov.cn/
+  reason: HTTP 404（候选路径不存在，需补该站正确 RSS / 列表页 URL）
+  attempts:
+  - url: https://samr.gov.cn/
+    status: URLError
+    items: 0
+  - url: http://samr.gov.cn/
+    status: URLError
+    items: 0
+  - url: https://www.samr.gov.cn/rss.xml
+    status: 404
+    items: 0
+  - url: https://www.samr.gov.cn/rss/
+    status: 404
+    items: 0
+  - url: https://www.samr.gov.cn/news/
+    status: 404
+    items: 0
+  - url: https://www.samr.gov.cn/xwzx/
+    status: 404
+    items: 0
+  - url: https://www.samr.gov.cn/yaowen/
+    status: 404
+    items: 0
+  - url: https://www.samr.gov.cn/zhengce/zuixin.htm
+    status: 404
+    items: 0
+- ok: false
+  domain: court.gov.cn
+  url: https://court.gov.cn/
+  reason: 可打开但各形态均未抽到 ≥3 条带日期条目
+  attempts:
+  - url: https://court.gov.cn/
+    status: URLError
+    items: 0
+  - url: http://court.gov.cn/
+    status: URLError
+    items: 0
+  - url: https://www.court.gov.cn/rss.xml
+    status: 200
+    items: 0
+    latest: ''
+  - url: https://www.court.gov.cn/rss/
+    status: 200
+    items: 0
+    latest: ''
+  - url: https://www.court.gov.cn/news/
+    status: 200
+    items: 0
+    latest: ''
+  - url: https://www.court.gov.cn/xwzx/
+    status: 200
+    items: 0
+    latest: ''
+  - url: https://www.court.gov.cn/yaowen/
+    status: 200
+    items: 0
+    latest: ''
+  - url: https://www.court.gov.cn/zhengce/zuixin.htm
+    status: 200
+    items: 0
+    latest: ''
+- ok: true
+  domain: spp.gov.cn
+  url: https://www.spp.gov.cn/rss.xml
+  channel: 最高检
+  items: 83
+  latest: '2026-11-18'
+  attempts:
+  - url: https://spp.gov.cn/
+    status: URLError
+    items: 0
+  - url: http://spp.gov.cn/
+    status: URLError
+    items: 0
+  - url: https://www.spp.gov.cn/rss.xml
+    status: 200
+    items: 83
+    latest: '2026-11-18'
+  - url: https://www.spp.gov.cn/rss/
+    status: 200
+    items: 83
+    latest: '2026-11-18'
+  - url: https://www.spp.gov.cn/news/
+    status: 200
+    items: 83
+    latest: '2026-11-18'
+  - url: https://www.spp.gov.cn/xwzx/
+    status: 200
+    items: 83
+    latest: '2026-11-18'
+  - url: https://www.spp.gov.cn/yaowen/
+    status: 200
+    items: 83
+    latest: '2026-11-18'
+  - url: https://www.spp.gov.cn/zhengce/zuixin.htm
+    status: 200
+    items: 83
+    latest: '2026-11-18'
+- ok: false
+  domain: mps.gov.cn
+  url: https://mps.gov.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://mps.gov.cn/
+    status: URLError
+    items: 0
+  - url: http://mps.gov.cn/
+    status: URLError
+    items: 0
+  - url: https://www.mps.gov.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.mps.gov.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.mps.gov.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.mps.gov.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.mps.gov.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.mps.gov.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: mem.gov.cn
+  url: https://mem.gov.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://mem.gov.cn/
+    status: URLError
+    items: 0
+  - url: http://mem.gov.cn/
+    status: URLError
+    items: 0
+  - url: https://www.mem.gov.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.mem.gov.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.mem.gov.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.mem.gov.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.mem.gov.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.mem.gov.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: moa.gov.cn
+  url: https://moa.gov.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://moa.gov.cn/
+    status: URLError
+    items: 0
+  - url: http://moa.gov.cn/
+    status: URLError
+    items: 0
+  - url: https://www.moa.gov.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.moa.gov.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.moa.gov.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.moa.gov.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.moa.gov.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.moa.gov.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: forestry.gov.cn
+  url: https://forestry.gov.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://forestry.gov.cn/
+    status: URLError
+    items: 0
+  - url: http://forestry.gov.cn/
+    status: URLError
+    items: 0
+  - url: https://www.forestry.gov.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.forestry.gov.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.forestry.gov.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.forestry.gov.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.forestry.gov.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.forestry.gov.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: mwr.gov.cn
+  url: https://mwr.gov.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://mwr.gov.cn/
+    status: 403
+    items: 0
+  - url: http://mwr.gov.cn/
+    status: 403
+    items: 0
+  - url: https://www.mwr.gov.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.mwr.gov.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.mwr.gov.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.mwr.gov.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.mwr.gov.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.mwr.gov.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: spacechina.com
+  url: https://spacechina.com/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://spacechina.com/
+    status: 403
+    items: 0
+  - url: http://spacechina.com/
+    status: 403
+    items: 0
+  - url: https://www.spacechina.com/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.spacechina.com/rss/
+    status: 403
+    items: 0
+  - url: https://www.spacechina.com/news/
+    status: 403
+    items: 0
+  - url: https://www.spacechina.com/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.spacechina.com/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.spacechina.com/zhengce/zuixin.htm
+    status: 403
+    items: 0
+- ok: false
+  domain: mod.gov.cn
+  url: https://mod.gov.cn/
+  reason: HTTP 403（出口策略拦截，域名级）
+  attempts:
+  - url: https://mod.gov.cn/
+    status: 403
+    items: 0
+  - url: http://mod.gov.cn/
+    status: 403
+    items: 0
+  - url: https://www.mod.gov.cn/rss.xml
+    status: 403
+    items: 0
+  - url: https://www.mod.gov.cn/rss/
+    status: 403
+    items: 0
+  - url: https://www.mod.gov.cn/news/
+    status: 403
+    items: 0
+  - url: https://www.mod.gov.cn/xwzx/
+    status: 403
+    items: 0
+  - url: https://www.mod.gov.cn/yaowen/
+    status: 403
+    items: 0
+  - url: https://www.mod.gov.cn/zhengce/zuixin.htm
+    status: 403
+    items: 0
