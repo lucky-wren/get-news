@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/data/workspace/news_daily/run.py", line 308, in main
+    raise RuntimeError(reason)
+RuntimeError: 采集质量门禁未达标：A级独立原文占比、非新闻噪声率
+
+[失败] RuntimeError: 采集质量门禁未达标：A级独立原文占比、非新闻噪声率
+[窗口] (2026-11-20 22:36, 2026-11-21 22:36)  Asia/Shanghai  跨度 24.0h
+[模式] live  [产物] /data/workspace/news_daily/output/live_probe/live_probe_窗口期.xlsx
+[质量] 不达标（内容硬闸：A级独立原文占比、非新闻噪声率）；未达标：A级独立原文占比、非新闻噪声率
+[撤回] 本批不达标，产物已改为 live_probe_窗口期.xlsx.rejected（不交付 / 不覆盖固定地址）
