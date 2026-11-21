@@ -20,7 +20,7 @@
     {
       "项": "真发检索通道可达（Bing RSS HTTP 200，网络 smoke）",
       "结果": "PASS",
-      "证据": "具体留痕=gnews:0；bing_rss:10；cn_endpoints:0；中文相关性闸剔除 8 条 | 泛词留痕=gnews:0；cn_endpoints:1；bing_rss:10；中文相关性闸剔除 4 条"
+      "证据": "具体留痕=gnews:0；bing_rss:10；cn_endpoints:0；中文相关性闸剔除 8 条 | 泛词留痕=cn_endpoints:1；gnews:0；bing_rss:10；中文相关性闸剔除 4 条"
     },
     {
       "项": "检索噪声不得冒充中文证据（数字误匹配垃圾全被拦）",
