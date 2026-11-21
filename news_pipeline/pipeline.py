@@ -28,6 +28,7 @@ from .rules import (f_verdict, hits, intl_verdict, mass_verdict, noise_verdict,
 from .scoring import compute_scores
 from . import quality_v3 as qv3
 from . import quality_gate as qgate
+from . import editorial_gate as egate
 from .timewindow import Window, window_verdict, parse_datetime_text
 from .social_main import collect_social_main
 from .platform_access import run_platform_access
@@ -362,18 +363,41 @@ def run_pipeline(cfg: dict, win: Window, base_dir: Path, out_path: Path) -> Dict
     _abs_limit = set_abstract_limit((cfg.get("abstract", {}) or {}).get("max_net_chars"))
     set_abstract_paragraphs((cfg.get("abstract", {}) or {}).get("paragraphs"))
     # 候选池摘要规范化（评级列仍全「—」，不做筛选 / 合并 / 编排）
+    # 2026-11-22 线上规格验收 56/56 FAIL「段落首行未缩进 2 个全角空格」：
+    # polish_abstract 会 strip 掉 build_abstract 加的缩进，成稿层又绕过 build_abstract，
+    # 于是整批摘要都缺缩进。这里统一补回，且用编辑部硬闸做整句/坏标点/净字复核。
+    _IND = "\u3000\u3000"
+    def _ensure_indent(t: str) -> str:
+        return "\n".join(
+            (p if p.startswith(_IND) else _IND + p.lstrip("\u3000 "))
+            for p in str(t or "").split("\n") if p.strip())
     for it in candidate:
         # 无 key 事件成稿已按「两段 / 整分句 / ≤100 净字 / 数字不改写」产出，
         # 不能再过一次单段抽取把它压成一段（样例 34/34 两段）。
         if (getattr(it, "channel_id", "") in ("KEYLESS", "EVENT_COMPOSER")
                 and "\n" in (it.abstract or "")):
-            # 成稿层摘要不能跳过清洗：线上批次出现过电头 / 记者署名 /
-            # 「；。」「。）。」等坏标点直接进 Excel。只清格式，不改内容数字。
             it.abstract = polish_abstract(it.abstract)
             it.abstract_source = "多源事件成稿（两段、整分句、数字未改写、格式已清洗）"
-            continue
-        it.abstract, it.abstract_source = build_abstract(it)
-        it.abstract = polish_abstract(it.abstract)
+        else:
+            it.abstract, it.abstract_source = build_abstract(it)
+            it.abstract = polish_abstract(it.abstract)
+        # 2026-11-22 全量线上重判：所有条目统一走 strict 收口（不只成稿层）。
+        # 线上 56 条主表有 4 条 3–4 段、1 条「（。」半句、候选池 43 条多段，
+        # 旧版只对成稿层修、其余直接判「段落超限」删条，误杀 LPR / 大模型等真新闻。
+        # 现在先修（1–2 段 / ≤100 净字 / 整句 / 去标题复读 / 数字不改），修不了才留痕。
+        fixed, fwhy = egate.polish_abstract_strict(it.abstract, it.title)
+        it.abstract = _ensure_indent(fixed)
+        raw = getattr(it, "raw", None)
+        if isinstance(raw, dict) and fixed != _ensure_indent(polish_abstract(it.abstract or "")):
+            raw["摘要修复"] = fwhy
+        # 编辑部硬闸：半句 / 坏标点 / 净字超限 / 占位句 一律不算有效摘要，
+        # 主表硬闸据此拦下，绝不把「(北纬37.14度。（。」这类残片摆进交付表。
+        ok_abs, gate_abs, why_abs = egate.abstract_verdict(it.abstract)
+        if not ok_abs:
+            it.abstract_status = "未取得"
+            raw = getattr(it, "raw", None)
+            if isinstance(raw, dict):
+                raw["摘要硬闸"] = f"{gate_abs}：{why_abs}"
     # 2026-11-20：Actions 真实批次 41/56 条「摘要未取得」。对已进候选池的
     # 无效摘要做定向二次补采（更长超时 + URL 变体 + Jina + 并发），只认正文。
     from .second_pass import rescue_abstracts
@@ -394,6 +418,16 @@ def run_pipeline(cfg: dict, win: Window, base_dir: Path, out_path: Path) -> Dict
         for r in ec_rejected:
             r["阶段"] = "事件成稿后"
         contract_reject.extend(ec_rejected)
+    # 2026-11-22 线上复盘：契约三闸只查「字段齐备/错配/主体/社交定义」，
+    # 查不出 SEO 法律科普页、企业黄页广告、GTA6 剧透视频、假多渠道合并。
+    # 编辑部硬闸对成稿后的候选池再过一遍（主表是其子集，同步生效），逐条留痕。
+    eg_on = bool((cfg.get("quality_gate") or {}).get("editorial", True))
+    if eg_on:
+        # 候选池层：只剔形态垃圾；摘要未取得 / 格式问题留池留痕（需求⑤）。
+        candidate, eg_rejected = egate.editorial_check_many(candidate, stage="candidate")
+        for r in eg_rejected:
+            r["阶段"] = "编辑部硬闸·候选池"
+        contract_reject.extend(eg_rejected)
     runlog.metric(候选池条数=len(candidate), 窗口外排除=len(excluded), 时点推定=len(estimated),
                   字段不合格=len(field_reject), 契约拦截=len(contract_reject),
                   采集层去重=len(dedup_dropped))
@@ -418,7 +452,18 @@ def run_pipeline(cfg: dict, win: Window, base_dir: Path, out_path: Path) -> Dict
 
     require_abstract = bool(cfg.get("rules", {}).get("main_requires_abstract", True))
     abstract_blocked = 0
+    eg_main_on = bool((cfg.get("quality_gate") or {}).get("editorial", True))
     for it in work:
+        # 主表层编辑部硬闸：候选池里留痕的「摘要无效 / 格式不合规」在这里拦下，
+        # 形态垃圾已在候选池层剔除；两层分离，既不丢留痕也不让垃圾进主表。
+        if eg_main_on:
+            mok, mgate, mwhy = egate.editorial_check(it, stage="main")
+            if not mok:
+                it.admitted, it.reject_stage = False, mgate
+                it.reject_reason = mwhy
+                mass_rows.append({"标题": it.title, "keep": [], "reject": [mgate],
+                                  "判定": "删除", "依据": mwhy})
+                continue
         # 3.0a 主表摘要硬闸（2026-11-20 用户「质量还是不行」）
         # 用户⑤：「窗口内全部数据」= 标题/摘要/来源齐备的候选池；主表是它的子集。
         # 旧版 normalize 明写「摘要未取得不剔条」，结果 40+ 条 RSS 倒排占位文本
