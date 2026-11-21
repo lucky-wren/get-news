@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-21 20:22:24",
+  "generated_at": "2026-11-22 02:53:24",
   "渠道数": 21,
   "通过渠道数": 21,
   "新增发现端点数": 19,
@@ -28,8 +28,8 @@
           "url": "https://www.bing.com/search?q=site%3Aysxw.cctv.cn&format=rss&count=50",
           "type": "rss",
           "status": 200,
-          "items": 10,
-          "time_samples": 10,
+          "items": 7,
+          "time_samples": 7,
           "ok": true,
           "reason": ""
         },
@@ -58,14 +58,14 @@
       "渠道": "中国互联网络信息中心",
       "判定": "通过",
       "通过端点": "https://www.bing.com/search?q=site%3Acnnic.cn&format=rss&count=50",
-      "条目数": 10,
+      "条目数": 7,
       "候选留痕": [
         {
           "url": "https://www.bing.com/search?q=site%3Acnnic.cn&format=rss&count=50",
           "type": "rss",
           "status": 200,
-          "items": 10,
-          "time_samples": 9,
+          "items": 7,
+          "time_samples": 7,
           "ok": true,
           "reason": ""
         },
@@ -166,14 +166,14 @@
       "渠道": "新华财经",
       "判定": "通过",
       "通过端点": "https://www.bing.com/search?q=site%3Acnfin.com&format=rss&count=50",
-      "条目数": 7,
+      "条目数": 10,
       "候选留痕": [
         {
           "url": "https://www.bing.com/search?q=site%3Acnfin.com&format=rss&count=50",
           "type": "rss",
           "status": 200,
-          "items": 7,
-          "time_samples": 7,
+          "items": 10,
+          "time_samples": 10,
           "ok": true,
           "reason": ""
         },
@@ -245,18 +245,18 @@
           "type": "rss",
           "status": 200,
           "items": 10,
-          "time_samples": 9,
+          "time_samples": 10,
           "ok": true,
           "reason": ""
         },
         {
           "url": "https://cpcaauto.com/rss.xml",
           "type": "rss",
-          "status": 0,
+          "status": 404,
           "items": 0,
           "time_samples": 0,
           "ok": false,
-          "reason": "ReadTimeout: HTTPSConnectionPool(host='cpcaauto.com', port=443): Read timed out. (read timeout=4.0)"
+          "reason": "HTTP 404"
         },
         {
           "url": "https://cpcaauto.com/",
@@ -317,7 +317,7 @@
           "type": "rss",
           "status": 200,
           "items": 10,
-          "time_samples": 9,
+          "time_samples": 10,
           "ok": true,
           "reason": ""
         },
@@ -382,14 +382,14 @@
       "渠道": "国家药监局",
       "判定": "通过",
       "通过端点": "https://www.bing.com/search?q=site%3Anmpa.gov.cn&format=rss&count=50",
-      "条目数": 10,
+      "条目数": 6,
       "候选留痕": [
         {
           "url": "https://www.bing.com/search?q=site%3Anmpa.gov.cn&format=rss&count=50",
           "type": "rss",
           "status": 200,
-          "items": 10,
-          "time_samples": 10,
+          "items": 6,
+          "time_samples": 6,
           "ok": true,
           "reason": ""
         },
@@ -425,7 +425,7 @@
           "type": "rss",
           "status": 200,
           "items": 10,
-          "time_samples": 9,
+          "time_samples": 10,
           "ok": true,
           "reason": ""
         },
@@ -454,14 +454,14 @@
       "渠道": "国家医保局",
       "判定": "通过",
       "通过端点": "https://www.bing.com/search?q=site%3Anhsa.gov.cn&format=rss&count=50",
-      "条目数": 7,
+      "条目数": 4,
       "候选留痕": [
         {
           "url": "https://www.bing.com/search?q=site%3Anhsa.gov.cn&format=rss&count=50",
           "type": "rss",
           "status": 200,
-          "items": 7,
-          "time_samples": 7,
+          "items": 4,
+          "time_samples": 4,
           "ok": true,
           "reason": ""
         },
@@ -598,14 +598,14 @@
       "渠道": "公安部",
       "判定": "通过",
       "通过端点": "https://www.bing.com/search?q=site%3Amps.gov.cn&format=rss&count=50",
-      "条目数": 7,
+      "条目数": 10,
       "候选留痕": [
         {
           "url": "https://www.bing.com/search?q=site%3Amps.gov.cn&format=rss&count=50",
           "type": "rss",
           "status": 200,
-          "items": 7,
-          "time_samples": 7,
+          "items": 10,
+          "time_samples": 10,
           "ok": true,
           "reason": ""
         },
@@ -634,14 +634,14 @@
       "渠道": "应急管理部",
       "判定": "通过",
       "通过端点": "https://www.bing.com/search?q=site%3Amem.gov.cn&format=rss&count=50",
-      "条目数": 7,
+      "条目数": 10,
       "候选留痕": [
         {
           "url": "https://www.bing.com/search?q=site%3Amem.gov.cn&format=rss&count=50",
           "type": "rss",
           "status": 200,
-          "items": 7,
-          "time_samples": 7,
+          "items": 10,
+          "time_samples": 10,
           "ok": true,
           "reason": ""
         },
@@ -713,7 +713,7 @@
           "type": "rss",
           "status": 200,
           "items": 10,
-          "time_samples": 9,
+          "time_samples": 10,
           "ok": true,
           "reason": ""
         },
@@ -742,14 +742,14 @@
       "渠道": "中国商飞",
       "判定": "通过",
       "通过端点": "https://www.bing.com/search?q=site%3Acomac.cc&format=rss&count=50",
-      "条目数": 7,
+      "条目数": 10,
       "候选留痕": [
         {
           "url": "https://www.bing.com/search?q=site%3Acomac.cc&format=rss&count=50",
           "type": "rss",
           "status": 200,
-          "items": 7,
-          "time_samples": 7,
+          "items": 10,
+          "time_samples": 10,
           "ok": true,
           "reason": ""
         },
