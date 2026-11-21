@@ -1,0 +1,1510 @@
+{
+ "generated_at": "2026-11-18 20:55:26",
+ "whitelist_total": 148,
+ "verified_endpoints": 56,
+ "covered_channels": 20,
+ "coverage_ratio": 0.1351,
+ "star_total": 46,
+ "star_covered": 14,
+ "star_ratio": 0.3043,
+ "layers": {
+  "可直连（端点覆盖 / 平台归并）": 20,
+  "网络出口拦截（换网络可启用）": 82,
+  "待补端点（候选路径无可枚举时间条目）": 10,
+  "无公开入口（栏目 / 账号 / 线下）": 14,
+  "需账号登录 / 动态渲染": 16,
+  "需密钥（搜索 / 开放平台 API）": 6
+ },
+ "domain_probe": {
+  "total": 101,
+  "passed": 2,
+  "blocked": {
+   "HTTP 403（出口策略拦截，域名级）": 83,
+   "HTTP 404（候选路径不存在，需补该站正确 ": 8,
+   "可打开但各形态均未抽到 ≥3 条带日期条目": 7,
+   "HTTP 404/412（候选路径不存在，需补该": 1
+  }
+ },
+ "channels": [
+  {
+   "channel_id": "S01-001",
+   "channel": "央视新闻",
+   "level": "★",
+   "layer": "可直连（端点覆盖 / 平台归并）",
+   "endpoint": "央视",
+   "entry": "news.cctv.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "已启用：python run.py 加载 data/endpoints_live.yaml；同平台多栏目复用同一时间倒排端点"
+  },
+  {
+   "channel_id": "S01-002",
+   "channel": "央视网·央视频",
+   "level": "★",
+   "layer": "可直连（端点覆盖 / 平台归并）",
+   "endpoint": "央视",
+   "entry": "ysxw.cctv.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "已启用：python run.py 加载 data/endpoints_live.yaml；同平台多栏目复用同一时间倒排端点"
+  },
+  {
+   "channel_id": "S01-003",
+   "channel": "新华网",
+   "level": "★",
+   "layer": "可直连（端点覆盖 / 平台归并）",
+   "endpoint": "新华网",
+   "entry": "news.cn / xinhuanet.com",
+   "domain_status": "可打开但各形态均未抽到 ≥3 条带日期条目",
+   "enable_condition": "已启用：python run.py 加载 data/endpoints_live.yaml；同平台多栏目复用同一时间倒排端点"
+  },
+  {
+   "channel_id": "S01-004",
+   "channel": "中新网",
+   "level": "★",
+   "layer": "可直连（端点覆盖 / 平台归并）",
+   "endpoint": "中新网",
+   "entry": "chinanews.com.cn",
+   "domain_status": "已实测可抓取",
+   "enable_condition": "已启用：python run.py 加载 data/endpoints_live.yaml；同平台多栏目复用同一时间倒排端点"
+  },
+  {
+   "channel_id": "S01-005",
+   "channel": "人民网",
+   "level": "★",
+   "layer": "可直连（端点覆盖 / 平台归并）",
+   "endpoint": "人民网",
+   "entry": "people.com.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "已启用：python run.py 加载 data/endpoints_live.yaml；同平台多栏目复用同一时间倒排端点"
+  },
+  {
+   "channel_id": "S01-006",
+   "channel": "央广网",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "cnr.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S01-007",
+   "channel": "中国网",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "china.com.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S02-001",
+   "channel": "中国互联网络信息中心",
+   "level": "★",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "cnnic.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S02-002",
+   "channel": "赛迪网",
+   "level": "★",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "ccidnet.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S02-003",
+   "channel": "工信部",
+   "level": "★",
+   "layer": "可直连（端点覆盖 / 平台归并）",
+   "endpoint": "工业和信息化部",
+   "entry": "miit.gov.cn",
+   "domain_status": "HTTP 404（候选路径不存在，需补该站正确 RSS / 列表页 URL）",
+   "enable_condition": "已启用：python run.py 加载 data/endpoints_live.yaml；同平台多栏目复用同一时间倒排端点"
+  },
+  {
+   "channel_id": "S02-004",
+   "channel": "中科院",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "cas.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S02-005",
+   "channel": "36氪",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "36kr.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S02-006",
+   "channel": "虎嗅",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "huxiu.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S02-007",
+   "channel": "钛媒体",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "tmtpost.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S02-008",
+   "channel": "极客公园",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "geekpark.net",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S02-009",
+   "channel": "量子位",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "qbitai.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S02-010",
+   "channel": "机器之心",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "jiqizhixin.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S02-011",
+   "channel": "新智元",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "aiera.com.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S02-012",
+   "channel": "雷锋网",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "leiphone.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S02-013",
+   "channel": "品玩",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "pingwest.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S02-014",
+   "channel": "创业邦",
+   "level": "✗",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "cyzone.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S02-015",
+   "channel": "新浪科技",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "tech.sina.com.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S02-016",
+   "channel": "搜狐科技",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "it.sohu.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S02-017",
+   "channel": "TechWeb",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "techweb.com.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S02-018",
+   "channel": "IT之家",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "ithome.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S02-019",
+   "channel": "爱范儿",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "ifanr.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S02-020",
+   "channel": "少数派",
+   "level": "✗",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "sspai.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S02-021",
+   "channel": "快科技",
+   "level": "✗",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "mydrivers.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S02-022",
+   "channel": "中关村在线",
+   "level": "✗",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "zol.com.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S02-023",
+   "channel": "太平洋电脑网",
+   "level": "✗",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "pconline.com.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S03-001",
+   "channel": "国家统计局",
+   "level": "★",
+   "layer": "待补端点（候选路径无可枚举时间条目）",
+   "endpoint": "",
+   "entry": "stats.gov.cn",
+   "domain_status": "HTTP 404（候选路径不存在，需补该站正确 RSS / 列表页 URL）",
+   "enable_condition": "域名可访问但 4 种常见形态（首页 / RSS / 新闻列表 / 要闻页）均未抽到带日期条目：需补该站正确的 RSS / 滚动页 / 公告列表 URL，或在 data/endpoints_live.yaml 手工登记后重新实测"
+  },
+  {
+   "channel_id": "S03-002",
+   "channel": "发改委",
+   "level": "★",
+   "layer": "可直连（端点覆盖 / 平台归并）",
+   "endpoint": "国家发展改革委",
+   "entry": "ndrc.gov.cn",
+   "domain_status": "HTTP 404（候选路径不存在，需补该站正确 RSS / 列表页 URL）",
+   "enable_condition": "已启用：python run.py 加载 data/endpoints_live.yaml；同平台多栏目复用同一时间倒排端点"
+  },
+  {
+   "channel_id": "S03-003",
+   "channel": "央行/外汇局",
+   "level": "★",
+   "layer": "可直连（端点覆盖 / 平台归并）",
+   "endpoint": "中国人民银行",
+   "entry": "pbc.gov.cn",
+   "domain_status": "HTTP 404（候选路径不存在，需补该站正确 RSS / 列表页 URL）",
+   "enable_condition": "已启用：python run.py 加载 data/endpoints_live.yaml；同平台多栏目复用同一时间倒排端点"
+  },
+  {
+   "channel_id": "S03-004",
+   "channel": "税务总局",
+   "level": "★",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "chinatax.gov.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S03-005",
+   "channel": "证监会",
+   "level": "★",
+   "layer": "可直连（端点覆盖 / 平台归并）",
+   "endpoint": "中国证监会",
+   "entry": "csrc.gov.cn",
+   "domain_status": "可打开但各形态均未抽到 ≥3 条带日期条目",
+   "enable_condition": "已启用：python run.py 加载 data/endpoints_live.yaml；同平台多栏目复用同一时间倒排端点"
+  },
+  {
+   "channel_id": "S03-006",
+   "channel": "财政部",
+   "level": "★",
+   "layer": "待补端点（候选路径无可枚举时间条目）",
+   "endpoint": "",
+   "entry": "mof.gov.cn",
+   "domain_status": "HTTP 404（候选路径不存在，需补该站正确 RSS / 列表页 URL）",
+   "enable_condition": "域名可访问但 4 种常见形态（首页 / RSS / 新闻列表 / 要闻页）均未抽到带日期条目：需补该站正确的 RSS / 滚动页 / 公告列表 URL，或在 data/endpoints_live.yaml 手工登记后重新实测"
+  },
+  {
+   "channel_id": "S03-007",
+   "channel": "商务部",
+   "level": "☆",
+   "layer": "可直连（端点覆盖 / 平台归并）",
+   "endpoint": "商务部",
+   "entry": "mofcom.gov.cn",
+   "domain_status": "HTTP 404（候选路径不存在，需补该站正确 RSS / 列表页 URL）",
+   "enable_condition": "已启用：python run.py 加载 data/endpoints_live.yaml；同平台多栏目复用同一时间倒排端点"
+  },
+  {
+   "channel_id": "S03-008",
+   "channel": "第一财经",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "yicai.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S03-009",
+   "channel": "财新",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "caixin.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S03-010",
+   "channel": "财联社",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "cls.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S03-011",
+   "channel": "界面新闻",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "jiemian.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S03-012",
+   "channel": "每日经济新闻",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "nbd.com.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S03-013",
+   "channel": "经济观察报",
+   "level": "✗",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "eeo.com.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S03-014",
+   "channel": "21世纪经济报道",
+   "level": "✗",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "21jingji.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S03-015",
+   "channel": "证券时报",
+   "level": "✗",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "stcn.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S03-016",
+   "channel": "中国证券报",
+   "level": "✗",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "cs.com.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S03-017",
+   "channel": "上海证券报",
+   "level": "✗",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "cnstock.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S03-018",
+   "channel": "证券日报",
+   "level": "✗",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "zqrb.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S03-019",
+   "channel": "金融界",
+   "level": "✗",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "jrj.com.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S03-020",
+   "channel": "和讯网",
+   "level": "✗",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "hexun.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S03-021",
+   "channel": "东方财富网",
+   "level": "✗",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "eastmoney.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S03-022",
+   "channel": "雪球",
+   "level": "✗",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "xueqiu.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S03-023",
+   "channel": "华尔街见闻",
+   "level": "✗",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "wallstreetcn.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S03-024",
+   "channel": "观察者网",
+   "level": "✗",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "guancha.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S03-025",
+   "channel": "澎湃财经",
+   "level": "✗",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "thepaper.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S03-026",
+   "channel": "中新经纬",
+   "level": "✗",
+   "layer": "可直连（端点覆盖 / 平台归并）",
+   "endpoint": "中新",
+   "entry": "jwview.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "已启用：python run.py 加载 data/endpoints_live.yaml；同平台多栏目复用同一时间倒排端点"
+  },
+  {
+   "channel_id": "S03-027",
+   "channel": "新华财经",
+   "level": "★",
+   "layer": "可直连（端点覆盖 / 平台归并）",
+   "endpoint": "新华",
+   "entry": "cnfin.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "已启用：python run.py 加载 data/endpoints_live.yaml；同平台多栏目复用同一时间倒排端点"
+  },
+  {
+   "channel_id": "S04-001",
+   "channel": "中汽协",
+   "level": "★",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "caam.org.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S04-002",
+   "channel": "乘联会",
+   "level": "★",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "cpcaauto.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S04-003",
+   "channel": "工信部",
+   "level": "★",
+   "layer": "可直连（端点覆盖 / 平台归并）",
+   "endpoint": "工业和信息化部",
+   "entry": "miit.gov.cn",
+   "domain_status": "HTTP 404（候选路径不存在，需补该站正确 RSS / 列表页 URL）",
+   "enable_condition": "已启用：python run.py 加载 data/endpoints_live.yaml；同平台多栏目复用同一时间倒排端点"
+  },
+  {
+   "channel_id": "S04-004",
+   "channel": "生态环境部",
+   "level": "☆",
+   "layer": "可直连（端点覆盖 / 平台归并）",
+   "endpoint": "生态环境部",
+   "entry": "mee.gov.cn",
+   "domain_status": "可打开但各形态均未抽到 ≥3 条带日期条目",
+   "enable_condition": "已启用：python run.py 加载 data/endpoints_live.yaml；同平台多栏目复用同一时间倒排端点"
+  },
+  {
+   "channel_id": "S04-005",
+   "channel": "国家能源局",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "nea.gov.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S04-006",
+   "channel": "每日电车",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "cardailys.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S04-007",
+   "channel": "第一电动",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "d1ev.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S04-008",
+   "channel": "新出行",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "xchuxing.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S04-009",
+   "channel": "汽车之家",
+   "level": "✗",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "autohome.com.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S04-010",
+   "channel": "太平洋汽车",
+   "level": "✗",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "pcauto.com.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S04-011",
+   "channel": "易车",
+   "level": "✗",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "bitauto.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S04-012",
+   "channel": "懂车帝",
+   "level": "✗",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "dongchedi.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S04-013",
+   "channel": "42号车库",
+   "level": "✗",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "42hao.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S04-014",
+   "channel": "电动邦",
+   "level": "✗",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "diandong.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S04-015",
+   "channel": "电车资源",
+   "level": "✗",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "evpartner.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S05-001",
+   "channel": "国家能源局",
+   "level": "★",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "nea.gov.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S05-002",
+   "channel": "中电联",
+   "level": "★",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "cec.org.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S05-003",
+   "channel": "发改委",
+   "level": "★",
+   "layer": "可直连（端点覆盖 / 平台归并）",
+   "endpoint": "国家发展改革委",
+   "entry": "ndrc.gov.cn",
+   "domain_status": "HTTP 404（候选路径不存在，需补该站正确 RSS / 列表页 URL）",
+   "enable_condition": "已启用：python run.py 加载 data/endpoints_live.yaml；同平台多栏目复用同一时间倒排端点"
+  },
+  {
+   "channel_id": "S05-004",
+   "channel": "国家电网",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "sgcc.com.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S05-005",
+   "channel": "南方电网",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "csg.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S05-006",
+   "channel": "中国气象局",
+   "level": "★",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "cma.gov.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S06-001",
+   "channel": "国家药监局",
+   "level": "★",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "nmpa.gov.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S06-002",
+   "channel": "卫健委",
+   "level": "★",
+   "layer": "待补端点（候选路径无可枚举时间条目）",
+   "endpoint": "",
+   "entry": "nhc.gov.cn",
+   "domain_status": "HTTP 404/412（候选路径不存在，需补该站正确 RSS / 列表页 URL）",
+   "enable_condition": "域名可访问但 4 种常见形态（首页 / RSS / 新闻列表 / 要闻页）均未抽到带日期条目：需补该站正确的 RSS / 滚动页 / 公告列表 URL，或在 data/endpoints_live.yaml 手工登记后重新实测"
+  },
+  {
+   "channel_id": "S06-003",
+   "channel": "国家医保局",
+   "level": "★",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "nhsa.gov.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S06-004",
+   "channel": "国家疾控局",
+   "level": "★",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "ndcpa.gov.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S06-005",
+   "channel": "中国食品药品网",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "health-china.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S06-006",
+   "channel": "中国医药信息网",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "cpi.ac.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S06-007",
+   "channel": "中国医药信息查询平台",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "dayi.org.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S06-008",
+   "channel": "中新网健康",
+   "level": "☆",
+   "layer": "可直连（端点覆盖 / 平台归并）",
+   "endpoint": "中新网",
+   "entry": "chinanews.com.cn/jk/",
+   "domain_status": "已实测可抓取",
+   "enable_condition": "已启用：python run.py 加载 data/endpoints_live.yaml；同平台多栏目复用同一时间倒排端点"
+  },
+  {
+   "channel_id": "S06-009",
+   "channel": "腾讯新闻健康",
+   "level": "☆",
+   "layer": "待补端点（候选路径无可枚举时间条目）",
+   "endpoint": "",
+   "entry": "news.qq.com 健康频道",
+   "domain_status": "可打开但各形态均未抽到 ≥3 条带日期条目",
+   "enable_condition": "域名可访问但 4 种常见形态（首页 / RSS / 新闻列表 / 要闻页）均未抽到带日期条目：需补该站正确的 RSS / 滚动页 / 公告列表 URL，或在 data/endpoints_live.yaml 手工登记后重新实测"
+  },
+  {
+   "channel_id": "S06-010",
+   "channel": "养生类自媒体",
+   "level": "✗",
+   "layer": "无公开入口（栏目 / 账号 / 线下）",
+   "endpoint": "",
+   "entry": "—",
+   "domain_status": "",
+   "enable_condition": "渠道文档未登记可拉取域名，属平台内栏目或聚合概念；需人工确认官方数据源后登记，不编造条目"
+  },
+  {
+   "channel_id": "S07-001",
+   "channel": "教育部",
+   "level": "★",
+   "layer": "待补端点（候选路径无可枚举时间条目）",
+   "endpoint": "",
+   "entry": "moe.gov.cn",
+   "domain_status": "HTTP 404（候选路径不存在，需补该站正确 RSS / 列表页 URL）",
+   "enable_condition": "域名可访问但 4 种常见形态（首页 / RSS / 新闻列表 / 要闻页）均未抽到带日期条目：需补该站正确的 RSS / 滚动页 / 公告列表 URL，或在 data/endpoints_live.yaml 手工登记后重新实测"
+  },
+  {
+   "channel_id": "S07-002",
+   "channel": "中国教育报",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "jyb.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S07-003",
+   "channel": "人社部",
+   "level": "★",
+   "layer": "待补端点（候选路径无可枚举时间条目）",
+   "endpoint": "",
+   "entry": "mohrss.gov.cn",
+   "domain_status": "可打开但各形态均未抽到 ≥3 条带日期条目",
+   "enable_condition": "域名可访问但 4 种常见形态（首页 / RSS / 新闻列表 / 要闻页）均未抽到带日期条目：需补该站正确的 RSS / 滚动页 / 公告列表 URL，或在 data/endpoints_live.yaml 手工登记后重新实测"
+  },
+  {
+   "channel_id": "S07-004",
+   "channel": "国家统计局",
+   "level": "☆",
+   "layer": "待补端点（候选路径无可枚举时间条目）",
+   "endpoint": "",
+   "entry": "stats.gov.cn",
+   "domain_status": "HTTP 404（候选路径不存在，需补该站正确 RSS / 列表页 URL）",
+   "enable_condition": "域名可访问但 4 种常见形态（首页 / RSS / 新闻列表 / 要闻页）均未抽到带日期条目：需补该站正确的 RSS / 滚动页 / 公告列表 URL，或在 data/endpoints_live.yaml 手工登记后重新实测"
+  },
+  {
+   "channel_id": "S07-005",
+   "channel": "老龄协会",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "cncaprc.gov.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S08-001",
+   "channel": "住建部",
+   "level": "★",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "mohurd.gov.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S08-002",
+   "channel": "交通运输部",
+   "level": "★",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "mot.gov.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S08-003",
+   "channel": "国家体育总局",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "sport.gov.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S08-004",
+   "channel": "国家统计局",
+   "level": "★",
+   "layer": "待补端点（候选路径无可枚举时间条目）",
+   "endpoint": "",
+   "entry": "stats.gov.cn",
+   "domain_status": "HTTP 404（候选路径不存在，需补该站正确 RSS / 列表页 URL）",
+   "enable_condition": "域名可访问但 4 种常见形态（首页 / RSS / 新闻列表 / 要闻页）均未抽到带日期条目：需补该站正确的 RSS / 滚动页 / 公告列表 URL，或在 data/endpoints_live.yaml 手工登记后重新实测"
+  },
+  {
+   "channel_id": "S09-001",
+   "channel": "市场监管总局",
+   "level": "★",
+   "layer": "待补端点（候选路径无可枚举时间条目）",
+   "endpoint": "",
+   "entry": "samr.gov.cn",
+   "domain_status": "HTTP 404（候选路径不存在，需补该站正确 RSS / 列表页 URL）",
+   "enable_condition": "域名可访问但 4 种常见形态（首页 / RSS / 新闻列表 / 要闻页）均未抽到带日期条目：需补该站正确的 RSS / 滚动页 / 公告列表 URL，或在 data/endpoints_live.yaml 手工登记后重新实测"
+  },
+  {
+   "channel_id": "S09-002",
+   "channel": "最高法",
+   "level": "★",
+   "layer": "待补端点（候选路径无可枚举时间条目）",
+   "endpoint": "",
+   "entry": "court.gov.cn",
+   "domain_status": "可打开但各形态均未抽到 ≥3 条带日期条目",
+   "enable_condition": "域名可访问但 4 种常见形态（首页 / RSS / 新闻列表 / 要闻页）均未抽到带日期条目：需补该站正确的 RSS / 滚动页 / 公告列表 URL，或在 data/endpoints_live.yaml 手工登记后重新实测"
+  },
+  {
+   "channel_id": "S09-003",
+   "channel": "最高检",
+   "level": "★",
+   "layer": "可直连（端点覆盖 / 平台归并）",
+   "endpoint": "最高检",
+   "entry": "spp.gov.cn",
+   "domain_status": "已实测可抓取",
+   "enable_condition": "已启用：python run.py 加载 data/endpoints_live.yaml；同平台多栏目复用同一时间倒排端点"
+  },
+  {
+   "channel_id": "S09-004",
+   "channel": "公安部",
+   "level": "★",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "mps.gov.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S09-005",
+   "channel": "应急管理部",
+   "level": "★",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "mem.gov.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S09-006",
+   "channel": "各地警方通报",
+   "level": "☆",
+   "layer": "无公开入口（栏目 / 账号 / 线下）",
+   "endpoint": "",
+   "entry": "地方公安官网/公众号",
+   "domain_status": "",
+   "enable_condition": "渠道文档未登记可拉取域名，属平台内栏目或聚合概念；需人工确认官方数据源后登记，不编造条目"
+  },
+  {
+   "channel_id": "S10-001",
+   "channel": "农业农村部",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "moa.gov.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S10-002",
+   "channel": "生态环境部",
+   "level": "★",
+   "layer": "可直连（端点覆盖 / 平台归并）",
+   "endpoint": "生态环境部",
+   "entry": "mee.gov.cn",
+   "domain_status": "可打开但各形态均未抽到 ≥3 条带日期条目",
+   "enable_condition": "已启用：python run.py 加载 data/endpoints_live.yaml；同平台多栏目复用同一时间倒排端点"
+  },
+  {
+   "channel_id": "S10-003",
+   "channel": "气象局",
+   "level": "★",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "cma.gov.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S10-004",
+   "channel": "林草局",
+   "level": "✗",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "forestry.gov.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S10-005",
+   "channel": "水利部",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "mwr.gov.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S11-001",
+   "channel": "中国航天科技集团",
+   "level": "★",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "spacechina.com",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S11-002",
+   "channel": "中国商飞",
+   "level": "★",
+   "layer": "无公开入口（栏目 / 账号 / 线下）",
+   "endpoint": "",
+   "entry": "comac.cc",
+   "domain_status": "",
+   "enable_condition": "渠道文档未登记可拉取域名，属平台内栏目或聚合概念；需人工确认官方数据源后登记，不编造条目"
+  },
+  {
+   "channel_id": "S11-003",
+   "channel": "中科院",
+   "level": "★",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "cas.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S11-004",
+   "channel": "国防部",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "mod.gov.cn",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S11-005",
+   "channel": "央媒军事频道",
+   "level": "☆",
+   "layer": "网络出口拦截（换网络可启用）",
+   "endpoint": "",
+   "entry": "news.cctv.cn 军事",
+   "domain_status": "HTTP 403（出口策略拦截，域名级）",
+   "enable_condition": "本沙盒实测 HTTP 403（出口策略拦截，域名级）；GitHub Actions 等 unrestricted 网络下重跑 python scripts/discover_endpoints.py 会自动把该域名写进端点清单并启用"
+  },
+  {
+   "channel_id": "S12-001",
+   "channel": "自贡网、荆楚网、广西新闻网",
+   "level": "☆",
+   "layer": "无公开入口（栏目 / 账号 / 线下）",
+   "endpoint": "",
+   "entry": "地方案件、本地政务、环境",
+   "domain_status": "",
+   "enable_condition": "渠道文档未登记可拉取域名，属平台内栏目或聚合概念；需人工确认官方数据源后登记，不编造条目"
+  },
+  {
+   "channel_id": "S12-002",
+   "channel": "澎湃新闻",
+   "level": "☆",
+   "layer": "无公开入口（栏目 / 账号 / 线下）",
+   "endpoint": "",
+   "entry": "地方舆情、社会调查",
+   "domain_status": "",
+   "enable_condition": "渠道文档未登记可拉取域名，属平台内栏目或聚合概念；需人工确认官方数据源后登记，不编造条目"
+  },
+  {
+   "channel_id": "S12-003",
+   "channel": "上游新闻、红星新闻",
+   "level": "✗",
+   "layer": "无公开入口（栏目 / 账号 / 线下）",
+   "endpoint": "",
+   "entry": "社会新闻",
+   "domain_status": "",
+   "enable_condition": "渠道文档未登记可拉取域名，属平台内栏目或聚合概念；需人工确认官方数据源后登记，不编造条目"
+  },
+  {
+   "channel_id": "S12-004",
+   "channel": "齐鲁晚报、南方都市报",
+   "level": "✗",
+   "layer": "无公开入口（栏目 / 账号 / 线下）",
+   "endpoint": "",
+   "entry": "地方社会",
+   "domain_status": "",
+   "enable_condition": "渠道文档未登记可拉取域名，属平台内栏目或聚合概念；需人工确认官方数据源后登记，不编造条目"
+  },
+  {
+   "channel_id": "S13-001",
+   "channel": "每天60秒读报（公众号）",
+   "level": "☆",
+   "layer": "需账号登录 / 动态渲染",
+   "endpoint": "",
+   "entry": "快递、铁路、综合简报",
+   "domain_status": "",
+   "enable_condition": "平台内栏目，无公开无鉴权端点：需官方开放平台授权，或走已授权的第三方热榜聚合；静态抓取无法覆盖，不编造条目"
+  },
+  {
+   "channel_id": "S13-002",
+   "channel": "央视财经",
+   "level": "☆",
+   "layer": "可直连（端点覆盖 / 平台归并）",
+   "endpoint": "央视",
+   "entry": "反诈、消费提示",
+   "domain_status": "",
+   "enable_condition": "已启用：python run.py 加载 data/endpoints_live.yaml；同平台多栏目复用同一时间倒排端点"
+  },
+  {
+   "channel_id": "S13-003",
+   "channel": "光明网",
+   "level": "☆",
+   "layer": "可直连（端点覆盖 / 平台归并）",
+   "endpoint": "光明网",
+   "entry": "消费警示",
+   "domain_status": "",
+   "enable_condition": "已启用：python run.py 加载 data/endpoints_live.yaml；同平台多栏目复用同一时间倒排端点"
+  },
+  {
+   "channel_id": "S14-001",
+   "channel": "微博",
+   "level": "✗",
+   "layer": "需账号登录 / 动态渲染",
+   "endpoint": "",
+   "entry": "热搜、突发快讯",
+   "domain_status": "",
+   "enable_condition": "平台内栏目，无公开无鉴权端点：需官方开放平台授权，或走已授权的第三方热榜聚合；静态抓取无法覆盖，不编造条目"
+  },
+  {
+   "channel_id": "S14-002",
+   "channel": "抖音",
+   "level": "✗",
+   "layer": "需账号登录 / 动态渲染",
+   "endpoint": "",
+   "entry": "热点话题",
+   "domain_status": "",
+   "enable_condition": "平台内栏目，无公开无鉴权端点：需官方开放平台授权，或走已授权的第三方热榜聚合；静态抓取无法覆盖，不编造条目"
+  },
+  {
+   "channel_id": "S14-003",
+   "channel": "快手",
+   "level": "✗",
+   "layer": "需账号登录 / 动态渲染",
+   "endpoint": "",
+   "entry": "热点",
+   "domain_status": "",
+   "enable_condition": "平台内栏目，无公开无鉴权端点：需官方开放平台授权，或走已授权的第三方热榜聚合；静态抓取无法覆盖，不编造条目"
+  },
+  {
+   "channel_id": "S14-004",
+   "channel": "今日头条",
+   "level": "✗",
+   "layer": "需账号登录 / 动态渲染",
+   "endpoint": "",
+   "entry": "热榜",
+   "domain_status": "",
+   "enable_condition": "平台内栏目，无公开无鉴权端点：需官方开放平台授权，或走已授权的第三方热榜聚合；静态抓取无法覆盖，不编造条目"
+  },
+  {
+   "channel_id": "S14-005",
+   "channel": "知乎",
+   "level": "✗",
+   "layer": "需账号登录 / 动态渲染",
+   "endpoint": "",
+   "entry": "热点问答、行业讨论",
+   "domain_status": "",
+   "enable_condition": "平台内栏目，无公开无鉴权端点：需官方开放平台授权，或走已授权的第三方热榜聚合；静态抓取无法覆盖，不编造条目"
+  },
+  {
+   "channel_id": "S14-006",
+   "channel": "微信搜一搜",
+   "level": "✗",
+   "layer": "需账号登录 / 动态渲染",
+   "endpoint": "",
+   "entry": "公众号内容",
+   "domain_status": "",
+   "enable_condition": "平台内栏目，无公开无鉴权端点：需官方开放平台授权，或走已授权的第三方热榜聚合；静态抓取无法覆盖，不编造条目"
+  },
+  {
+   "channel_id": "S14-007",
+   "channel": "百度热搜",
+   "level": "✗",
+   "layer": "需账号登录 / 动态渲染",
+   "endpoint": "",
+   "entry": "热度参考",
+   "domain_status": "",
+   "enable_condition": "平台内栏目，无公开无鉴权端点：需官方开放平台授权，或走已授权的第三方热榜聚合；静态抓取无法覆盖，不编造条目"
+  },
+  {
+   "channel_id": "X-127",
+   "channel": "Google News RSS·民生服务",
+   "level": "★",
+   "layer": "需密钥（搜索 / 开放平台 API）",
+   "endpoint": "",
+   "entry": "news.google.com/rss/search",
+   "domain_status": "未探测",
+   "enable_condition": "在 Secrets 配 SERPER_API_KEY / TAVILY_API_KEY，开 source.live.search"
+  },
+  {
+   "channel_id": "X-128",
+   "channel": "Google News RSS·财经市场",
+   "level": "★",
+   "layer": "需密钥（搜索 / 开放平台 API）",
+   "endpoint": "",
+   "entry": "news.google.com/rss/search",
+   "domain_status": "未探测",
+   "enable_condition": "在 Secrets 配 SERPER_API_KEY / TAVILY_API_KEY，开 source.live.search"
+  },
+  {
+   "channel_id": "X-129",
+   "channel": "Google News RSS·科技与产业",
+   "level": "★",
+   "layer": "需密钥（搜索 / 开放平台 API）",
+   "endpoint": "",
+   "entry": "news.google.com/rss/search",
+   "domain_status": "未探测",
+   "enable_condition": "在 Secrets 配 SERPER_API_KEY / TAVILY_API_KEY，开 source.live.search"
+  },
+  {
+   "channel_id": "X-130",
+   "channel": "Google News RSS·国际三类突发",
+   "level": "★",
+   "layer": "需密钥（搜索 / 开放平台 API）",
+   "endpoint": "",
+   "entry": "news.google.com/rss/search",
+   "domain_status": "未探测",
+   "enable_condition": "在 Secrets 配 SERPER_API_KEY / TAVILY_API_KEY，开 source.live.search"
+  },
+  {
+   "channel_id": "X-131",
+   "channel": "Google News RSS·社会治理与政策",
+   "level": "★",
+   "layer": "需密钥（搜索 / 开放平台 API）",
+   "endpoint": "",
+   "entry": "news.google.com/rss/search",
+   "domain_status": "未探测",
+   "enable_condition": "在 Secrets 配 SERPER_API_KEY / TAVILY_API_KEY，开 source.live.search"
+  },
+  {
+   "channel_id": "X-132",
+   "channel": "微博",
+   "level": "☆",
+   "layer": "需账号登录 / 动态渲染",
+   "endpoint": "",
+   "entry": "",
+   "domain_status": "",
+   "enable_condition": "平台内栏目，无公开无鉴权端点：需官方开放平台授权，或走已授权的第三方热榜聚合；静态抓取无法覆盖，不编造条目"
+  },
+  {
+   "channel_id": "X-133",
+   "channel": "知乎",
+   "level": "☆",
+   "layer": "需账号登录 / 动态渲染",
+   "endpoint": "",
+   "entry": "",
+   "domain_status": "",
+   "enable_condition": "平台内栏目，无公开无鉴权端点：需官方开放平台授权，或走已授权的第三方热榜聚合；静态抓取无法覆盖，不编造条目"
+  },
+  {
+   "channel_id": "X-134",
+   "channel": "抖音",
+   "level": "☆",
+   "layer": "需账号登录 / 动态渲染",
+   "endpoint": "",
+   "entry": "",
+   "domain_status": "",
+   "enable_condition": "平台内栏目，无公开无鉴权端点：需官方开放平台授权，或走已授权的第三方热榜聚合；静态抓取无法覆盖，不编造条目"
+  },
+  {
+   "channel_id": "X-135",
+   "channel": "今日头条",
+   "level": "☆",
+   "layer": "需账号登录 / 动态渲染",
+   "endpoint": "",
+   "entry": "",
+   "domain_status": "",
+   "enable_condition": "平台内栏目，无公开无鉴权端点：需官方开放平台授权，或走已授权的第三方热榜聚合；静态抓取无法覆盖，不编造条目"
+  },
+  {
+   "channel_id": "X-136",
+   "channel": "百度热搜",
+   "level": "☆",
+   "layer": "需账号登录 / 动态渲染",
+   "endpoint": "",
+   "entry": "",
+   "domain_status": "",
+   "enable_condition": "平台内栏目，无公开无鉴权端点：需官方开放平台授权，或走已授权的第三方热榜聚合；静态抓取无法覆盖，不编造条目"
+  },
+  {
+   "channel_id": "X-137",
+   "channel": "36氪",
+   "level": "☆",
+   "layer": "无公开入口（栏目 / 账号 / 线下）",
+   "endpoint": "",
+   "entry": "",
+   "domain_status": "",
+   "enable_condition": "渠道文档未登记可拉取域名，属平台内栏目或聚合概念；需人工确认官方数据源后登记，不编造条目"
+  },
+  {
+   "channel_id": "X-138",
+   "channel": "USGS 实时 GeoJSON 源",
+   "level": "☆",
+   "layer": "无公开入口（栏目 / 账号 / 线下）",
+   "endpoint": "",
+   "entry": "",
+   "domain_status": "",
+   "enable_condition": "渠道文档未登记可拉取域名，属平台内栏目或聚合概念；需人工确认官方数据源后登记，不编造条目"
+  },
+  {
+   "channel_id": "X-139",
+   "channel": "GDACS 全球灾害警报",
+   "level": "☆",
+   "layer": "无公开入口（栏目 / 账号 / 线下）",
+   "endpoint": "",
+   "entry": "",
+   "domain_status": "",
+   "enable_condition": "渠道文档未登记可拉取域名，属平台内栏目或聚合概念；需人工确认官方数据源后登记，不编造条目"
+  },
+  {
+   "channel_id": "X-140",
+   "channel": "GDELT DOC 2.0",
+   "level": "☆",
+   "layer": "需密钥（搜索 / 开放平台 API）",
+   "endpoint": "",
+   "entry": "",
+   "domain_status": "",
+   "enable_condition": "在 Secrets 配 SERPER_API_KEY / TAVILY_API_KEY，开 source.live.search"
+  },
+  {
+   "channel_id": "X-141",
+   "channel": "ReliefWeb / UN OCHA",
+   "level": "☆",
+   "layer": "无公开入口（栏目 / 账号 / 线下）",
+   "endpoint": "",
+   "entry": "",
+   "domain_status": "",
+   "enable_condition": "渠道文档未登记可拉取域名，属平台内栏目或聚合概念；需人工确认官方数据源后登记，不编造条目"
+  },
+  {
+   "channel_id": "X-142",
+   "channel": "百度热搜官方页",
+   "level": "☆",
+   "layer": "需账号登录 / 动态渲染",
+   "endpoint": "",
+   "entry": "",
+   "domain_status": "",
+   "enable_condition": "平台内栏目，无公开无鉴权端点：需官方开放平台授权，或走已授权的第三方热榜聚合；静态抓取无法覆盖，不编造条目"
+  },
+  {
+   "channel_id": "X-143",
+   "channel": "微博热搜官方页",
+   "level": "☆",
+   "layer": "需账号登录 / 动态渲染",
+   "endpoint": "",
+   "entry": "",
+   "domain_status": "",
+   "enable_condition": "平台内栏目，无公开无鉴权端点：需官方开放平台授权，或走已授权的第三方热榜聚合；静态抓取无法覆盖，不编造条目"
+  },
+  {
+   "channel_id": "X-144",
+   "channel": "今日热榜",
+   "level": "☆",
+   "layer": "需账号登录 / 动态渲染",
+   "endpoint": "",
+   "entry": "",
+   "domain_status": "",
+   "enable_condition": "平台内栏目，无公开无鉴权端点：需官方开放平台授权，或走已授权的第三方热榜聚合；静态抓取无法覆盖，不编造条目"
+  },
+  {
+   "channel_id": "X-145",
+   "channel": "财联社 / 界面 / 每经 7×24 快讯流",
+   "level": "☆",
+   "layer": "无公开入口（栏目 / 账号 / 线下）",
+   "endpoint": "",
+   "entry": "",
+   "domain_status": "",
+   "enable_condition": "渠道文档未登记可拉取域名，属平台内栏目或聚合概念；需人工确认官方数据源后登记，不编造条目"
+  },
+  {
+   "channel_id": "X-146",
+   "channel": "澎湃快讯 / 时间倒排流",
+   "level": "☆",
+   "layer": "无公开入口（栏目 / 账号 / 线下）",
+   "endpoint": "",
+   "entry": "",
+   "domain_status": "",
+   "enable_condition": "渠道文档未登记可拉取域名，属平台内栏目或聚合概念；需人工确认官方数据源后登记，不编造条目"
+  },
+  {
+   "channel_id": "X-147",
+   "channel": "中央气象台 / 国家气象中心",
+   "level": "☆",
+   "layer": "无公开入口（栏目 / 账号 / 线下）",
+   "endpoint": "",
+   "entry": "",
+   "domain_status": "",
+   "enable_condition": "渠道文档未登记可拉取域名，属平台内栏目或聚合概念；需人工确认官方数据源后登记，不编造条目"
+  }
+ ]
+}
