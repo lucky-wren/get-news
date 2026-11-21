@@ -195,6 +195,25 @@ def _domain(url: str) -> str:
         return ""
 
 
+# 中文常见的二级公共后缀：finance.people.com.cn / society.people.com.cn 是
+# **同一家媒体**，按完整 hostname 计数会把一个参与方算成 2~3 个独立来源，
+# 正是线上「假多渠道合并」的另一种形态。成稿/去重用主域名，URL 保持原样。
+_CC_SLD = ("com.cn", "net.cn", "org.cn", "gov.cn", "edu.cn", "ac.cn",
+           "co.uk", "com.hk", "com.tw", "co.jp")
+
+
+def _root_domain(url_or_host: str) -> str:
+    h = _domain(url_or_host) if "://" in str(url_or_host) else str(url_or_host or "").lower()
+    if not h:
+        return ""
+    parts = h.split(".")
+    if len(parts) <= 2:
+        return h
+    if ".".join(parts[-2:]) in _CC_SLD:
+        return ".".join(parts[-3:])
+    return ".".join(parts[-2:])
+
+
 def _clean_title(s: str) -> str:
     s = html.unescape(re.sub(r"<[^>]+>", "", s or "")).strip()
     s = re.sub(r"\s+-\s+[^-]{2,20}$", "", s)          # Google News RSS 的「 - 来源」尾巴
@@ -486,17 +505,28 @@ def cn_endpoints(clue: str, *, cfg: dict | None = None, timeout: float = 8.0,
         eps = (yaml.safe_load(path.read_text(encoding="utf-8")) or {}).get("endpoints") or []
     except Exception as e:
         return [], f"yaml 读取失败 {type(e).__name__}"
-    # 按独立域名各取 1 个端点：yaml 前 8 条有 6 条都是 news.cctv.com，
-    # 顺序截断会导致「多渠道」永远只有 1 个域名。跨域名取样才有覆盖证据。
-    by_dom: Dict[str, dict] = {}
+    # 端点选择：跨域名轮转，每个域名最多取 per_dom 个频道。
+    # 旧版「按域名各取 1 个」把中新网 16 个频道（society/finance/health/
+    # importnews…）压成 1 条 scroll-news，而 scroll-news 里恰好没有地震稿 →
+    # 同一事件在别的域名本来有报道却被判「零覆盖」。真发请求实测：扫更多频道
+    # 能把命中率提上来；二次去重仍按真实域名合并，不会伪造多渠道。
+    groups: Dict[str, List[dict]] = {}
     for e in eps:
         if str(e.get("type", "")).lower() not in CN_ENDPOINT_TYPES:
             continue
         u = str(e.get("url") or "")
         if not u.startswith("http"):
             continue
-        by_dom.setdefault(_domain(u), e)
-    cands = list(by_dom.values())[:int(conf.get("cn_max_endpoints", 8))]
+        groups.setdefault(_domain(u), []).append(e)
+    per_dom = max(1, int(conf.get("cn_per_domain_endpoints", 3)))
+    cands: List[dict] = []
+    for i in range(per_dom):
+        for _d, lst in groups.items():
+            if i < len(lst):
+                cands.append(lst[i])
+        if len(cands) >= int(conf.get("cn_max_endpoints", 16)):
+            break
+    cands = cands[:int(conf.get("cn_max_endpoints", 16))]
     evs: List[Evidence] = []
     notes: List[str] = []
     ttl = float(conf.get("cn_cache_ttl", 300.0))
@@ -523,7 +553,7 @@ def cn_endpoints(clue: str, *, cfg: dict | None = None, timeout: float = 8.0,
             pub = _cn_pub(r["pub"])
             if pub is None or (win is not None and not win.contains(pub)):
                 continue
-            dom = _domain(r["url"])
+            dom = _root_domain(r["url"])
             if not dom or CN_JUNK_DOMAIN.search(dom):
                 continue
             evs.append(Evidence(url=r["url"], title=_clean_title(r["title"]),
@@ -533,7 +563,9 @@ def cn_endpoints(clue: str, *, cfg: dict | None = None, timeout: float = 8.0,
                                 basis=f"中文实证端点 {ep.get('id')} 时间字段"))
             kept += 1
         notes.append(f"{ep.get('id', '?')}:{len(rows)}→{kept}")
-    return evs, "；".join(notes[:8])
+    # 旧版 notes[:8] 把 403 / 解析 0 行的端点藏掉，日志只显示 3 个成功端点，
+    # 看起来像「只配了 3 个源」；现在逐条全留，便于复核到底哪些域名真的没数据。
+    return evs, "；".join(notes)
 
 
 def prefilter_noise(evs: List[Evidence], clue: str, cfg: dict | None = None) -> List[Evidence]:
@@ -708,7 +740,16 @@ def search_clue(clue: str, *, cfg: dict | None = None, win: Any = None,
             evs = head + evs[n_res:]
     second: Dict[str, Evidence] = {}
     for ev in evs:
-        k = ev.domain or _domain(ev.url)
+        # 主域名归一：finance.people.com.cn 与 society.people.com.cn 是同一家媒体，
+        # 不能算两个独立参与方（AIHOT：每个来源只算一次）。
+        # 但 gnews 未还原（或还原失败）时 ev.url 是 news.google.com 中转页，按它
+        # 取主域名会把新华网/中新网/央视网全压成 google.com 一条 —— 此时必须用
+        # <source url> 给出的真实媒体域名。线上 gnews 8 条 CBMi 链路就靠这个区分。
+        if ev.google_redirect:
+            base = ev.domain or _domain(ev.url)
+        else:
+            base = _root_domain(ev.url) or ev.domain
+        k = _root_domain(base) if base else _domain(ev.url)
         cur = second.get(k)
         if cur is None or (bool(ev.pub), len(ev.title)) > (bool(cur.pub), len(cur.title)):
             second[k] = ev
