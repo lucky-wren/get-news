@@ -76,7 +76,12 @@ def source_format_ok(s: str) -> bool:
     if not s or not str(s).strip():
         return False
     t = str(s)
-    if re.search(r"https?://|www\.|\||｜|【|】|\[|\]|（|）|\(|\)|未取得|待补|N/A|—|\d+[、.]", t):
+    # 2026-11-22：`\d+[、.]` 本意是拒绝「1、搜狐网 / 2. 中新网」这类编号，
+    # 但会误伤 `163.com` 这种数字开头的真实域名（线上 CI 第 3 行来源列因此整行 FAIL）。
+    # 收紧为编号的真实形态：顿号必拒；数字+点只在后面跟空白/结尾时判编号，
+    # 点后紧跟字母（域名）放行。不放宽其它任何一项（链接/占位/括号/竖线仍全拒）。
+    if re.search(r"https?://|www\.|\||｜|【|】|\[|\]|（|）|\(|\)|未取得|待补|N/A|—|"
+                 r"\d+、|\d+\.(?=\s|$)", t):
         return False
     parts = t.split(SOURCE_SEP)
     if len(parts) < 1:
@@ -353,9 +358,20 @@ def verify_workbook(path: str) -> Dict[str, Any]:
         add("④ 破产倒闭主体可核对性核验留痕",
             "破产倒闭主体可核对性核验留痕" in txt,
             "附录 16 主体核验 section")
+        # 2026-11-22 线上 CI 截图：FAIL「同目录其它 xlsx: ['线上批次新规则重判对照.xlsx']」。
+        # 那是随包交付的**验收/重判排障证据**，不是本批期次产物；旧版 glob("*.xlsx")
+        # 把根目录所有 xlsx 都数进去，等于「自己带的证据把自己判红」，并与
+        # sync_single_xlsx 已修的口径打架（后者只清理 *_窗口期*.xlsx，明确不删验收材料）。
+        # 现在只数同批日期产物：多出一份往期 xlsx 照样 FAIL，证据文件如实列出但不计入。
+        _here = _P(path).parent
+        _batch = [f for f in _here.glob("*_窗口期*.xlsx")
+                  if f.resolve() != _P(path).resolve()]
+        _evidence = [f.name for f in _here.glob("*.xlsx")
+                     if f.name != _P(path).name and f not in _batch]
         add("⑤ 单个 xlsx（output 目录仅一份产物，latest 为字节副本）",
-            len([f for f in _P(path).parent.glob("*.xlsx") if f.name != _P(path).name]) == 0,
-            f"同目录其它 xlsx：{[f.name for f in _P(path).parent.glob('*.xlsx') if f.name != _P(path).name]}")
+            len(_batch) == 0,
+            f"同批其它期次产物：{[f.name for f in _batch]}；"
+            f"验收/重判证据（不计入）：{_evidence}")
         add("⑤ 被剔 / 被合并 / 线索待原文均有留痕",
             all(k in txt for k in ("附录 1 ·", "附录 12b", "附录 13 ·", "附录 15 ·", "附录 17 ·",
                                    "候选池边界留痕")),
