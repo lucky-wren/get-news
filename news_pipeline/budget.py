@@ -163,6 +163,9 @@ class Budget:
 
         # 把采集层截止时刻传给 Collector（在 _get 里检查，抛出 BudgetExpired 即停）
         c.setdefault("budget", {})["_deadline_at"] = time.monotonic() + sl("rss")
+        # 全局硬墙绝对时刻：后台限量补采若发现余量不足就立即停，
+        # 否则 rss 层短路后后台线程仍占 CPU，会把主线程拖过 15min 线（冒烟实测）。
+        c["budget"]["_wall_at"] = self.t0 + max(0.1, self.total - self.reserve)
         self.applied = {"_deadline_at": c["budget"]["_deadline_at"],
             "keyless_deadline": kl["deadline_seconds"], "gdelt_calls": kl["gdelt_max_total_calls"],
             "body_deadline": live["body_deadline_seconds"],
@@ -284,9 +287,14 @@ class Budget:
             "全局硬墙": self.expired,
             "被短路的层": self.skipped, "参数裁剪": self.applied,
             "逐层": rows,
+            # 2026-11-22：线上日志出现过「353.7s / 600.0s | 剩余 246.3s |
+            # 预算耗尽」——层配额之和用尽被误报成全局预算耗尽，直接导致正文补采
+            # 被压到 6 篇。两者必须分开写，否则下游按「快没时间」做错误降级。
             "结论": ("预算内完成" if not self.skipped and not self.expired else
-                     "预算耗尽/层超时，已短路 " + "、".join(self.skipped) +
-                     "；采集层停止但本批仍出表"),
+                     (("全局硬墙到点" if self.expired else
+                       f"层配额用尽（全局硬墙仍有余量 {round(self.left(), 1)}s）")
+                      + "，已短路 " + "、".join(self.skipped)
+                      + "；采集层停止但本批仍出表")),
         }
 
     def write_report(self, base_dir) -> None:
