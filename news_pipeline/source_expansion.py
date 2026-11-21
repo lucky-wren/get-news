@@ -16,6 +16,8 @@
 """
 from __future__ import annotations
 
+import time
+
 import html
 import json
 import re
@@ -270,6 +272,12 @@ def collect(cfg: dict, win: Any, base_seq: int) -> Tuple[List[RawItem], List[Lis
         return [], [["总开关", "-", "关闭", "config.source_expansion.enabled=true 启用"]], {"启用": False}
     proxy_prefix = str(c.get("proxy_url") or "")
     timeout = float(c.get("timeout", 8.0))
+    # 2026-11-22：整层 deadline 由 budget.bounded 注入到 cfg["budget"]。
+    # 旧版纯串行循环按 timeout 累加到数分钟，是 15min 硬杀的主要来源之一。
+    from .budget import deadline_at_of
+    def _expired():
+        d = deadline_at_of(cfg)
+        return bool(d and time.monotonic() > d)
     rows: List[List[str]] = []
     items: List[RawItem] = []
     seq = base_seq
@@ -279,6 +287,9 @@ def collect(cfg: dict, win: Any, base_seq: int) -> Tuple[List[RawItem], List[Lis
     # 1) GDELT：按主题词补 31 类里零端点的大类
     if c.get("gdelt_enabled", True):
         for q in list(c.get("topic_queries", TOPIC_QUERIES))[:int(c.get("gdelt_max_queries", 6))]:
+            if _expired():
+                rows.append(["GDELT DOC 2.0", "-", "层 deadline 到达，后续查询短路", "预算短路"])
+                break
             arts, why = gdelt_articles(q, timespan=c.get("gdelt_timespan", "1d"),
                                        maxrecords=int(c.get("gdelt_maxrecords", 40)),
                                        timeout=timeout, proxy_prefix=proxy_prefix)
@@ -302,6 +313,9 @@ def collect(cfg: dict, win: Any, base_seq: int) -> Tuple[List[RawItem], List[Lis
         sites = list(c.get("gov_sites", GOV_SITES))[:int(c.get("gnews_max_sites", 10))]
         kw = str(c.get("gnews_query", "政策 通知 发布"))
         for site in sites:
+            if _expired():
+                rows.append(["Google News RSS site:", site, "层 deadline 到达，后续站点短路", "预算短路"])
+                break
             arts, why = gnews_feed(site, kw, after=after, before=before,
                                    timeout=timeout, proxy_prefix=proxy_prefix)
             rows.append(["Google News RSS site:", site, why,
@@ -319,7 +333,7 @@ def collect(cfg: dict, win: Any, base_seq: int) -> Tuple[List[RawItem], List[Lis
                 items.append(it)
 
     # 3) NewsNow / RSSHub 公共实例池
-    if c.get("pool_enabled", True):
+    if c.get("pool_enabled", True) and not _expired():
         pr, clues = probe_instances(list(c.get("instances", DEFAULT_INSTANCES)),
                                     list(c.get("hot_routes", HOT_ROUTES)),
                                     timeout=timeout, proxy_prefix=proxy_prefix)
@@ -339,7 +353,7 @@ def collect(cfg: dict, win: Any, base_seq: int) -> Tuple[List[RawItem], List[Lis
                                  raw={"instance": cl["instance"], "style": cl["style"]}))
 
     # 4) 公众号公开镜像
-    if c.get("wechat_enabled", True):
+    if c.get("wechat_enabled", True) and not _expired():
         wf, wr = wechat2rss(list(c.get("wechat_feeds", [])), timeout=timeout,
                             proxy_prefix=proxy_prefix)
         rows.extend([["wechat2rss"] + r for r in wr])
