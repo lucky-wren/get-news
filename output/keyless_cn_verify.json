@@ -1,6 +1,6 @@
 {
-  "通过": 9,
-  "总计": 9,
+  "通过": 14,
+  "总计": 14,
   "检查": [
     {
       "项": "线上 H-c 噪声语料随包",
@@ -18,9 +18,24 @@
       "证据": "['finance.sina.com.cn', 'news.qq.com']"
     },
     {
-      "项": "具体事件标题线索真发检索有中文证据（≥1 个域名）",
+      "项": "真发检索通道可达（Bing RSS HTTP 200，网络 smoke）",
       "结果": "PASS",
-      "证据": "独立中文域名 6：['baike.baidu.com', 'blog.csdn.net', 'cnblogs.com', 'microsoft.com', 'microsoftstore.com.cn', 'win11.ithome.com'] | gnews:0；cn_endpoints:0；bing_rss:10；中文相关性闸剔除 1 条"
+      "证据": "具体留痕=gnews:0；bing_rss:10；cn_endpoints:0；中文相关性闸剔除 8 条 | 泛词留痕=gnews:0；cn_endpoints:1；bing_rss:10；中文相关性闸剔除 4 条"
+    },
+    {
+      "项": "检索噪声不得冒充中文证据（数字误匹配垃圾全被拦）",
+      "结果": "PASS",
+      "证据": "具体保留 0 条 / 泛词保留 4 条；中文域名 ['gjzwfw.www.gov.cn', 'm12333.cn', 'nhsa.gov.cn', 'people.com.cn']（旧版会留下 Windows11/百科/爱奇艺）"
+    },
+    {
+      "项": "Bing 数字误匹配垃圾 7/7 被拦（真发语料固化，防相关性闸再放水）",
+      "结果": "PASS",
+      "证据": "7 条全拦（NBA/百科/Win11/软件商店/影视/163邮箱）"
+    },
+    {
+      "项": "真新闻换说法 3/3 保留（不因收紧相关性闸而误杀）",
+      "结果": "PASS",
+      "证据": "央视 / 中新网 / 人民网三条全保留"
     },
     {
       "项": "具体事件线索可形成 ≥2 个独立中文域名（确定性 mock，不依赖实时 Bing 波动）",
@@ -28,9 +43,19 @@
       "证据": "domains=3 / 中文域名 ['chnfund.com', 'finance.eastmoney.com', 'jingji.cctv.cn']"
     },
     {
-      "项": "真发检索有中文证据（网络可达性 smoke，不做数量优劣比较）",
+      "项": "同媒体不同频道归一为一个独立来源（防假多渠道）",
       "结果": "PASS",
-      "证据": "具体 6 个 / 泛词 9 个；线上泛词 122 候选仅 6 中文域名"
+      "证据": "4 条 URL → 3 个独立参与方 ['cctv.com', 'chinanews.com.cn', 'people.com.cn']"
+    },
+    {
+      "项": "4 条报道里 3 条同媒 → 独立来源数=2 而非 4",
+      "结果": "PASS",
+      "证据": "domains=2 / 证据 2 条 / ['finance.people.com.cn', 'news.cctv.com']"
+    },
+    {
+      "项": "中文端点池跨域名取样（不再把 16 个频道压成 1 个）",
+      "结果": "PASS",
+      "证据": "cn_max_endpoints=16 / per_domain=3 / 端点池独立域名 15 个；具体 0 / 泛词 4 中文域名（实时波动不判优劣）"
     },
     {
       "项": "中文实证端点 provider 真发请求可用",
