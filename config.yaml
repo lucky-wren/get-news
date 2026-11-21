@@ -1,0 +1,524 @@
+# ============================================================
+# get-news · 资讯获取 · 唯一配置文件
+# 项目：get-news（仓库 lucky-wren/get-news）；产品显示名见第 10 节 product.name。
+# 「咨询获取」是同一产品的同音别名；若按该字面显示，改 product.name 后重跑
+# python scripts/verify_branding.py，脚本会列出所有需同步的显示点。
+# 改这里就够了：几点跑 / 窗口期（资讯时间）/ 数据源 / 输出名。
+# 命令行参数优先级 > 本文件；GitHub Actions 定时与手动补跑都读同一份文件。
+# ============================================================
+
+# ---- 1. 定时任务（几点跑）---------------------------------
+schedule:
+  enabled: true
+  run_at: "20:00"              # 每天几点跑，Asia/Shanghai，24 小时制（01 instruction 参数）
+  timezone: Asia/Shanghai
+  # cron_utc 由 `python scripts/set_schedule.py` 依据 run_at 自动同步到工作流，勿手改
+  cron_utc: "0 12 * * *"        # UTC 12:00 = 北京 20:00，全年固定
+
+# ---- 2. 窗口期（资讯时间）---------------------------------
+window:
+  timezone: Asia/Shanghai
+  mode: relative               # relative（推荐，跟定时联动）| absolute（固定日期，复现用）
+  # relative：以「运行时刻」为锚，run_at=20:00 + start=-24h → (前一日20:00, 当日20:00)
+  # 口径（用户拍板 2026-11-20）：默认左开右开 (a, b)，两端整点都不归本批；
+  # 端点开闭可在页面 / --interval / 本项四档切换，零缺口不重叠由相邻批次承担。
+  start_offset_hours: -24
+  end_offset_hours: 0
+  anchor_to_run_at: true           # 手动补跑/延迟跑时右界锁到最近一个 run_at(20:00)，不跟着 now 漂到 23:10
+  anchor: null                 # 留空=运行时当前时刻；填 "2026-11-19 20:00" 可复现历史批次
+  # absolute 模式用下面四项（mode: absolute 时生效）
+  date: null
+  start: null
+  end: null
+  hours: 24
+  interval: lo-ro              # 默认左开右开（用户拍板）；可选 lo-rc / lc-ro / lc-rc
+  strict_window: false         # true = 发布时间未取得的条目一律不入池
+  allow_estimated: true        # 仅限「有窗口内日期线索」才做时点推定，并在附录 4b 逐条留痕；
+                               # 无发布时间且无日期线索的条目由 window_verdict 硬闸拒绝（见 full_audit ⑦）
+
+# ---- 2b. 内容摘要（用户 2026-11-20 补充口径，覆盖 SKILL §8 的 2–3 段 / 240 字）----
+# 净字数 = 去掉 2 全角空格缩进与换行后的可见字符；上限 100，内容流畅、大概说清楚。
+# 形态对齐目标样例：两段（抽到 ≥2 个整句时按句边界分两段，每段都是整句、不复读），
+# 只有一句时保持单段；绝不为了凑段数把同一句对半切。
+# 实现：news_pipeline/normalize.py 按原文顺序挑整句、整分句收束，数字一个不改，
+#       纯代码抽取式，不调用任何模型语义层；keyless 成稿层同样输出两段带缩进。
+# 生效优先级：本项 max_net_chars > 环境变量 NEWS_ABSTRACT_MAX > 100。
+# 由 pipeline 在跑批前调用 normalize.set_abstract_limit(cfg.abstract.max_net_chars) 注入。
+# 注意：spec.py 验收器固定按 100 字校验（规格契约不随配置放宽）；调大只会让生成端放宽、
+# 验收判不达标，是刻意的防回退设计；调小（如 80）则生成与验收都通过。
+abstract:
+  max_net_chars: 100
+  paragraphs: 2                # 目标样例 34/34 两段；1 = 退回单段（由 pipeline 注入 normalize）
+  keep_original_numbers: true
+
+# ---- 3. 数据源 -------------------------------------------
+source:
+  # live = 默认：真实联网多源抓取（央视网 JSONP 时间倒排 / 中新网 RSS / 人民网 RSS /
+  #        政府网与站内时间倒排页 / 独立原文正文补采；国际源组按可达性自动启用）。
+  #        受限网络下自动跳过不可达端点并逐源申报，不编造、不回炉台账。
+  # target = 代码化补跑（内置标准语料重放，非实时，仅作离线回归）；
+  # demo / inbox / hybrid = 离线台账模式
+  mode: live
+  inbox_path: data/demo_inbox.json
+  target:
+    seed: data/target_seed.json   # scripts/build_seed.py 原子化生成的内置标准语料
+    auto_live: true               # 先探测实时端点，不可达则如实降级
+    probe_timeout: 3.0
+    estimated_ratio: 0.18        # 标「时点推定」的比例，对齐目标态样例
+  live:
+    rss: true
+    apis: true
+    html_lists: true
+    hotboards: true            # 快讯/拼盘源全量拆条逐条回查（60秒早报/新闻联播/财联社电报/澎湃快讯/热榜快照）
+    social_hotboards: true     # 社交平台主干：微博/百度/抖音/头条/知乎/B站/小红书/快手/贴吧/微信搜一搜
+    search: true               # 统一搜索层：有 key 走 Serper/Tavily，无 key 自动降级 Bing 站内（实测可达）
+    fetch_article: true        # RSS 只给标题复读时，从独立原文 URL 补正文（关键质量开关）
+    max_articles: 400          # 声明上限；运行时裁剪到 260（并发 8；窗口内优先排序后取前 N）
+    article_timeout: 6         # 单篇硬超时；全文核查：4s 让搜索回查到的第三方站点大量落空，提到 6s（仍受 body_deadline 110s 总闸保护）
+    body_deadline_seconds: 110 # 正文补采整批硬上限，个别源站挂住时取消并如实留空，不拖死整批
+    # 摘要二次补采：对首轮仍「摘要未取得」的候选池条目，用更长超时 + URL 变体 + Jina 并发重试。
+    # 只认独立原文正文，抽不到保持「未取得」，不用标题 / snippet 冒充。
+    second_pass_enabled: true
+    second_pass:
+      max_items: 200           # 声明上限；运行时裁剪到 120。90 个名额不够，且已改为按可成稿价值排序
+      timeout: 9               # 单 URL 变体超时（首轮 4s 对部分第三方站点不够）
+      jina_timeout: 6
+      workers: 8
+      deadline_seconds: 130    # 整批总闸，超时后剩余条目如实留空
+    request_timeout: 8
+    max_per_channel: 60
+    user_agent: "news-daily-pipeline/1.0 (+robots.txt respected)"
+    min_interval_seconds: 5    # GDELT DOC 2.0 要求请求间隔 ≥5 秒
+
+# ---- 3b. 统一搜索 API 层（开源热榜源 + 搜索 API → 高质量独立原文）----
+# 实现：news_pipeline/search_api.py；逐次调用留痕写进 Excel「工程留痕 H」。
+# 不是「取第一条」：每个 query 拉多候选，按权威域名 / 窗口内发布时间 / 事实锚点 /
+# query 贴合度打分选最优；旧闻、PDF、话题页、无事实摘要由硬闸拦下并逐条留痕。
+# 不吃 snippet：搜索结果只给 URL，正文由 collectors._fetch_search_bodies 从独立原文补采。
+search_api:
+  enabled: true
+  # 有 key 优先；无 key 自动走 keyless 多源检索（Google News RSS / Bing RSS / GDELT / SearXNG），
+  # 不配任何 Secret 也能逐条回查独立原文并成稿。Serper 只是「更快」，不是「必需」。
+  provider_order: "serper,tavily,keyless,bing,sogou"
+  results_per_query: 8
+  max_calls: 300                # 声明上限；运行时 budget.apply 裁剪到 160（见 output/budget_report.json）。
+                               # 160 仍 ≥ 34 条 × 3 源 ≈ 120 次回查；48 次数学上做不出多渠道成稿。
+  timeout: 9
+  hotboard_lookup_max: 60
+  min_score: 18
+  default_site: ""
+  keywords_per_group: 2
+  max_body_fetch: 300           # 声明上限；运行时裁剪到 160。原 32 篇全被前 3 个源吃满
+  body_timeout: 9
+  body_deadline_seconds: 180
+  jina_max: 40                  # r.jina.ai 无 key 20 RPM，正文补采兜底
+  open_hot_sources: true
+  hot_routes: [weibo, zhihu, toutiao, baidu, thepaper, 36kr, bilibili]
+  hot_timeout: 4
+  clues_per_route: 12
+
+# ---- 3c. 无 key 多源检索 + 事件级成稿（2026-11-21，主链路）----
+# 回答「不配 Serper key 就达不到效果吗」：这条链路全部免费、公开、无需签名，
+# 按「一个事件 = 一条 + N 个独立原文证据」成稿，产出样例形态的两段摘要与多渠道来源列。
+# 实现 news_pipeline/keyless_compose.py；不调模型、不绕登录、不编数据。
+keyless:
+  enabled: true
+  # 2026-11-22 吞吐根因：GDELT 有全局 5 秒/请求锁，放在每个线索的 provider_order 里
+  # 会把并发线程全部串行化（实测 80 线索只跑完 13 条）。GDELT 仍保留在
+  # source_expansion 独立层（2 条定向查询、35s 配额），不丢源，但不进逐线索主链路。
+  # 2026-11-22 线上 H-c 逐次留痕：122 个检索候选 URL 里中文独立域名仅 6 个，
+  # 88 个是 www.bing.com 搜索页、8 个 news.google.com 重定向、其余是英文娱乐/政务站；
+  # keyless 43 次调用 0 成稿。换网络只让英文站可达，召回质量不会变。
+  # 中文证据改从项目已实证端点（央视网 JSONP / 中新网 RSS 等，沙盒实测 200/80 条带秒级时间）取。
+  provider_order: "cn_endpoints,gnews,bing_rss,searxng"
+  endpoints_file: data/endpoints_live.yaml
+  cn_max_endpoints: 8          # 每批最多探测的中文端点数
+  cn_cache_ttl: 300            # 端点结果批次内复用，避免 80 线索 × 8 端点重复请求
+  cn_min_overlap: 0.18         # 标题与主题词的中文 2-gram 最低重合率
+  cn_noise_prefilter: true     # 剔英文站 / 搜索结果页 / 无中文标题候选
+  # 线索层：泛主题词召回失败，改用本批已抓到的具体中文事件标题做多站回查
+  use_raw_event_clues: true
+  max_event_clues: 48          # 具体事件线索上限；其后才是泛主题词表与社会热榜词条
+  # Google News RSS：免费无 key，单查询约 100 条，带精确 pubDate 与来源域；link 需跟随重定向
+  gnews_when: "1d"
+  gnews_limit: 60
+  # Bing RSS：免费无 key，format=rss
+  bing_limit: 30
+  # GDELT DOC 2.0：免费无 key，65 语言，250 条/查询，服务端硬要求 ≥5 秒/请求
+  gdelt_maxrecords: 100
+  gdelt_timeout: 12
+  gdelt_gap_seconds: 5.2
+  gdelt_max_total_calls: 4         # 声明值即运行时值（budget.apply 上限也是 4）；免费通道 5 秒/请求，
+                               # 20 次=104s 性价比最低，只作元数据补充
+  # SearXNG（可选）：开源自建元搜索，format=json，无 key 无配额；不配不影响其它 provider
+  searxng_url: ""               # 也可用环境变量 SEARXNG_URL；自建见 资讯获取_无Key多源成稿方案.md
+  timeout: 9
+  max_redirects: 12
+  max_clues: 100                # 主题词表 12 + 7 路由×12 社交词条 = 96，留 4 个余量
+  workers: 12                   # 检索与成稿同一 future 内全并发；_HTTP_SEM=36 = 12×3 活跃 provider
+  deadline_seconds: 185         # 声明值即运行时值（budget.apply 上限同为 185）；
+                               # 与 budget.layer_seconds.keyless 一致，总量仍从 540 降到 510s
+  min_independent_domains: 2    # AIHOT：≥2 个独立参与方才成事件
+  min_bodies_with_text: 1          # 摘要只从取到正文的原文抽（≥1 篇）；其余带 URL/时间的独立域名
+                                   # 仅作「覆盖证据」进来源列并逐条留痕，绝不用 snippet 冒充正文
+  max_sources_per_event: 6      # 样例最多 6 个来源
+  abstract_net_chars: 100       # 两段、整分句、净字 ≤100、数字不改写
+  body_timeout: 9
+  jina_fallback: true
+  jina_timeout: 9
+  use_social_clues: true        # 把 10 平台热榜词条也当线索，逐条回查独立原文
+  topic_queries:
+    - "医保 社保 养老金 辟谣"
+    - "地方债 城投 隐性债务"
+    - "新能源 电池 质保 召回"
+    - "AI 算力 芯片 裁员"
+    - "房地产 房企 面值退市 破产"
+    - "工厂 制药 医药 集采"
+    - "企业倒闭 资不抵债 清算"
+    - "铁路 民航 高速 出行 预警"
+    - "地震 灾害 突发事故 伤亡"
+    - "物价 猪肉 蔬菜 食品 消费"
+    - "劳动仲裁 拖欠工资 社保"
+    - "战争 空袭 伤亡 使馆"
+
+# ---- 4. 渠道白名单 ---------------------------------------
+channels:
+  # 国际只留重大突发：USGS 全量 feed 会把 0.7 级小震灌进候选池并靠「级地震」关键词
+  # 混过国际三类门禁（实测 0.7 级排到主表第 4）。低于该震级不入库，逐条计数留痕。
+  usgs_min_magnitude: 5.5
+  doc: data/资讯渠道大全_31类扩展版.md   # 31 类 599 渠道主干白名单（v3 113 渠道表另存作扩展参考）
+  extra: data/channels_extra.yaml
+  status_all: true             # 逐渠道申报全部白名单渠道，不静默不采
+
+# ---- 5. 评级口径 -----------------------------------------
+rules:
+  # 大众贴近度档位（SKILL §1.5 / §4.1.3）：strict（默认）/ moderate / off，三档之外无第四档。
+  # strict：未命中三类强剔除、且未命中正面清单 / 全民性热点 → 剔除；
+  #         真实批次里新出现的合规表述应补进 rules.MASS_TOPIC，不得放宽判定式。
+  # moderate：未命中三类强剔除即通过（SKILL 允许的宽松档，可一键切换）。
+  mass_strictness: strict
+  excluded_groups: []
+  gated_groups: {}
+  intl_three_only: true
+  intl_front_cap: 4
+  intl_label_bonus: {}
+  story_dedup: true
+  # 01 第三节：story_max_keep 默认 1（每簇留 1 条代表条，其余进附录 17）；
+  # 设 2 可留两条不同侧面。此前写 2 是为避免退市潮刷屏，属偏离规格，已改回 1。
+  story_max_keep: 1
+  main_requires_abstract: true     # 主表硬闸：摘要「未取得」只留候选池，不进主表（需求⑤）
+  topic_cluster: true              # 同主题多渠道归并（LPR/医保目录等），让 H 代理有可核对输入
+  legacy_groups: true        # 保留台账扩展大类（工厂与制造业 / 社会治理），对齐目标态样例
+
+scoring:
+  lambda_: 6                   # Final_adj = Final − λ × min(gin−1, cap)
+  weather_first: false
+  # 可选 auto（>70% 无后台数据即关闭）/ on / off / proxy（独立来源数构造 H_c）
+  # / heat（事件级热度，当前值）：48h 窗口 / 24h 半衰期 / 每个独立来源只算一次。
+  # 四者都不降 grade 阈值、不改 V_MAX、不猜平台浏览量；A 是多源覆盖的自然结果。
+  h_channel: heat                  # 事件级热度（AIHOT heat-v1-48h-halflife24h），2026-11-21 修 A 档恒空
+  h_proxy_min_sources: 3       # 仅 ≥3 个独立来源的条目生效（稀疏生效，不整体上移等级）
+  h_proxy_cap: 5.0                 # 5 个独立来源即视为传播足迹饱和（与 rank.cross_channels_min=4 对齐）             # H_c = min(1, (n-1)/cap)；3 源→0.25→+6.55 分，温和叠加不整体上移
+  u_final_weight: 8
+  intl_important_weight: 6
+  quality_penalty: true       # 01 第四节五项惩罚（−8/−5/−5/−4/−3）全部启用
+  verify_cap: true            # 三态核实：B 部分核实封顶 C、C 未核实不得进 A（作用在 Final 上）
+  max_items: null
+
+orchestrate:
+  enabled: true
+  head_window: 3
+  front_window: 10
+  max_per_cat: 3
+  interleave: true
+  interleave_label_epsilon: 1.0
+
+# ---- 6. 输出：固定地址 + 覆盖式写入 -----------------------
+output:
+  dir: output
+  name: "{date}_窗口期.xlsx"   # 按窗口右界日期命名；keep_history=false 时包内只保留这一份
+  suffix: ""
+  verify_short_window: false
+  # 覆盖式：每次跑完覆盖同一份固定文件，页面地址与下载链接永不变
+  overwrite: true
+  latest_name: "latest.xlsx"   # docs/downloads/latest.xlsx，页面固定下载入口
+  site_latest_json: "latest.json"  # docs/data/latest.json，页面固定数据源
+  keep_history: false          # true 才累积往期归档；默认只保留最新一期
+
+# ---- 7. 采集质量门禁（12 项实测，含 2 项分层盘点；不达标只告警，不伪造成品）----------
+quality:
+  min_a_ratio: 0.60            # A 级独立原文占主表比例下限
+  min_pub_ratio: 0.80          # 取得发布时间的条目比例下限
+  min_channel_ratio: 0.30      # 渠道触达比例下限
+  min_lookup_ratio: 0.80       # 榜单词条回查到独立原文比例下限
+  min_abstract_ratio: 0.80     # 有效摘要（非标题复读）比例下限
+  min_group_consistency: 0.98  # 上位大类 == 分类标签前缀 比例下限
+  min_endpoint_ratio: 0.50     # 白名单里已配置可拉取端点的比例下限
+  max_noise_ratio: 0.10        # F5 非新闻噪声占采集结果比例上限
+  max_story_dup_ratio: 0.30    # 议题簇合并条数占合并前主表比例上限
+  max_para_dup_ratio: 0.02     # 摘要内自我重复段落的条目比例上限（目标态样例实测 52.1%）
+  min_source_ratio: 0.60       # 本批真实联网源中已触达比例下限（与白名单完备度分开考核）
+  warn_only: true              # true=写进「工程留痕 A」与 CI 摘要并告警；false=不达标直接失败
+
+
+# ---- 8. 社交平台主干（需求②：主干不是补充）------------------
+social_main:
+  enabled: true
+  # 10 个平台逐条登记为主干发现入口；词条必须回查到独立原文才成行，只有话题名+热度进附录 15
+  platforms:
+    - 微博·热搜
+    - 百度·热搜
+    - 抖音·热点
+    - 今日头条·热榜
+    - 知乎·热榜
+    - B站·热门
+    - 小红书·热点
+    - 快手·热点
+    - 百度贴吧·热议
+    - 微信·搜一搜·搜索发现
+  # 不能整页当拼盘丢掉：下列源全量拆条，每条独立回查，母行与词条逐条进附录 15
+  digest_sources:
+    - 每天60秒读报
+    - 新闻联播
+    - 财联社电报
+    - 澎湃快讯
+    - 热榜快照
+  require_article: true          # 词条无独立原文 → 附录 15「线索待原文」，不进候选池
+  snapshot_in_main: false        # 快照本身不进主表（01 §3.3 独立原文准入）
+  max_lookup: 32                # 声明值即运行时值（budget.apply 上限 40，本层按 35s 配额取 32）
+                               # 32×11s / 12 路并发 = 29.3s ≤ social 层 35s；
+                               # 社交/热榜词条另由 0a-0 keyless 全量多源成稿，这里是拼盘拆条补充
+  lookup_workers: 12            # 2026-11-22：逐条串行 40×11s=440s 远超层配额；
+                               # 改 12 路并发 + wait 真截断，未完成任务 cancel_futures
+  lookup_deadline_seconds: 35  # 与 budget.layer_seconds.social 一致；超时词条进附录 15
+  # 通路 E：平台公开发布的分享预览页带 SSR 数据，不需要 Cookie / 签名 / 开放平台资质。
+  # 外部注入真实分享链接（小红书带 xsec_token、抖音带 aweme_id、公众号 /s/{id} 永久链接）即成稿；
+  # 不注入就只做能力申报 + 域名实测，绝不凭空造 URL。
+  share_links: []
+  share_links_max: 12
+
+# ---- 8b. 事件成稿层（2026-11-22：候选池从 URL 级改为事件级）----------------
+# 目标样例「窗口内全部数据」73 行 = 73 个事件（34/34 多渠道、34/34 两段、e21/s13）；
+# 线上旧批次 327 行 = 327 个 URL（0/23 多渠道）。筛选/评分都在成稿之后，必须先补这一层。
+event_composer:
+  enabled: true                # 关掉即回到旧 URL 级形态（离线回归用）
+  max_cluster: 6               # 单簇上限，防 58 条政务稿并成一簇刷假 A
+  max_sources: 6               # 来源列最多 6 个独立渠道
+  abstract_net_chars: 100      # 两段摘要净字上限（用户拍板）
+  force_single_as_event: true  # 单条也包成事件，保证候选池形态一致
+
+# ---- 9. 排序补充口径（需求④：只决定顺序、不动评级数值）------
+rank:
+  force_first: true              # ≥7 级地震 / 死伤多的事故 / 多渠道高覆盖 → 强制第 1
+  quake_min: 7.0
+  casualty_min: 10              # 死亡 ≥10 或伤亡 ≥30
+  casualty_total_min: 30
+  cross_channels_min: 4         # 独立信源渠道数 ≥4 视为高覆盖
+  impact4_in_u: true            # 影响面四维计入编排分 U（只改展示序）
+  impact4_weight: 1.0
+  bankruptcy_subject_check: true  # 破产倒闭只留上市 / 知名 / 规模可核对主体
+
+# ---- 9a. 候选池契约三闸（需求⑤「未经筛选」的正确读法）----
+# 「未经筛选」= 不做贴近度严选 / 评级 / 编排；仍要求标题·摘要·来源齐备、分类合规、同一行只讲一件事。
+# 三闸对候选池生效（主表是其子集），采集条目级 + 事件成稿后各跑一次，被拦逐条写工程留痕 P。
+quality_gate:
+  enabled: true
+  placeholder_abstract: true     # 「按未经筛选契约保留」这类说明文字不算摘要齐备
+  headline_abstract_match: true  # 标题与摘要必须讲同一事件（聚类侧同步 cannot-link）
+  bankruptcy_subject: true       # 匿名主体 / 法院公告+单一公众号弱来源一律剔除
+  social_topic: true             # 社交话题 = 民生社会议题 / 有可核验证据的高关注社会事件
+
+
+# ---- 9b. 受限平台取数（需签名 / 登录的抖音·小红书·微信搜一搜）----
+# 四条通路与凭证模板见 data/platform_credentials.example.yaml；能力矩阵写进 Excel 工程留痕 G。
+# 代码不内置签名破解、不把话题名+热度冒充新闻；词条一律回查独立原文才成行。
+# 通路 A 的两种来源：
+#   ① GitHub Actions 默认在 runner 内起 scripts/modelscope_notebook.py --serve（无需任何配置）；
+#   ② 配 Secrets.DAILYHOT_BASE_URL（魔搭公网地址 / Vercel / 自建实例）则改用外部服务。
+#   ③ 魔搭 Notebook CPU 实例只用于预先验证网络与手动跑一次，操作见 魔搭Notebook_通路A操作手册.md。
+platform_access:
+  enabled: true
+  tier_order: "A,C,B,D"        # A 开源自建 → C 授权聚合 → B 官方开放 → D 自持签名
+  dailyhot_base_url: ""        # 留空则读环境变量 DAILYHOT_BASE_URL
+  newsnow_base_url: ""
+  rsshub_base_url: ""
+  licensed_provider: ""        # tikhub / dataxapi / okdata / redfox / jzl
+  licensed_base_url: ""
+  timeout: 7
+  # 10 个社交主干全部走本层逐条申报；无凭证时逐通路写明启用条件，不编数据
+  platforms:
+    - 微博·热搜
+    - 百度·热搜
+    - 抖音·热点
+    - 今日头条·热榜
+    - 知乎·热榜
+    - B站·热门
+    - 小红书·热点
+    - 快手·热点
+    - 百度贴吧·热议
+    - 微信·搜一搜·搜索发现
+
+# ---- 9c. 免费 / 开源数据源池（DailyHotApi 之外的多实例 fallback）----
+# 清单、GitHub 实测元数据、免费额度见 news_pipeline/free_sources.py；
+# 每次跑批实测 14 个免费公共实例，结果落 data/free_sources_probe.json 与 Excel 工程留痕 G-c。
+free_sources:
+  enabled: true
+  free_probe_timeout: 4         # 免费实例探针超时（秒），8 并发
+  free_cache_hours: 6           # 实测结果缓存，避免每次跑批重复探测
+  public_instances: true        # 自建实例不可用时逐个试免费公共 API
+  jina_reader_fallback: true    # trafilatura 抽不到正文时用免费 r.jina.ai 补采
+  jina_fallback_max: 12         # 单批最多回退篇数（控制耗时）
+  jina_timeout: 3               # 单篇超时
+  # 免费额度 Key（可选，不填则只走无 key 通道）；逐步操作见
+  # 资讯获取_免费方案四步操作手册.md；自检 python scripts/check_keys.py [--online]
+  # SERPER_API_KEY / TAVILY_API_KEY：词条→独立原文回查（Serper 2500 次、Tavily 1000 次/月）
+  # JINA_API_KEY：Reader 10M tokens；免 key 也有 20 RPM（key 由 workflow env 自动透传）
+  # HOT_API_PROVIDER / HOT_API_KEY / HOT_API_BASE_URL：通路 C 免费试用
+  #   dataxapi → /v1/<platform>/trends/list（含小红书）；tikhub → 微信搜一搜按关键词回查
+  # HOT_API_KEYWORDS：微信搜一搜关键词，逗号分隔，默认 5 个大众贴近主题词
+
+# ---- 10. 产品名与全渠道补齐链（需求：全部渠道都要取到，取不到想办法）----
+# 单点：改 name 后重跑 scripts/verify_branding.py，它会校验页面 / 预览 / 建站 /
+# 部署标记 / workflow 提交文案 / README 是否同步；文档文件名沿用「资讯获取_」前缀，
+# 属历史命名，不随显示名变动，避免 20+ 处文档链接失效。
+product:
+  project: get-news               # 仓库 / 项目名（lucky-wren/get-news）
+  name: 资讯获取                  # 产品显示名（用户 2026-11-20 拍板）
+  alias: 咨询获取                 # 同音别名，用户 2026-11-21 也曾这样写
+  run_label: "每天 20:00（Asia/Shanghai）"
+  output_prefix: 资讯获取
+
+reach:
+  enabled: true
+  fingerprint_matrix: true  # 8 组 UA / Referer / 协议，403 自动换指纹
+  runtime_self_heal: true   # 采集时 403 即时换指纹重试（live_cn._get / _get_social）
+  providers: true           # DailyHotApi / TrendRadar / newsnow / 60s / RSSHub 镜像逐个探测
+  github_channels: true     # raw.githubusercontent.com / jsdelivr 实测可达，拉开源清单与归档
+  bing_backlink: true       # 无 SERPER/TAVILY key 时的站内独立原文回查
+  actions_on_dispatch: true # 每次 Actions 构建前重测 599 渠道，可达自动登记端点
+  max_workers: 28
+  # 逐渠道状态与启用动作输出：data/channel_reach.json / data/endpoints_reach.yaml
+
+# ---------------------------------------------------------------- 站点 / 零配置重跑
+# 页面「重跑并刷新」不需要填 Token / owner / repo：
+# 静态 Pages 下点按钮 → 打开本仓库 Actions 工作流页（GitHub 页面上的 Run workflow）+ 自动轮询刷新。
+# 本地 python serve.py → 直接 POST /api/run。只有想「页面内直接触发并等待完成」才需要可选 Token。
+site:
+  github_repo: "lucky-wren/get-news"   # 换成你的 用户名/仓库名；留空则由 git remote origin 自动探测
+  branch: main
+
+# ---------------------------------------------------------------- 渠道质量淘汰（用户 2026-11-20）
+# 「把低质量和过滤数据多的渠道直接去掉」：按本批真实单元格逐渠道复算，
+# 命中阈值的渠道下一轮采集端跳采；白名单 599 渠道**不删除**，仍逐条申报
+# 淘汰原因与解禁条件（需求②）。解禁自动：补端点 / 配 Jina key /
+# 连续 2 批摘要有效率回到阈值以上即可。逐渠道账本写 Excel「工程留痕 I」。
+channel_quality:
+  enabled: true
+  write_blocklist: true
+  min_raw_to_judge: 12         # 原始条数少于此不判（样本不足不误杀）
+  min_abstract_ratio: 0.15     # 候选池摘要有效率低于此即淘汰
+  min_main_ratio: 0.015        # 主表率低于此且过滤率超限即淘汰
+  max_reject_ratio: 0.95
+  top_block: 40                # 单批最多淘汰渠道数，避免一次全砍
+
+# ---------------------------------------------------------------- 多资源扩展（全网检索落地）
+# 只取公开、可核对、无需逆向签名的入口；失败逐路由留痕到「工程留痕 J」。
+# 资料核实见 docs/资讯获取_渠道扩容与质量提升方案.md。
+source_expansion:
+  enabled: true
+  timeout: 8
+  proxy_url: ""                # 可选：Cloudflare Worker 反代地址，直连 403 时填 https://xxx.workers.dev
+  # 1) GDELT DOC 2.0：免费无 key，65 语言，JSON，近 3 个月，服务端要求 ≥5 秒/请求
+  gdelt_enabled: true
+  gdelt_timespan: "1d"
+  gdelt_max_queries: 2         # 每次 5.2s 串行节流，2 次足够做元数据兜底
+  gdelt_maxrecords: 40
+  gdelt_gap_seconds: 5.2
+  topic_queries:
+    - "医保 社保 药品目录"
+    - "地方债 城投 财政"
+    - "新能源 充电桩 汽车召回"
+    - "AI 大模型 芯片 就业"
+    - "房地产 LPR 房贷"
+    - "工厂 制药 医药 集采"
+    - "裁员 破产 资不抵债"
+    - "铁路 民航 交通 出行"
+    - "地震 灾害 突发事故"
+  # 2) Google News RSS：每个站点一个 feed（单 feed 上限 100），支持 site:/after:/before:
+  gnews_enabled: true
+  gnews_query: "政策 通知 发布"
+  gnews_max_sites: 10
+  gov_sites:
+    - gov.cn
+    - mohrss.gov.cn
+    - nhsa.gov.cn
+    - mof.gov.cn
+    - csrc.gov.cn
+    - miit.gov.cn
+    - samr.gov.cn
+    - mot.gov.cn
+    - ndrc.gov.cn
+    - stats.gov.cn
+    - chinatax.gov.cn
+    - pbc.gov.cn
+    - mohurd.gov.cn
+    - mem.gov.cn
+  # 3) NewsNow / RSSHub 公共实例池（占位 xxx 的条目只申报启用条件，不发假请求）
+  pool_enabled: true
+  pool_max_clues: 12
+  instances:
+    - https://newsnow.busiyi.world
+    - https://rsshub.app
+    - https://rsshub.rssforever.com
+    - https://newsnow-xxx.pages.dev
+  hot_routes: [weibo, zhihu, douyin, toutiao, baidu, 36kr, thepaper, bilibili]
+  # 4) 公众号公开镜像：从 https://wechat2rss.xlab.app/posts/list/ 取订阅 id 再填，
+  #    留空则不请求、不凭空造 URL；也可自建 we-mp-rss
+  wechat_enabled: true
+  wechat_feeds: []
+  wechat_max: 20
+  per_query: 12
+  # 5) Jina Reader 增强（无 key 20 RPM；填 JINA_API_KEY 可到 500 RPM）
+  jina_rpm: 20
+  jina_return_format: text
+  jina_target_selector: "article, main, .article-content, .content"
+  jina_remove_selector: "nav, footer, aside, .sidebar, #ads"
+  jina_page_timeout: 20
+  jina_no_cache: true
+
+# ---- 事件级热度（质量 v3，2026-11-21）----
+heat:
+  rule_version: heat-v1-48h-halflife24h
+  window_hours: 48
+  half_life_hours: 24
+  min_participants: 2
+  cap: 5.0
+  jaccard: 0.7
+  hamming_max: 3
+  note: 事件级热度：48h 窗口 / 24h 半衰期 / 独立来源去重 / authority + originality；只产出 H_c∈[0,1]，不改
+    grade 阈值、不改 V_MAX、不读平台后台
+
+# ---- 12. 全局运行预算（2026-11-21 采集步 35 分钟超时事故修复）----------------
+# 事故：每层各有独立 deadline（keyless 420 + body 110 + second_pass 130 + GDELT 104
+# + platform 10×4×7 + 社交逐条回查不限 + RSS 约 16min），叠加远超 workflow 硬杀；
+# GitHub 到点 SIGTERM，Excel 未落盘 → 建站/提交/部署 6 步全跳过，页面不更新。
+# 原则：宁可短路采集层，也必须按时出表。不调低质量阈值、不改摘要与评级口径。
+# 环境变量 NEWS_BUDGET_TOTAL 可覆盖总预算；实施见 news_pipeline/budget.py。
+budget:
+  enabled: true
+  total_collect_seconds: 600       # 10 分钟；workflow 采集步 15 分钟仅作兜底
+  export_reserve_seconds: 25      # 永远留给筛选 / 评级 / 编排 / 五工作表出表
+  # 2026-11-22 重分配：**总量从 540s 降到 510s**（用户要求缩短而非加时），
+  # 把单源 RSS 倒排省下的 35s 全部给「生产多渠道事件」的 keyless 主链路。
+  # 线上 327 行候选池里央视网单源占 135 条，再堆 RSS 不产生多渠道；
+  # free_sources / expansion 的逐条 lookup 已并入 keyless 并发池，配额相应下调。
+  # 合计 95+185+25+15+35+35+70+50 = 510，+25s 出表保留 = 535 < 600。
+  layer_seconds:
+    rss: 95                       # 端点采集（单源倒排，只作补充证据）
+    keyless: 185                  # 无 Key 多源检索 + 事件级成稿（主链路，10 workers）
+    platform: 25                  # 受限平台四通路
+    free_sources: 15              # 开源热榜源探针留痕（词条已并入 keyless）
+    expansion: 35                 # GDELT / Google News site: / 实例池
+    social: 35                    # 社交主干拆条 + 有界并发回查
+    body: 70                      # 独立原文正文补采
+    second_pass: 50               # 摘要二次补采
