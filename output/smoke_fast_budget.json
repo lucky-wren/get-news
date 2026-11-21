@@ -1,0 +1,81 @@
+{
+ "启用": true,
+ "总预算秒": 12.0,
+ "出表保留秒": 0.5,
+ "实际耗时秒": 9.5,
+ "剩余秒": 2.5,
+ "全局硬墙": false,
+ "被短路的层": [
+  "rss",
+  "platform",
+  "free_sources",
+  "expansion",
+  "social",
+  "second_pass"
+ ],
+ "参数裁剪": {
+  "_deadline_at": 1131.8794361080002,
+  "keyless_deadline": 3.7,
+  "gdelt_calls": 4,
+  "body_deadline": 1.4000000000000001,
+  "second_pass_deadline": 1.0,
+  "max_calls": 160,
+  "max_lookup": 32,
+  "expansion_queries": 2,
+  "expansion_deadline": 1.0,
+  "platform_deadline": 1.0
+ },
+ "逐层": [
+  {
+   "层": "rss",
+   "配额秒": 1.9000000000000001,
+   "允许": true,
+   "实耗秒": 2.6,
+   "短路": "层超时（主线程继续出表）"
+  },
+  {
+   "层": "keyless",
+   "配额秒": 3.7,
+   "剩余全局秒": 9.1,
+   "允许": true,
+   "实耗秒": 3.5,
+   "短路": ""
+  },
+  {
+   "层": "platform",
+   "配额秒": 0.5,
+   "剩余全局秒": 5.2,
+   "允许": false,
+   "实耗秒": 0.0
+  },
+  {
+   "层": "free_sources",
+   "配额秒": 0.3,
+   "剩余全局秒": 5.2,
+   "允许": false,
+   "实耗秒": 0.0
+  },
+  {
+   "层": "expansion",
+   "配额秒": 0.7000000000000001,
+   "剩余全局秒": 5.2,
+   "允许": false,
+   "实耗秒": 0.0
+  },
+  {
+   "层": "social",
+   "配额秒": 0.7000000000000001,
+   "剩余全局秒": 5.2,
+   "允许": false,
+   "实耗秒": 0.0
+  },
+  {
+   "层": "second_pass",
+   "配额秒": 1.0,
+   "剩余全局秒": 5.2,
+   "允许": false,
+   "实耗秒": 0.0
+  }
+ ],
+ "结论": "预算耗尽/层超时，已短路 rss、platform、free_sources、expansion、social、second_pass；采集层停止但本批仍出表"
+}
