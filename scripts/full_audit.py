@@ -28,6 +28,21 @@ sys.path.insert(0, str(BASE))
 CHECKS: list[dict] = []
 
 
+def _rejudge_ok() -> bool:
+    """全量线上真表重判证据：断言全过且数字正确（不是静态字符串检查）。"""
+    try:
+        d = json.loads((BASE / "output/online_batch_rejudge.json").read_text(encoding="utf-8"))
+        st = d.get("统计", {})
+        checks = d.get("断言", [])
+        return (all(c["结果"] == "PASS" for c in checks) and len(checks) >= 12
+                and st.get("主表原始") == 56 and st.get("主表保留") == 53
+                and st.get("主表剔除") == 3 and st.get("候选池原始") == 344
+                and st.get("主表摘要修复") >= 8
+                and st.get("主表来源规范化") >= 10)
+    except Exception:
+        return False
+
+
 def add(name: str, ok: bool, detail: str = "", hard: bool = True) -> None:
     CHECKS.append({"项": name, "结果": "PASS" if ok else "FAIL",
                    "证据": detail, "硬项": hard})
@@ -214,8 +229,10 @@ def static_checks() -> None:
     add("㉔ 端到端冒烟三场景 21/21（真跑 run_pipeline，非静态算式）",
         (BASE / "scripts/smoke_run.py").exists()
         and (BASE / "output/smoke_report.json").exists()
-        and "smoke_run.py" in text("scripts/make_package.py"),
-        "worst / fast / hang × 7 项；两种缩放各 21/21，Excel 落盘且总耗时 ≤ 预算")
+        and "smoke_run.py" in text("scripts/make_package.py")
+        and "default=SCALE" in text("scripts/smoke_run.py"),
+        "worst / fast / hang × 7 项；scale=0.1 单档 21/21（固定 CPU 不随缩放，0.02 档不作交付判据）；"
+        "Excel 落盘且总耗时 ≤ 预算，argparse 默认与 SCALE 一致")
     add("㉕ 冒烟报告实耗与实测自洽、逐层不超配额（事故复盘可复算）",
         (BASE / "资讯获取_15分钟超时事故复盘与真限时修复.md").exists()
         and "664s / 600s" in text("资讯获取_15分钟超时事故复盘与真限时修复.md")
@@ -225,6 +242,73 @@ def static_checks() -> None:
         "中文标题一律保留" in text("news_pipeline/url_resolve.py")
         and (BASE / "output/keyless_cn_verify.json").exists(),
         "旧按零 2-gram 交集剔 8/10 条中文候选；verify_keyless_cn 改确定性 mock 9/9")
+
+    add("㉗ 线上真产物语料与逐条回归随包（不再用离线样例自证）",
+        (BASE / "data/online_quality_corpus_20261121.json").exists()
+        and (BASE / "scripts/verify_online_quality.py").exists()
+        and (BASE / "output/online_quality_verify.json").exists()
+        and "online_quality_corpus_20261121.json" in text("scripts/make_package.py"),
+        "用户上传 latest.xlsx 主表 1–18 条逐字照抄：3 负例 / 8 正例 / 3 格式样本")
+    add("㉘ 编辑部硬闸 E1–E5 接线（垃圾条目 / 假合并 / 半句摘要 / 裸域名）",
+        "editorial_check_many" in text("news_pipeline/pipeline.py")
+        and "def fake_merge_verdict" in text("news_pipeline/editorial_gate.py")
+        and "def normalize_source" in text("news_pipeline/editorial_gate.py")
+        and bool((BASE / "news_pipeline/editorial_gate.py").exists()),
+        "线上 A 级第 2 条是法律 SEO 页、B 级第 3 条是黄页广告、D 级第 17 条是 GTA6 剧透")
+    add("㉙ 质量/规格验收 FAIL 真阻断（线上 55/59 却 success 的终结）",
+        "hard_fail_metrics" in text("config.yaml")
+        and "规格验收不达标：" in text("run.py")
+        and "startswith(\"不达标\")" in text("run.py")
+        and "verify_online_quality.py --mode ci" in text(".github/workflows/daily-news.yml")
+        and "行为 A" in text("scripts/verify_online_quality.py"),
+        "真跑 run.py 两个行为验证：内容硬指标不达标 rc≠0、规格不达标 rc≠0")
+    add("㉚ 预算短路时正文补采不再整段跳过（线上 0 篇 / A级 0.1071）",
+        "短路后按余量足量补采" in text("news_pipeline/live_cn.py")
+        and "_BUDGET_DEADLINE[0] = _saved" in text("news_pipeline/live_cn.py")
+        and "_wall_at" in text("news_pipeline/budget.py")
+        and "_left * 0.55" in text("news_pipeline/live_cn.py"),
+        "层配额用尽但硬墙有余量时按 0.55×余量 / 8 并发足量补正文；余量不足如实跳过，不拖过 600s")
+    add("㉜ 线上全量 56+344 条真表随包并逐条重判（不再只用 18 条样本）",
+        (BASE / "data/online_batch_20261121_2028.xlsx").exists()
+        and (BASE / "scripts/rejudge_online_batch.py").exists()
+        and (BASE / "output/online_batch_rejudge.json").exists()
+        and (BASE / "output/线上批次新规则重判对照.xlsx").exists()
+        and "online_batch_20261121_2028.xlsx" in text("scripts/make_package.py"),
+        "851K 线上真产物，表行数与日志「候选 344 / 主表 56」逐格对上")
+    add("㉝ 全量重判修掉过杀：只删 3 条垃圾、保住 S 级地震与 5 条 F10 真新闻",
+        _rejudge_ok(),
+        "56 → 53 条；序 2/3/17 拦下，序 1/4/9/10/29/31 保留；摘要修复 8 / 来源规范化 10")
+    add("㉞ 不达标批次产物撤回（真联网 live rc=1，正式 xlsx 不存在）",
+        "_reject_artifact" in text("run.py")
+        and "[撤回]" in text("output/live_probe_ci.txt")
+        and "A2：不达标批次产物被撤回" in text("scripts/verify_online_quality.py"),
+        "质量硬失败与规格 FAIL 都撤回产物，只留 .rejected + 原因 json 供排障")
+    add("形态硬闸 / 产能指标分级（硬门禁自身「永久红」副作用已修）",
+        "scale_metrics" in text("config.yaml")
+        and "scale_short" in text("news_pipeline/quality.py")
+        and "产能不足（内容形态全部达标" in text("news_pipeline/quality.py")
+        and "q.get(\"产能未达标项\")" in text("run.py")
+        and "行为 C" in text("scripts/verify_online_quality.py")
+        and "max_noise_ratio\"] = -1.0" in text("scripts/verify_online_quality.py")
+        and "var WHITE = ['渠道触达率', '端点配置率']" in text("docs/assets/app.js")
+        and "contentFail.length" in text("docs/assets/app.js"),
+        "6 项形态硬闸不达标仍 rc≠0；2 项产能指标不达标出表但页面 contentFail 红条 / "
+        "CI 摘要 / Excel 工程留痕 A 显式标注，避免推包后 20:00 必然失败、页面永远停在旧基线")
+    add("㉜ 质量门禁按最终成品/真实回查复算（硬闸越严不再越容易红）",
+        "product_noise" in text("news_pipeline/quality.py")
+        and "_failed_attempts" in text("news_pipeline/quality.py")
+        and "noise_ratio = (noise /" not in text("news_pipeline/quality.py")
+        and "逐条真调 editorial_check" in text("news_pipeline/quality.py")
+        and "min(int(_lv.get(\"max_articles\", 60)), 6)" not in text("news_pipeline/live_cn.py")
+        and "_left * 0.55" in text("news_pipeline/live_cn.py")
+        and "层配额用尽" in text("news_pipeline/budget.py")
+        and (BASE / "scripts/verify_quality_metric_scope.py").exists(),
+        "线上 353.7s/600s 剩余 246.3s 误报预算耗尽 → 只补 6 篇 → evidence 全 B 封顶 → A 恒空")
+    add("㉛ smoke 默认档 = 0.1 且与模块常量一致（0.02 档固定 CPU 不自洽）",
+        "SCALE = 0.1" in text("scripts/smoke_run.py")
+        and "default=SCALE" in text("scripts/smoke_run.py")
+        and "default=0.02" not in text("scripts/smoke_run.py"),
+        "干净解包后无参数跑 smoke 必须 21/21，不再出现 700s 假超限")
 
 
 def behavior_checks() -> None:
@@ -276,6 +360,11 @@ def verify_scripts(quick: bool) -> None:
                "scripts/verify_runtime_budget.py", "scripts/verify_quality_gate.py"]
     if not quick:
         scripts.append("scripts/verify_share_pages.py")
+        # 2026-11-22：包内无参数跑 smoke 曾按 0.02 档判出假超限，纳入硬项
+        scripts.append("scripts/smoke_run.py")
+        # 2026-11-22 续：质量门禁口径方向 + 正文补采达标链路，真调运行时函数
+        scripts.append("scripts/verify_quality_metric_scope.py")
+        scripts.append("scripts/rejudge_online_batch.py")
     rows = []
     # 2026-11-22：多个 verify 脚本各自跑 run.py 离线回放，会共享
     # docs/downloads/latest.xlsx 与环境变量，顺序执行时结果偶发漂移。
