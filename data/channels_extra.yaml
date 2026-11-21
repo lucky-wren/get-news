@@ -1,0 +1,120 @@
+# 在《资讯渠道大全》§1–§31 白名单之上扩充的「可实际拉取端点」。
+# channel 与文档表格首列同名时，会把端点合并进该白名单渠道；不同名则新增为扩充渠道。
+# 采集器只使用这里登记的端点，没有端点的渠道如实申报「未触达」，不编造条目。
+channels:
+  # ---- 免 key 的 RSS / 时间倒排（Google News RSS 按 8 个上位大类逐组检索）----
+  - channel: Google News RSS·民生服务
+    entry: news.google.com/rss/search
+    coverage: 物价/医保/社保/天气/出行（when:1d）
+    level: ★
+    rss_url: "https://news.google.com/rss/search?q=(油价 OR 医保 OR 社保 OR 寒潮 OR 高速封闭 OR 召回 OR 反诈) when:1d&hl=zh-CN&gl=CN&ceid=CN:zh-Hans"
+    full_enumeration: "否"
+  - channel: Google News RSS·财经市场
+    entry: news.google.com/rss/search
+    coverage: 地方债/房地产/LPR/退市/破产重整
+    level: ★
+    rss_url: "https://news.google.com/rss/search?q=(地方债 OR 保交楼 OR LPR OR 退市 OR 破产重整 OR CPI) when:1d&hl=zh-CN&gl=CN&ceid=CN:zh-Hans"
+    full_enumeration: "否"
+  - channel: Google News RSS·科技与产业
+    entry: news.google.com/rss/search
+    coverage: AI/芯片/工厂/新能源/供应链
+    level: ★
+    rss_url: "https://news.google.com/rss/search?q=(大模型发布 OR 晶圆 OR 停产 OR 产能 OR 充电桩 OR 算法备案) when:1d&hl=zh-CN&gl=CN&ceid=CN:zh-Hans"
+    full_enumeration: "否"
+  - channel: Google News RSS·国际三类突发
+    entry: news.google.com/rss/search
+    coverage: 战争/灾害/重大事故（三类门禁前置）
+    level: ★
+    rss_url: "https://news.google.com/rss/search?q=(空袭 OR 地震 OR 海啸 OR 空难 OR 埃博拉 OR 爆炸) when:1d&hl=zh-CN&gl=CN&ceid=CN:zh-Hans"
+    full_enumeration: "否"
+  - channel: Google News RSS·社会治理与政策
+    entry: news.google.com/rss/search
+    coverage: 教育/食安/反诈/预警/司法
+    level: ★
+    rss_url: "https://news.google.com/rss/search?q=(教育部 OR 食品安全 OR 抽检 OR 预警 OR 宣判 OR 欠薪) when:1d&hl=zh-CN&gl=CN&ceid=CN:zh-Hans"
+    full_enumeration: "否"
+
+  # ---- RSSHub 路由（渠道文档 §29.3）----
+  # 实测：rsshub.app 域名在本沙盒 403，以下为旧 hotboards 链路登记（config.live.hotboards=false）。
+  # 当前社交热榜走 live_cn.collect_social_hotboards()（config.live.social_hotboards=true）：
+  #   微博 weibo.com/ajax/statuses/hot_band 实测 200，出 50 条带秒级上榜时间的完整快照；
+  #   抖音 10 个官方/历史路径 + 6 个 RSSHub 公共实例全部被拒，逐路径申报见附录 23b。
+  #   按 v3 §14「✗ 仅作热度参考，默认不入池」，快照不进候选池与主表，仅在附录 23 留痕。
+  - channel: 微博
+    rss_url: "https://rsshub.app/weibo/search/hot"
+    hotboard: true
+    full_enumeration: "快照制"
+  - channel: 知乎
+    rss_url: "https://rsshub.app/zhihu/hot"
+    hotboard: true
+    full_enumeration: "快照制"
+  - channel: 抖音
+    rss_url: "https://rsshub.app/douyin/hot"
+    hotboard: true
+    full_enumeration: "快照制"
+  - channel: 今日头条
+    rss_url: "https://rsshub.app/toutiao/hot"
+    hotboard: true
+    full_enumeration: "快照制"
+  - channel: 百度热搜
+    rss_url: "https://rsshub.app/baidu/hot"
+    hotboard: true
+    full_enumeration: "快照制"
+  - channel: 36氪
+    rss_url: "https://rsshub.app/36kr/newsflash"
+    full_enumeration: "否"
+
+  # ---- 结构化 API（免 key）----
+  - channel: USGS 实时 GeoJSON 源
+    api: "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson"
+    api_kind: usgs
+    full_enumeration: "是"
+  - channel: GDACS 全球灾害警报
+    api: "https://www.gdacs.org/gdacsapi/api/events/geteventdata/SEARCH?eventlist=TC;FL;EQ;VO&alertlevel=Green;Orange;Red"
+    api_kind: gdacs
+    full_enumeration: "是"
+  - channel: GDELT DOC 2.0
+    api: "https://api.gdeltproject.org/api/v2/doc/doc"
+    api_kind: gdelt
+    full_enumeration: "否"
+  - channel: ReliefWeb / UN OCHA
+    api: "https://api.reliefweb.int/v1/reports?appname=news-daily&limit=50&sort[]=date:desc"
+    api_kind: reliefweb
+    full_enumeration: "否"
+
+  # ---- 榜单四时点快照页（词条 → 回查独立原文）----
+  - channel: 百度热搜官方页
+    list_pages:
+      - url: "https://top.baidu.com/board?tab=realtime"
+        selectors: {item: "div.category-wrap_iQLoo", title: "div.c-single-text-ellipsis", link: "a", time: ""}
+    hotboard: true
+    full_enumeration: "快照制"
+  - channel: 微博热搜官方页
+    list_pages:
+      - url: "https://s.weibo.com/top/summary"
+        selectors: {item: "tbody tr", title: "td a", link: "td a", time: ""}
+    hotboard: true
+    full_enumeration: "快照制"
+  - channel: 今日热榜
+    list_pages:
+      - url: "https://tophub.today/"
+        selectors: {item: "div.cc-cd-is", title: "a", link: "a", time: ""}
+    hotboard: true
+    full_enumeration: "快照制"
+
+  # ---- 站内时间倒排 / 快讯流 ----
+  - channel: 财联社 / 界面 / 每经 7×24 快讯流
+    list_pages:
+      - url: "https://www.cls.cn/telegraph"
+        selectors: {item: "div.telegraph-content-box", title: "span", link: "a", time: "span.time"}
+    full_enumeration: "否"
+  - channel: 澎湃快讯 / 时间倒排流
+    list_pages:
+      - url: "https://www.thepaper.cn/"
+        selectors: {item: "div.news_li", title: "h2 a, h3 a", link: "h2 a, h3 a", time: ""}
+    full_enumeration: "否"
+  - channel: 中央气象台 / 国家气象中心
+    list_pages:
+      - url: "https://www.nmc.cn/publish/alarm.html"
+        selectors: {item: "div.alarm-text, li", title: "a, p", link: "a", time: ""}
+    full_enumeration: "否"
