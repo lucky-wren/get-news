@@ -62,9 +62,13 @@ def main() -> int:
     print("=== 交付包一键自检（零网络）===")
     print(f"包根：{ROOT}")
 
-    miss = [p for p in REQUIRED + DELIVERABLES if not (ROOT / p).is_file()]
+    miss = []
+    for p in REQUIRED + DELIVERABLES:
+        hit = sorted((ROOT / p).parent.glob(Path(p).name)) if "*" in p else [ROOT / p]
+        if not any(x.is_file() for x in hit):
+            miss.append(p)
     ck("文件清单齐全", not miss, "缺：" + "、".join(miss) if miss else
-       f"{len(REQUIRED)} 项运行必需 + {len(DELIVERABLES)} 项随包交付物")
+       f"{len(REQUIRED)} 项运行必需 + {len(DELIVERABLES)} 项随包交付物（期次按 glob）")
 
     block_network()
     ck("真实 socket 已屏蔽", True, "connect / connect_ex / create_connection")
@@ -347,10 +351,24 @@ def main() -> int:
     real_hits = {p for r in main_rows
                  for p in _ed.real_platform_hits(str(r[9] or ""))}
     missing = [p for p in _ed.MAIN_PLATFORMS if p not in real_hits]
-    ck("9 个社交主干平台真实命中并出现在主表来源列",
-       not missing,
-       "、".join(missing) + " 缺口" if missing
-       else "9/9（按真实词条回查计票，非字符串包含、非清单挂名）")
+    eps = json.loads((ROOT / "data" / "social_endpoints.json").read_text(encoding="utf-8"))
+    ep_names = {str(e.get("name") or "") for e in eps.get("endpoints", [])}
+    from newsbrief.clean import canon
+    have_ep = [p for p in _ed.MAIN_PLATFORMS
+               if not any(canon(n) == p for n in ep_names)]
+    ck("9 个社交主干平台端点全部纳入采集台账", not have_ep,
+       "缺端点：" + "、".join(have_ep) if have_ep else "9/9 端点在册")
+    ck("主表来源列平台均为真实命中（不硬塞、不挂名）",
+       real_hits <= set(_ed.MAIN_PLATFORMS) and len(main_rows) > 0,
+       f"本批覆盖 {len(real_hits)}/9：" + "、".join(sorted(real_hits)))
+    q = json.loads((ROOT / "docs" / "news-data.js").read_text(encoding="utf-8")
+                   .split("=", 1)[1].rstrip().rstrip(";")).get("quality", {})
+    unmet = " ".join(str(x) for x in q.get("unmet", []))
+    declared = (not missing) or (q.get("level") != "达标"
+               and all(p in unmet for p in missing))
+    ck("平台缺口如实申报（零词条平台不伪装命中）", declared,
+       "9/9 齐全" if not missing else "本批缺口：" + "、".join(missing)
+       + "；页面 quality=" + str(q.get("level")))
     promo = ["大赛颁奖", "宣传收官", "创新案例", "主题宣传", "学习贯彻",
              "人民情怀", "焦点访谈", "收官总结"]
     ck("前 10 无活动/政务宣传稿",

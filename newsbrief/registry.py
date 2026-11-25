@@ -158,11 +158,7 @@ def collect(cfg: dict, channels: dict, *, client: httpx.Client,
     workers = max(1, int(cfg["network"].get("concurrent_endpoints", 16)))
     t_start = time.monotonic()
 
-    # 端点一个都不删，只做两件事：
-    # ① 组内把「实测可达（probe_status=200）」排到前面，预算万一耗尽也先把
-    #    能采的采完；403/412 仍在队列里，照常真跑、照常申报，不因沙盒裁掉。
-    # ② 并发拉取：503 个端点串行 × 6s 超时会把整批预算耗在前几十个端点上，
-    #    这正是「线上只采到十几条」的机制。并发后单源失败仍隔离。
+# 端点一个不删：16 线程并发、可达优先、单源隔离、逐类申报。
     tasks: list[tuple[int, str, dict]] = []
     group_spans: list[tuple[dict, list[dict], int, int]] = []
     for g in channels["groups"]:

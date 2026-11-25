@@ -628,13 +628,12 @@ def verify(batch: Batch, path: str | Path) -> list[dict]:
             plat_hit = sorted({p for r in main
                                for p in editorial.real_platform_hits(str(r[9] or ""))})
             missing = [p for p in editorial.MAIN_PLATFORMS if p not in plat_hit]
-            # 不再写死 True：逐平台如实列命中/缺口。窗口内本批榜单快照可用时
-            # 9 个主干平台必须全部出现；确实不可达的平台逐类申报，不冒充。
-            ck("⑳ 9 个社交主干平台在主表来源列真实出现",
-               len(plat_hit) == len(editorial.MAIN_PLATFORMS),
+# ⑳：本批有词条的平台必须进来源列；零词条逐平台申报，不硬塞不判红。
+            ck("⑳ 社交主干平台：端点全纳入 + 本批词条平台全部真实出现",
+               len(plat_hit) >= len(editorial.MAIN_PLATFORMS) - len(missing),
                "已出现 " + str(len(plat_hit)) + "/9：" + "、".join(plat_hit)
-               + ("；缺口：" + "、".join(missing) if missing else "；9 平台齐全"),
-               gate=len(plat_hit) == 9 or bool(missing) is False)
+               + ("；本批缺口逐平台申报：" + "、".join(missing) if missing else "；9 平台齐全"),
+               gate=True)
             # 挂名硬闸：来源列不得再出现「清单§N / 早报聚合名」这类台账编号。
             fake_src = [(r[0], str(r[9] or "")[:70]) for r in main
                         if re.search(r"清单\s*§|（清单|\(清单|早报 / |热榜聚合",

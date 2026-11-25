@@ -275,12 +275,20 @@ def build_site(batch, checks: list[dict], docs_dir: Path) -> None:
     else:
         level = "达标"
         text = "达标（内容形态与编排全部通过）"
-    quality = {
-        "level": level, "text": text,
-        "unmet": ([str(c["项"]) for c in soft]
-                  + (["主表 0 条：窗口内未产出可交付要闻"] if empty_main else [])),
-        "hard_failed": len(hard),
-    }
+    from . import editorial as _ed
+    _plats = {x for it in (getattr(batch, "main", None) or [])
+              for x in _ed.real_platform_hits(str(it.sources or ""))}
+    _gap = ([x for x in _ed.MAIN_PLATFORMS if x not in _plats]
+            if getattr(batch, "mode", "") != "offline" else [])
+    if _gap and not empty_main and level == "达标":
+        level = "产能不足"
+        text = "平台覆盖 %d/9，缺 %s；内容形态与编排通过" % (len(_plats), "、".join(_gap))
+    _unmet = ([str(c["项"]) for c in soft]
+              + (["主表 0 条：窗口内未产出可交付要闻"] if empty_main else [])
+              + (["平台覆盖 %d/9，缺 %s（端点全在册，本批未取得窗口内词条）"
+                  % (len(_plats), "、".join(_gap))] if _gap else []))
+    quality = {"level": level, "text": text, "unmet": _unmet,
+               "hard_failed": len(hard)}
     ws, we = _batch_bounds(batch)
     gate = {}
     if getattr(batch, "rule_trace", None) is not None:

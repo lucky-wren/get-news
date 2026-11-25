@@ -51,7 +51,7 @@
     "tests/test_daily_quality.py"
   ],
   "deliverables": [
-    "output/daily_news_20261124_20h.xlsx",
+    "output/daily_news_*_20h.xlsx",
     "docs/index.html",
     "docs/news-data.js",
     "docs/downloads/latest.xlsx"

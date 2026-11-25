@@ -65,7 +65,11 @@ def _is_checkout() -> bool:
 def test_deliverables_in_package():
     if _is_checkout():
         pytest.skip("CI checkout 零网络自检：运行时产物由构建步骤生成，非本步职责")
-    miss = [p for p in _m()["deliverables"] if not (ROOT / p).is_file()]
+    miss = []
+    for p in _m()["deliverables"]:
+        hit = sorted((ROOT / p).parent.glob(Path(p).name)) if "*" in p else [ROOT / p]
+        if not any(x.is_file() for x in hit):
+            miss.append(p)
     assert not miss, "完整交付包缺随包交付物：" + "、".join(miss)
 
 

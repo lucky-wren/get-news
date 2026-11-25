@@ -290,13 +290,7 @@ def admit(items: list[Item], tr: Trace, *, strict: str = "strict") -> list[Item]
             ok, reason = False, f"三类强剔除：{reject_branch}（命中 {','.join((a_hits or f_hits or u_hits)[:3])}）"
             n_reject[reject_branch] += 1
         elif not keep_branch:
-            # 截图 44：把「我的词表没覆盖」当成「不贴近大众」硬剔除，是 13 条
-            # 窗口内稿件塌成主表 0 条的直接原因。词表再大也覆盖不了所有民生稿，
-            # 尤其窗口右界未到、当批只采到十几条时，一刀切就等于当天不交付。
-            # 改为：正面清单只做加权/留痕（_daily 用 TABLE_R 独立现算，未命中
-            # 天然 daily_score=0、编排排后面），不再作为准入否决项。
-            # 三类强剔除 / F1–F4 / 国际三类门禁 / 主体规模闸全部保留，
-            # 「学习贯彻」「焦点访谈」这类政务宣传仍进不来。
+# 截图 44：词表未覆盖不否决准入，只降权/留痕；空表兜底，三类强剔除不放宽。
             keep_branch = "未命中正面清单（降权不剔除）"
             reason = "窗口内可核对、非宣传稿；未命中贴近度词表，降权保留"
             soft_only.append(it)

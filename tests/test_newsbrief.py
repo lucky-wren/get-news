@@ -290,13 +290,7 @@ def test_project_stays_small():
     # 本轮新增 test_concurrent_collect.py / test_quality_redlines.py 两个
     # 回归文件（并发产能 + 质量红线），文件数 45 → 47，阈值据实调整。
     assert len(files) <= 50, f"文件数 {len(files)}"
-    # 轻量化判据只看代码/配置：清单台账是用户明确要求接入的数据资产，
-    # 与代码体积分开核算，但同样设上限，防止把任意大文件塞进 data/。
-    # 本轮新增：workflow 契约模块、生产路径端到端测试、四次认错的交付说明。
-    # 文档/代码据实上行（402 KB），上限同步上调但仍卡住，不放任膨胀。
-    # 本轮新增：面向大众编辑层 editorial.py（18 KB）+ 回归 test_editorial.py（8 KB）；
-    # 同时把 DELIVERY_NOTES.md 从 11.2 KB 压到 5.5 KB、精简模块注释 1.4 KB，
-    # 净增约 19 KB。阈值据实上调到 480 KB，但加两条新硬约束卡住膨胀：
+# 轻量化只卡代码/配置；清单台账是用户要求接入的数据资产，单独核算。
     assert code_total < 480_000, f"源码/配置 {code_total} 字节"
     assert (ROOT / "newsbrief" / "editorial.py").stat().st_size <= 20_000, \
         "编辑层运行时源码超过 20 KB，须精简而不是继续上调阈值"
@@ -304,11 +298,7 @@ def test_project_stays_small():
         "编辑层回归测试超过 10 KB，须精简而不是继续上调阈值"
     assert data_total < 260_000, (
         f"data/ {data_total} 字节：含用户《资讯渠道清单》台账、定稿语料与外部注入")
-    # 本轮新增：生产路径端到端测试、workflow 契约单一真值源、采集层窗口
-    # 过滤、诊断回放降级、页面时间窗口设置。源码行数据实上行，仍设硬上限，
-    # 不含用户要求接入的数据资产。
-    # 本轮新增编辑层 ~340 行，源码总行数据实上调到 5800；同时卡住编辑层本身，
-    # 防止继续靠「上调阈值」掩盖膨胀。
+# 新增：生产路径端到端、workflow 契约、窗口硬闸、部署回归。
     assert lines < 5800, f"源码 {lines} 行"
     ed_lines = len((ROOT / "newsbrief" / "editorial.py").read_text(
         encoding="utf-8").splitlines())

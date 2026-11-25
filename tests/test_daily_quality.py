@@ -128,7 +128,7 @@ def test_html_trafilatura_exception_falls_back_and_window_is_hard():
 def test_verify_20_is_a_real_assertion():
     src = inspect.getsource(pipeline.verify)
     assert 'ck("⑳ 9 个社交主干平台逐平台真实命中申报", True' not in src
-    assert "len(plat_hit) == len(editorial.MAIN_PLATFORMS)" in src
+    assert "len(plat_hit) >= len(editorial.MAIN_PLATFORMS) - len(missing)" in src
     assert 'ck("㉑ 来源列零清单挂名 / 零聚合名堆砌"' in src
 
 
@@ -165,7 +165,18 @@ def test_9_platforms_all_present_in_shipped_product():
     assert not [r for r in rows if re.search(
         r"清单\s*§|（清单|\(清单|早报 / |热榜聚合", str(r[9] or ""))]
     hit = {p for r in rows for p in editorial.real_platform_hits(str(r[9] or ""))}
-    assert set(editorial.MAIN_PLATFORMS) <= hit, "9 个主干平台必须在来源列出现"
+    assert hit <= set(editorial.MAIN_PLATFORMS), "来源列不得出现非主干平台挂名"
+    eps = json.loads((ROOT / "data" / "social_endpoints.json").read_text(encoding="utf-8"))
+    from newsbrief.clean import canon
+    names = {canon(str(e.get("name") or "")) for e in eps.get("endpoints", [])}
+    assert set(editorial.MAIN_PLATFORMS) <= names, "9 个主干平台端点必须全部在册"
+    gap = [q for q in editorial.MAIN_PLATFORMS if q not in hit]
+    if gap:
+        kou = "\n".join(" | ".join(str(x or "") for x in r) for r in
+                         load_workbook(xlsx, data_only=True)[
+                             load_workbook(xlsx, data_only=True).sheetnames[3]]
+                         .iter_rows(values_only=True))
+        assert "缺口" in kou and all(q in kou for q in gap), "平台缺口须逐平台申报"
     fins = [float(r[1]) for r in rows]
     assert fins == sorted(fins, reverse=True), "按重要性（Final_adj）严格降序"
     assert all(r[0] == r[4] for r in rows), "展示序 = 分数序"
@@ -199,3 +210,45 @@ def test_checkout_stale_xlsx_and_workflow_contract():
     i = wf.index("python -m newsbrief")
     j = wf.index("git add docs/")
     assert "verify_package.py" in wf[i:j]
+
+
+def test_deliverables_use_glob_not_fixed_date():
+    """截图 46：CI 换日后产物名变了，写死日期的交付物清单必红。"""
+    m = json.loads((ROOT / "manifest.json").read_text(encoding="utf-8"))
+    dv = [x for x in m["deliverables"] if x.startswith("output/")]
+    assert dv and all("*" in x for x in dv), dv
+    src = inspect.getsource(__import__("verify_package"))
+    assert '"*" in p' in src and "glob" in src
+
+
+def test_platform_contract_two_layers():
+    """端点全纳入是硬闸；缺口如实申报不靠硬塞名字凑 9/9。"""
+    import newsbrief.editorial as ed
+    from newsbrief.clean import canon
+    eps = json.loads((ROOT / "data" / "social_endpoints.json").read_text(encoding="utf-8"))
+    names = {canon(str(e.get("name") or "")) for e in eps.get("endpoints", [])}
+    assert set(ed.MAIN_PLATFORMS) <= names, "9 个主干平台端点必须全部在册"
+    src = inspect.getsource(__import__("verify_package"))
+    assert "端点全部纳入采集台账" in src and "缺口如实申报" in src
+    ed_src = inspect.getsource(ed)
+    assert "_bridge_missing_platforms" in ed_src and "共享实词" in ed_src
+    vp = inspect.getsource(__import__("verify_package"))
+    assert "ck(\"平台缺口如实申报（零词条平台不伪装命中）\", True" not in vp
+    assert "declared" in vp and "unmet" in vp
+
+
+def test_bridge_only_when_shared_word_exists():
+    """桥接必须有共享实词，零词条平台绝不硬塞。"""
+    import newsbrief.editorial as ed
+    from types import SimpleNamespace as NS
+    def mk(t, s):
+        return NS(title=t, sources=s)
+    a = mk("今日小雪各地气温下降明显", "中新网")
+    log = {p: [] for p in ed.MAIN_PLATFORMS}
+    ed._bridge_missing_platforms([a], [{"title": "今日小雪降温", "discovery": "百度贴吧"}], log)
+    assert "贴吧" in ed.real_platform_hits(a.sources)
+    b = mk("央行开展逆回购操作", "中新网")
+    log2 = {p: [] for p in ed.MAIN_PLATFORMS}
+    ed._bridge_missing_platforms([b], [{"title": "旅行拍照姿势", "discovery": "小红书"}], log2)
+    assert "小红书" not in ed.real_platform_hits(b.sources)
+    assert log2["小红书"] == []

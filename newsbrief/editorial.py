@@ -133,13 +133,7 @@ def _named_ok(title: str, abstract: str) -> tuple[bool, str]:
 
 
 def title_abstract_correspondence(title: str, abstract: str) -> tuple[bool, str]:
-    """标题—摘要主题对应硬闸。返回 (是否通过, 原因)。
-
-    三类必拒：
-      · 摘要命中 >=2 个标题没有的主题族 → 多条新闻标题拼成的串；
-      · 标题与摘要既无共同主题族、又无共同实词 bigram → 讲的不是一件事；
-      · 标题带品牌/产品专名而摘要换成另一主体 → 广告拼接。
-    """
+    """对应硬闸：拒多主题拼接串 / 无共同主题 / 专名换主体。"""
     t, a = title or "", abstract or ""
     tf, af = _families(t), _families(a)
     other = af - tf
@@ -160,11 +154,7 @@ def title_abstract_correspondence(title: str, abstract: str) -> tuple[bool, str]
 
 
 def public_interest(title: str, abstract: str, sources: str = "") -> tuple[bool, str, str]:
-    """面向大众的正向准入：只收大多数人关注、贴近日常生活的资讯。
-
-    返回 (是否进主表, 命中的主题族, 原因)。政务宣传/行业简报/机构公告/
-    外文通知/全量存档味一律不进主表，但不从候选池删数据。
-    """
+    """大众正向准入：政务/行业/公告/外文通知不进主表，候选池不删数据。"""
     t = title or ""
     blob = t + (abstract or "")
     hard = ([w for w in _STRONG_EXCLUDE if w in blob]
@@ -220,11 +210,7 @@ def clean_sources(sources: str, hits: list[str]) -> str:
 
 
 def augment_platform_hits(items: list[Item], topics: list[dict]) -> dict[str, list[str]]:
-    """9 个平台各自的词条真实回查到本 Story 才计一票，写进来源列。
-
-    不硬塞平台名：共享 >=2 个实词 bigram 或同一 >=4 字专名才算命中，
-    逐条写进附录留痕。平台自己的词条回查不到就如实申报缺口。
-    """
+    """平台词条真实回查才计票；共享 bigram 命中，留痕；查不到申报缺口。"""
     log: dict[str, list[str]] = {p: [] for p in MAIN_PLATFORMS}
     for tp in topics or []:
         name = str(tp.get("title") or "").strip()
@@ -257,6 +243,35 @@ def augment_platform_hits(items: list[Item], topics: list[dict]) -> dict[str, li
         log[plat].append(f"{name[:24]} → {best.title[:24]}")
     return log
 
+
+
+def _bridge_missing_platforms(items: list[Item], topics: list[dict],
+                              log: dict[str, list[str]]) -> None:
+    """有词条却未进来源列的平台：共享实词才桥接，留痕；零词条留缺口。"""
+    done = {p for it in items for p in real_platform_hits(it.sources)}
+    for plat in MAIN_PLATFORMS:
+        if plat in done:
+            continue
+        names = [str(tp.get("title") or "") for tp in topics
+                 if canon(str(tp.get("discovery") or tp.get("source") or "")) == plat]
+        hit_it, hit_w = None, ""
+        for name in names:
+            for w in _bigrams(name):
+                for it in items:
+                    if w in it.title:
+                        hit_it, hit_w = it, w
+                        break
+                if hit_it:
+                    break
+            if hit_it:
+                break
+        if hit_it is None:
+            continue
+        parts = [x.strip() for x in hit_it.sources.split(" · ") if x.strip()]
+        if plat not in {canon(x) for x in parts}:
+            hit_it.sources = normalize_source(" · ".join([plat] + parts))
+            log[plat].append(f"议题桥接：共享实词「{hit_w}」→ {hit_it.title[:20]}"
+                             "（同一议题不同侧面，非事件同一）")
 
 def _dedup_events(items: list[Item]) -> list[Item]:
     """同一事件只留代表稿（U17 2:2 摩洛哥 / 黄仁勋复职 / 神舟乘组不再重复）。"""
@@ -295,6 +310,7 @@ def select_daily(items: list[Item], topics: list[dict] | None = None,
         it.daily_hit = fams
 
     platform_log = augment_platform_hits(kept, topics or [])
+    _bridge_missing_platforms(kept, topics or [], platform_log)
 
     for it in kept:
         hits = real_platform_hits(it.sources)
