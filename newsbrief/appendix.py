@@ -48,11 +48,18 @@ def build_koushi(batch, tr: Trace, *, checks: list[dict] | None = None) -> list[
     groups_front = len({it.group for it in main[:10]})
     hard_fail = [c["项"] for c in (checks or []) if c.get("结果") == "FAIL" and c.get("gate", True)]
 
+    _f = getattr(batch, "failed", {}) or {}
+    n_pol = sum(1 for v in _f.values() if "出口策略拒绝" in str(v))
+    n_oth = len(_f) - n_pol
     rows: list[list] = [["项目", "内容"]]
     body = [
         ("批次", f"{batch.date} 20:00 期 / 生成于 {datetime.now(TZ):%Y-%m-%d %H:%M:%S} (Asia/Shanghai)"),
+        ("端点可达性分类",
+         f"出口策略拒绝 {n_pol} 个 / 站点或解析故障 {n_oth} 个；策略拒绝是执行环境"
+         "按域名白名单拦截，非站点无数据；端点全在册，配置 HTTPS_PROXY/HTTP_PROXY"
+         " 或换网络即可全量采集"),
         ("执行环境声明",
-         (f"本批 {len(getattr(batch, 'failed', {}) or {})} 个端点不可达（逐类见附录 2），"
+         (f"本批 {n_pol} 个端点受出口策略拦截（非站点无数据）、{n_oth} 个站点/解析故障，"
           f"主表 {len(main)} 条为窗口内可见子集，非当日全渠道成果；"
           "正式环境端点可达时条数由当批真实采集量决定。此产物为生产路径实跑样本，"
           "不是诊断回放，也不是喂数据凑数。"

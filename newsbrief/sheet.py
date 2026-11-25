@@ -79,9 +79,7 @@ def build_workbook(batch, path: str | Path, koushi_rows: list[list],
         _head(ws, 12)
         _body(ws, ws.max_row, 12)
 
-    # 口径与稿外信息：不冻结、5 列全顶端换行。
-    # A 列三类：项目名区（前 N 行，仅加粗）/ 章节标题行（B 列空或「——」，
-    # 加粗 + DDEBF7 底色）/ 留痕行（常规）。不是整列加粗。
+# 口径表不冻结、5 列全顶端换行。
     _widths(ws_kou, WIDTHS_KOUSHI)
     head_rows = 0
     for r in range(1, ws_kou.max_row + 1):

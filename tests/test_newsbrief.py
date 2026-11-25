@@ -279,9 +279,7 @@ def test_project_stays_small():
     total = sum(p.stat().st_size for p in files)
     py = [p for p in files if p.suffix == ".py" and "tests" not in p.parts]
     lines = sum(len(p.read_text(encoding="utf-8").splitlines()) for p in py)
-    # 01 口径规则引擎（准入 / 六维评分 / 置顶池 / 编排 / 附录 1–17 现算）
-    # 与外部注入语料落地后模块数上升；本轮再补包完整性自检、零网络 fixture
-    # 与一键自检脚本（3 个文件）。阈值据实调整，不放任膨胀。
+# 01 口径、注入语料、自检脚本落地后模块数上升，阈值据实调整。
     rel = lambda p: p.relative_to(ROOT).as_posix()
     code = [p for p in files if not rel(p).startswith("data/")]
     data = [p for p in files if rel(p).startswith("data/")]

@@ -24,8 +24,9 @@ ROOT = Path(__file__).resolve().parent
 
 
 def _cur_xlsx():
-    xs = sorted((ROOT / "output").glob("daily_news_*_20h.xlsx"))
-    return xs[-1] if xs else None
+    # 多期次并存时认「本批刚生成」的那份（按 mtime），不是文件名最大的那份。
+    xs = list((ROOT / "output").glob("daily_news_*_20h.xlsx"))
+    return max(xs, key=lambda p: p.stat().st_mtime) if xs else None
 sys.path.insert(0, str(ROOT.as_posix()))
 
 import json
@@ -214,9 +215,7 @@ def main() -> int:
     r = wc.check(wf_win)
     ck("workflow 生产路径与窗口契约（旧定义触发不判红）", r["ok"], r["note"])
 
-    # 网页上传友好：交付清单里的文件名一律 ASCII（中文名会触发兜底报错）。
-    # 只验 manifest 声明的交付物；checkout 里若混有旧版残留，由 workflow
-    # 清理步与 deploy.verify_head_state 负责，不算在「交付物命名」头上。
+# 交付清单文件名一律 ASCII，避免网页上传兜底报错。
     mf = json.loads((ROOT / "manifest.json").read_text(encoding="utf-8"))
     declared = list(mf["required"]) + list(mf["deliverables"])
     non_ascii = [x for x in declared if not x.isascii()]

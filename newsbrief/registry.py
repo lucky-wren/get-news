@@ -106,13 +106,9 @@ def collect(cfg: dict, channels: dict, *, client: httpx.Client,
     except (OSError, ValueError):
         by_sec, catalog_note = {}, "清单台账未随包，逐类申报以 sources.json 为准"
 
-    # 单元隔离/排障开关：默认 True（生产与 CI 全量展开 503 URL，一个都不删）。
-    # 只在使用精简 cfg + 假 channels 的单测里显式关掉，避免 503 个真实 URL
-    # 涌进「只验 ETag/缓存」这类局部测试；不影响正式环境的端点集合。
+# 隔离开关默认 True：生产与 CI 全量展开清单，单测可显式关。
     expand_enabled = bool(cfg["network"].get("catalog_expand", True))
-    # 《资讯渠道清单》503 URL 运行时全量展开：不按本环境探测结果裁剪端点。
-    # NewsNow「pre-sources 单一真值源 → 构建期展开 sources.json」的 Python 版：
-    # 静态端点表只放精细配置，清单 URL 在此追加，避免把 500 行塞进配置文件。
+# 清单 URL 运行时全量展开，不按本环境探测裁剪端点。
     expand: dict[int, list[dict]] = {}
     static_urls = {e.get("url") for g in channels["groups"]
                    for e in g.get("endpoints", []) if e.get("url")}
@@ -149,10 +145,7 @@ def collect(cfg: dict, channels: dict, *, client: httpx.Client,
             {k: v for k, v in _e.items() if k != "group_id"})
     _n_expand = sum(len(v) for v in expand.values())
 
-    # 端点一律真跑，单源失败由下面 try/except 隔离并回吐缓存。
-    # 早期版本曾按「出口策略层是否 403」二态跳过全部端点，导致沙盒与正式
-    # 环境走两条完全不同数据流、产物不可复现；已彻底删除。
-
+# 端点全真跑，单源失败隔离并回吐缓存。
     reports, raw, failed = [], [], {}
     budget = float(cfg["network"].get("total_budget_seconds", 300))
     workers = max(1, int(cfg["network"].get("concurrent_endpoints", 16)))
@@ -215,8 +208,12 @@ def collect(cfg: dict, channels: dict, *, client: httpx.Client,
             out["rows"] = kept_stale
             out["got"] = len(kept_stale)
             msg = re.sub(r"\s+", " ", str(ex))[:80]
-            out["failed"] = (ep["name"], f"{type(ex).__name__}: {msg}")
-            out["errs"].append(f"{ep['name']}：{type(ex).__name__}（{msg}）"
+            resp = getattr(ex, "response", None)
+            blocked = resp is not None and b"policy_default_denied" in bytes(resp.content[:400])
+            tag = ("出口策略拒绝（非站点故障，正式环境/代理可达即采）: "
+                   + type(ex).__name__ if blocked else f"{type(ex).__name__}: {msg}")
+            out["failed"] = (ep["name"], tag)
+            out["errs"].append(f"{ep['name']}：{tag}"
                                + ("，已回吐旧缓存" if stale else "，无旧缓存本类缺数据"))
         return out
 

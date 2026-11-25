@@ -374,10 +374,13 @@ def run_live(cfg: dict, channels: dict, date: str, client: httpx.Client,
                     "data" / "social_endpoints.json").read_text(encoding="utf-8"))
                     .get("endpoints", [])),
         "本轮取得词条": len(topics),
+        "本轮联网直连词条": sum(1 for x in topics if not x.get("fallback")),
+        "兜底榜单线索": sum(1 for x in topics if x.get("fallback")),
         "逐平台": sorted({str(t.get("discovery") or t.get("source")) for t in topics}),
         "四时点快照": "本轮取得 1 个时点（当前），其余 3 个时点未取得，逐渠道申报缺口",
         "回查命中": len(matched), "回查未命中": len(unmatched),
-        "声明": "词条不扩写成事件；回查不到进附录 15；发现渠道与真实媒体同时体现在来源列",
+        "声明": "词条不扩写成事件；回查不到进附录 15；兜底线索不计入窗口内采集量，"
+                "只有回查到窗口内独立原文才把平台名挂进来源列",
     }
     # 逐类申报：本环境策略层拦截不等于站点不可达，端点一个都没删
     for rep in reports:
@@ -396,9 +399,7 @@ def run_live(cfg: dict, channels: dict, date: str, client: httpx.Client,
     main = rules.orchestrate(deduped, tr,
                              enabled=cfg.get("rules", {}).get("orchestrate", True),
                              head_window=3, interleave=True)
-    # 面向大众的每日要闻：编辑层是主表唯一出表口。
-    # 正向选题（只收大众贴近主题）+ 标题—摘要对应硬闸 + 9 平台真实命中 +
-    # 按 Final_adj 降序；候选池仍保留窗口内全量，不在采集层删数据。
+# 编辑层是主表唯一出表口。
     from . import editorial
     main, ed_rejects, ed_stats = editorial.select_daily(
         main, topics, cap=int(cfg["limits"].get("max_main_items", 50)))
@@ -513,9 +514,7 @@ def verify(batch: Batch, path: str | Path) -> list[dict]:
                adj == 0 and all(v <= 3 for v in dist.values()),
                f"相邻 {adj} / 分布 {dist}", gate=feasible)
         else:
-            # 用户明确「按重要性排好序」：主表与前 10 一律按 Final_adj 严格降序。
-            # 相邻同大类 / 单类分布只做如实申报，不再靠跨分数打散去换编排花样
-            # （那会把低分稿抬到高分稿前面，与「按重要性排序」直接冲突）。
+# 主表与前 10 按 Final_adj 严格降序。
             fins10 = [float(r[1]) for r in main[:10]]
             ck("⑧ 前 10 按 Final_adj 严格降序（按重要性排序）",
                fins10 == sorted(fins10, reverse=True),
@@ -605,9 +604,7 @@ def verify(batch: Batch, path: str | Path) -> list[dict]:
                          if expected_grade(float(r[3]), state.get(r[0], "已核实")) != r[2]]
             ck("⑰ 等级 S/A/B/C/D 机械映射 + 核实三态封顶 0 异常",
                not grade_bad, grade_bad[:2])
-        # 截图 44：0 条主表时上面 17 项全是「空集恒真」（top==main[:10]、
-        # 子集、相邻同类、数字自洽、等级映射…）全 PASS，页面却报「达标」。
-        # 必须有硬闸拦住「一条要闻都没有还判绿」，否则会覆盖固定地址与页面。
+# 截图 44：0 条时 17 项恒真判据会假达标，⑱ 补主表≥1 硬闸。
         ck("⑱ 交付文件非空、五表齐备且主表 ≥1 条",
            p.stat().st_size > 0 and len(wb.sheetnames) == 5 and len(main) >= 1,
            f"{p.stat().st_size} 字节 / 主表 {len(main)} 条"

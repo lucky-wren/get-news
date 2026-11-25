@@ -252,3 +252,69 @@ def test_bridge_only_when_shared_word_exists():
     ed._bridge_missing_platforms([b], [{"title": "旅行拍照姿势", "discovery": "小红书"}], log2)
     assert "小红书" not in ed.real_platform_hits(b.sources)
     assert log2["小红书"] == []
+
+
+def test_social_topics_are_clues_not_dated_articles():
+    """截图 46/47：榜单线索不得按快照 captured_at 卡窗口（换日曾整批剔光→0/9）。"""
+    src = inspect.getsource(__import__("newsbrief.sources.social", fromlist=["x"]))
+    assert "if window and not (window[0] < at <= window[1])" not in src
+    assert '"published": ""' in src and "fallback" in src
+
+
+def test_promo_and_industry_briefs_blocked_in_title():
+    """机构成就宣传 / 行业简报不得漏进面向大众主表。"""
+    import newsbrief.editorial as ed
+    for w in ("服务保障", "治理观察", "全链条全周期全流程"):
+        assert w in ed._TITLE_EXCLUDE
+    for s in ("神舟二十四号成功发射 中国电科提供全链条全周期全流程服务保障",
+              "广东网络餐饮治理观察：近50万商户背后的食安攻坚"):
+        assert not ed.public_interest(s, "第一段事实。\n　　第二段背景。", "中新网")[0]
+
+
+def test_reachable_landing_pages_and_proxy_are_configured():
+    """渠道排查：实测 200 的栏目页必须真挂进清单，每端点不得再硬砍到 3 条。"""
+    import json, httpx
+    from pathlib import Path
+    ROOT = Path(__file__).resolve().parents[1]
+    cat = json.loads((ROOT / "data" / "channel_catalog.json").read_text(encoding="utf-8"))
+    ok = [e for e in cat["entries"] if e.get("b") == "可达栏目页（实测 200）"
+          and any(isinstance(u, list) and u[1] == 200 for u in e.get("u", []))]
+    assert len(ok) >= 30, f"可达栏目页只登记 {len(ok)} 个"
+    cfg = json.loads((ROOT / "config.json").read_text(encoding="utf-8"))
+    assert cfg["network"]["html_articles_per_endpoint"] >= 12
+    wf = (ROOT / ".github" / "workflows" / "daily.yml").read_text(encoding="utf-8")
+    assert "NEWSBRIEF_PROXY" in wf and "HTTPS_PROXY" in wf
+    assert httpx.Client().trust_env, "client 不得关掉标准代理环境变量支持"
+
+
+def test_policy_denial_is_reported_as_environment_not_dead_site():
+    """403 policy_default_denied 必须归类为出口策略拒绝，不写成站点无数据。"""
+    import inspect
+    from newsbrief import registry, appendix
+    assert "policy_default_denied" in inspect.getsource(registry)
+    assert "出口策略拒绝" in inspect.getsource(registry)
+    assert "端点可达性分类" in inspect.getsource(appendix)
+
+
+def test_multi_batch_xlsx_picks_current_by_mtime():
+    """多期次并存时，期次成品按生成时间认定，不能按文件名取到上一批。"""
+    import tempfile, time, os
+    import verify_package as V
+    with tempfile.TemporaryDirectory() as d:
+        from pathlib import Path
+        out = Path(d) / "output"; out.mkdir()
+        old = out / "daily_news_20261125_20h.xlsx"; old.write_bytes(b"old")
+        cur = out / "daily_news_20261124_20h.xlsx"; cur.write_bytes(b"cur")
+        os.utime(old, (time.time() - 100, time.time() - 100))
+        os.utime(cur, (time.time(), time.time()))
+        orig = V.ROOT
+        V.ROOT = Path(d)
+        try: assert V._cur_xlsx() == cur
+        finally: V.ROOT = orig
+
+
+def test_catalog_stays_compact():
+    """清单只存数据：indent 格式化会多 65KB 空白并撑爆体积阈值。"""
+    from pathlib import Path
+    p = Path(__file__).resolve().parents[1] / "data" / "channel_catalog.json"
+    assert p.stat().st_size <= 140000, f"清单 {p.stat().st_size} 字节"

@@ -173,8 +173,7 @@ def _snapshots(platform: str, cap: int, window: tuple | None) -> list[dict]:
                 at = at.replace(tzinfo=TZ)
         except (KeyError, ValueError):
             continue
-        if window and not (window[0] < at <= window[1]):
-            continue
+# 词条是发现线索：不按快照时刻卡窗口，published 留空。
         for e in s.get("entries", [])[:cap]:
             t = _clean_topic(str(e.get("title") or ""))
             if not t or _NAV.search(t) or not _TOPIC.match(t):
@@ -183,14 +182,16 @@ def _snapshots(platform: str, cap: int, window: tuple | None) -> list[dict]:
                 "title": t,
                 "url": str(e.get("url") or s.get("source_url", "")),
                 "body": str(e.get("desc") or "")[:200],
-                "published": s["captured_at"],
+                "published": "",
                 "source": platform,
                 "shape": "热榜词条",
                 "evidence": "B",
                 "discovery": platform,
                 "hot": str(e.get("hot") or ""),
                 "group": "社交平台主干",
-                "channel": "平台通道快照（本轮联网采集，非历史 xlsx 回放）",
+                "channel": "榜单线索（随包快照，非本轮实时采集，不计入窗口内采集量）",
+                "fallback": True,
+                "evidence_at": s["captured_at"],
                 "source_url": s.get("source_url", ""),
             })
     return out[:cap]
@@ -203,9 +204,7 @@ def fetch(client: httpx.Client, ep: dict, timeout: float) -> list[dict]:
     cap = int(ep.get("max_items", 50))
     window = ep.get("_window")
 
-    # ① 本批平台通道快照：每轮必采，不是「直连失败才兜底」。
-    # 早期版本做成二选一，直连拿到站点首页/导航壳就直接 return，本批真实
-    # 榜单快照根本没进链路，9 个主干平台在来源列里集体消失。窗口外不读。
+# ① 快照每轮必采，不是直连失败才兜底。
     rows = _snapshots(platform, cap, window)
     for r0 in rows:
         r0["channel"] = "本批平台通道榜单快照（captured_at 可核对）"
@@ -234,8 +233,8 @@ def fetch(client: httpx.Client, ep: dict, timeout: float) -> list[dict]:
             continue
 
     if rows:
-        rows[0]["_meta"] = {"via": "snapshot+direct",
-                            "note": "本批快照必采，直连结果去重合并；窗口外不读"}
+        rows[0]["_meta"] = {"via": "live+direct+fallback",
+                            "note": "直连真采优先；快照仅作发现渠道线索，不冒充稿件"}
         return rows
 
     # ③ 全失败：返回空列表，由 registry 逐类如实申报缺口；端点仍保留在配置里

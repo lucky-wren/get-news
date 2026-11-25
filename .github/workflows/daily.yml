@@ -58,8 +58,14 @@ jobs:
         env:
           WINDOW_START: ${{ inputs.window_start }}
           WINDOW_END: ${{ inputs.window_end }}
+          NEWSBRIEF_PROXY: ${{ secrets.NEWSBRIEF_PROXY }}
         run: |
           set -e
+          # 受限网络可选：在仓库 Secrets 配 NEWSBRIEF_PROXY，httpx 会自动走代理；
+          # 不配则直连（GitHub 官方 runner 无域名白名单）。
+          if [ -n "$NEWSBRIEF_PROXY" ]; then
+            export HTTPS_PROXY="$NEWSBRIEF_PROXY" HTTP_PROXY="$NEWSBRIEF_PROXY"
+          fi
           args=(--mode live)
           # 页面「时间窗口设置」里填的起止值，通过 Run workflow 的 inputs 传到这里，
           # 由 CLI 的时间窗口硬闸执行「只采集窗口内数据」。

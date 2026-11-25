@@ -49,9 +49,7 @@ def read_capture(path: Path, window: tuple) -> list[dict]:
         abstract = str(r[8] or "")
         text = title + " " + abstract
         m = old_pat.search(text)
-        # 诊断回放只做规则验算，绝不把「回执收录时刻」冒充原文发布时间。
-        # 上一版把全部 77 条一律写成 2026-11-24 12:00，等于把 11-23 早上、
-        # 11-22 甚至更早的稿洗进当批窗口，18 条成果是喂出来的不是采出来的。
+# 诊断回放只验规则，绝不把回执时刻冒充原文发布时间。
         if m and ("9月" in m.group(0) or "11月1" in m.group(0)
                   or "11月2" in m.group(0) or "2027年" in m.group(0)
                   or "2025年" in m.group(0) or "2024年" in m.group(0)):

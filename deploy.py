@@ -41,9 +41,7 @@ def run(*a: str, check: bool = True, text: bool = True,
     e = dict(os.environ)
     e["GIT_TERMINAL_PROMPT"] = "0"           # 任何情况下都不弹「输入用户名/密码」
     e["GCM_INTERACTIVE"] = "never"           # Windows Git Credential Manager 不弹登录窗
-    # git push/fetch 卡住时必须有上限：否则用户双击 deploy.bat 会永远挂在那，
-    # 窗口不报错也不结束。90s 对 42 文件 / 真实 GitHub 仓库都足够。
-    # receive-pack 孙进程继承 pipe 不关 fd 会挂到超时；改用临时文件 fd。
+# push/fetch 必须有超时，否则双击 deploy.bat 会永远挂起。
     import tempfile
     try:
         with tempfile.TemporaryFile() as fo, tempfile.TemporaryFile() as fe:
@@ -188,9 +186,7 @@ def verify_head_state() -> list[str]:
                         "（推送未生效或仓库仍是旧版）")
     if "清理旧版残留文件" not in wf:
         problems.append("HEAD 的 daily.yml 缺少旧残留清理步（不是最新包）")
-    # 截图 34：光「文件齐备」挡不住 Git 换行规范化。必须确认
-    # .gitattributes 与 workflow 字节自愈步都在 HEAD 里，否则 CI 上
-    # deploy.bat 会变纯 LF，旧的「必须 CRLF」断言直接 0 >= 20 红。
+# 截图 34：光「文件齐备」挡不住 Git 换行规范化。
     ga = run("git", "show", "HEAD:.gitattributes", text=False, check=False)
     ga_txt = ga.stdout.decode("utf-8", "replace") if ga.returncode == 0 else ""
     if "*.bat text eol=crlf" not in ga_txt:
@@ -199,10 +195,7 @@ def verify_head_state() -> list[str]:
     if "规范化 deploy.bat 换行" not in wf:
         problems.append("HEAD 的 daily.yml 缺少 deploy.bat 字节级自愈步"
                         "（CI checkout 后 bat 可能仍是 LF）")
-    # 截图 42：CI 按「触发时的 workflow 定义」执行，改过文件后第一次运行
-    # checkout 到的 daily.yml 仍是旧定义（无 inputs / --window-start）。
-    # runtime 测试不能因此判红，但**推送时**必须确认 HEAD 已经是新版，
-    # 否则下一次 Run workflow 永远填不了窗口。
+# 截图 42：旧定义触发时版本相关契约不判红，强校验在 deploy 推 HEAD。
     try:
         from newsbrief.workflow_contract import head_is_new
         new_ok, missing = head_is_new(wf)
@@ -379,9 +372,7 @@ def main() -> int:
     run("git", "remote", "remove", "origin", check=False)
     run("git", "remote", "add", "origin", remote)
 
-    # 远端历史只作为「父提交」保留，绝不把远端独有的文件并进工作区。
-    # 旧做法 merge -X ours 只在冲突时选 ours，远端残留的 test_contract.py
-    # 会被原样带进 HEAD，CI 的 pytest 收集阶段直接 ModuleNotFoundError。
+# 远端历史只作父提交，绝不把远端独有文件并进工作区。
     parent, remote_tree = None, None
     f = git_auth("fetch", "origin", "main", check=False)
     if f.returncode == 0 and run("git", "rev-parse", "--verify", "FETCH_HEAD",
@@ -424,9 +415,7 @@ def main() -> int:
         return 1
     print(f"[部署] 推送后 tree 自检通过：{len(m['required'])} 项必需文件全部在 HEAD")
 
-    # 更强的一层：光「必需文件齐备」不够。旧版仓库可能同时留着
-    # 交付说明.md 与单 job 的 daily.yml，pytest 收集时就会红（截图 33）。
-    # 这里直接读 HEAD 的 tree 与 workflow 内容，确认新版本真的换上去了。
+# 光「必需文件齐备」不够：旧仓库可能同时留着旧 workflow/中文名。
     stale = verify_head_state()
     if stale:
         print("[部署] 推送后状态自检不通过：\n  " + "\n  ".join(stale)
@@ -435,9 +424,7 @@ def main() -> int:
         return 1
     print("[部署] 推送后状态自检通过：HEAD 无旧版残留，daily.yml 为 build/deploy 双 job")
 
-    # Pages 站点必须先存在：configure-pages@v5 只 GET 不创建，GITHUB_TOKEN
-    # 又没有 administration 权限去 enablement。用用户自己的 Token 在这里
-    # 一次性补上，deploy.bat 依旧只粘一次 Token、免登录（截图 43 根因）。
+# Pages 站点必须先存在：configure-pages 只 GET 不创建。
     ok_pages, note_pages = ensure_pages_enabled(repo, token)
     if not ok_pages:
         print("[部署] ⚠ Pages 站点未就绪：" + note_pages, file=sys.stderr)

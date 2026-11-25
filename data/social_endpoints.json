@@ -1,255 +1,283 @@
 {
- "version": "4.0",
- "note": "社交平台主干 16 个采集端点；由 registry 运行时展开，不在 sources.json 里堆 500 行。",
- "endpoints": [
-  {
-   "name": "财联社电报",
-   "url": "https://www.cls.cn/telegraph",
-   "urls": [
-    "https://www.cls.cn/telegraph",
-    "https://www.cls.cn/v1/roll/get_roll_list"
-   ],
-   "type": "social_hot",
-   "level": "★",
-   "catalog_sec": 24,
-   "enabled": true,
-   "max_items": 50,
-   "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
-   "group_id": 24
-  },
-  {
-   "name": "60秒早报",
-   "url": "https://60s.viki.moe/v2/60s",
-   "urls": [
-    "https://60s.viki.moe/v2/60s",
-    "https://60s-api.viki.moe/v2/60s"
-   ],
-   "type": "social_hot",
-   "level": "★",
-   "catalog_sec": 25,
-   "enabled": true,
-   "max_items": 50,
-   "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
-   "group_id": 25
-  },
-  {
-   "name": "微信24h热文榜",
-   "url": "https://tophub.today/n/WnBe01o371",
-   "urls": [
-    "https://tophub.today/n/WnBe01o371"
-   ],
-   "type": "social_hot",
-   "level": "★",
-   "catalog_sec": 26,
-   "enabled": true,
-   "max_items": 50,
-   "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
-   "group_id": 26
-  },
-  {
-   "name": "微博热搜",
-   "url": "https://s.weibo.com/top/summary?cate=realtimehot",
-   "urls": [
-    "https://s.weibo.com/top/summary?cate=realtimehot",
-    "https://m.weibo.cn/api/container/getIndex?containerid=106003type%3D25%26t%3D3%26disable_hot%3D1%26show_type%3D1",
-    "https://tophub.today/n/KqndgxeLl9"
-   ],
-   "type": "social_hot",
-   "level": "★",
-   "catalog_sec": 27,
-   "enabled": true,
-   "max_items": 50,
-   "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
-   "group_id": 27
-  },
-  {
-   "name": "百度热搜",
-   "url": "https://top.baidu.com/board?tab=realtime",
-   "urls": [
-    "https://top.baidu.com/board?tab=realtime",
-    "https://top.baidu.com/api/board?platform=wise&tab=realtime",
-    "https://tophub.today/n/Jb0vmloB1G"
-   ],
-   "type": "social_hot",
-   "level": "★",
-   "catalog_sec": 27,
-   "enabled": true,
-   "max_items": 50,
-   "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
-   "group_id": 27
-  },
-  {
-   "name": "抖音热榜",
-   "url": "https://www.iesdouyin.com/web/api/v2/hotsearch/billboard/word/",
-   "urls": [
-    "https://www.iesdouyin.com/web/api/v2/hotsearch/billboard/word/",
-    "https://www.douyin.com/aweme/v1/web/hot/search/list/",
-    "https://tophub.today/n/K7GdaMgdQy"
-   ],
-   "type": "social_hot",
-   "level": "★",
-   "catalog_sec": 27,
-   "enabled": true,
-   "max_items": 50,
-   "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
-   "group_id": 27
-  },
-  {
-   "name": "今日头条",
-   "url": "https://www.toutiao.com/",
-   "urls": [
-    "https://www.toutiao.com/",
-    "https://www.toutiao.com/hot-event/hot-board/?origin=toutiao_pc",
-    "https://tophub.today/n/x9ozB4KoXb"
-   ],
-   "type": "social_hot",
-   "level": "★",
-   "catalog_sec": 27,
-   "enabled": true,
-   "max_items": 50,
-   "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
-   "group_id": 27
-  },
-  {
-   "name": "知乎热榜",
-   "url": "https://www.zhihu.com/api/v3/feed/topstory/hot-lists/total?limit=50&desktop=true",
-   "urls": [
-    "https://www.zhihu.com/api/v3/feed/topstory/hot-lists/total?limit=50&desktop=true",
-    "https://www.zhihu.com/hot",
-    "https://tophub.today/n/mproPpoq6O"
-   ],
-   "type": "social_hot",
-   "level": "★",
-   "catalog_sec": 27,
-   "enabled": true,
-   "max_items": 50,
-   "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
-   "group_id": 27
-  },
-  {
-   "name": "小红书",
-   "url": "https://www.xiaohongshu.com/explore",
-   "urls": [
-    "https://www.xiaohongshu.com/explore",
-    "https://www.xiaohongshu.com/search_result?keyword=%E7%83%AD%E6%90%9C"
-   ],
-   "type": "social_hot",
-   "level": "★",
-   "catalog_sec": 27,
-   "enabled": true,
-   "max_items": 50,
-   "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
-   "group_id": 27
-  },
-  {
-   "name": "快手",
-   "url": "https://www.kuaishou.com/?isHome=1",
-   "urls": [
-    "https://www.kuaishou.com/?isHome=1",
-    "https://www.kuaishou.com/brilliant"
-   ],
-   "type": "social_hot",
-   "level": "★",
-   "catalog_sec": 27,
-   "enabled": true,
-   "max_items": 50,
-   "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
-   "group_id": 27
-  },
-  {
-   "name": "百度贴吧",
-   "url": "https://tieba.baidu.com/hottopic/browse/topicList",
-   "urls": [
-    "https://tieba.baidu.com/hottopic/browse/topicList",
-    "https://tophub.today/n/4KvxKe4wR3"
-   ],
-   "type": "social_hot",
-   "level": "★",
-   "catalog_sec": 27,
-   "enabled": true,
-   "max_items": 50,
-   "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
-   "group_id": 27
-  },
-  {
-   "name": "微信搜一搜·搜索发现",
-   "url": "https://weixin.sogou.com/",
-   "urls": [
-    "https://weixin.sogou.com/",
-    "https://weixin.sogou.com/weixin?type=2&query=%E4%BB%8A%E6%97%A5%E7%83%AD%E7%82%B9",
-    "https://tophub.today/n/WnBe01o371"
-   ],
-   "type": "social_hot",
-   "level": "★",
-   "catalog_sec": 27,
-   "enabled": true,
-   "max_items": 50,
-   "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
-   "group_id": 27
-  },
-  {
-   "name": "澎湃热榜",
-   "url": "https://www.thepaper.cn/",
-   "urls": [
-    "https://www.thepaper.cn/",
-    "https://tophub.today/n/WnBe01o371"
-   ],
-   "type": "social_hot",
-   "level": "★",
-   "catalog_sec": 28,
-   "enabled": true,
-   "max_items": 50,
-   "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
-   "group_id": 28
-  },
-  {
-   "name": "今日热榜聚合",
-   "url": "https://tophub.today/",
-   "urls": [
-    "https://tophub.today/",
-    "https://api.vvhan.com/api/hotlist/all",
-    "https://tenapi.cn/v2/weibohot",
-    "https://api.oioweb.cn/api/common/HotList",
-    "https://api.rebang.today/v1/items?tab=weibo"
-   ],
-   "type": "social_hot",
-   "level": "★",
-   "catalog_sec": 28,
-   "enabled": true,
-   "max_items": 50,
-   "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
-   "group_id": 28
-  },
-  {
-   "name": "B站热门",
-   "url": "https://api.bilibili.com/x/web-interface/popular?ps=50&pn=1",
-   "urls": [
-    "https://api.bilibili.com/x/web-interface/popular?ps=50&pn=1",
-    "https://api.bilibili.com/x/web-interface/ranking/v2?rid=0&type=all",
-    "https://tophub.today/n/74Kvx59dkx"
-   ],
-   "type": "social_hot",
-   "level": "★",
-   "catalog_sec": 29,
-   "enabled": true,
-   "max_items": 50,
-   "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
-   "group_id": 29
-  },
-  {
-   "name": "夸克/搜狗热点",
-   "url": "https://quark.sm.cn/s?q=%E7%83%AD%E6%90%9C",
-   "urls": [
-    "https://quark.sm.cn/s?q=%E7%83%AD%E6%90%9C",
-    "https://tophub.today/n/KqndgxeLl9"
-   ],
-   "type": "social_hot",
-   "level": "★",
-   "catalog_sec": 30,
-   "enabled": true,
-   "max_items": 50,
-   "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
-   "group_id": 30
-  }
- ]
+  "version": "4.0",
+  "note": "社交平台主干 16 个采集端点；由 registry 运行时展开，不在 sources.json 里堆 500 行。；9 主干平台各配直连/镜像/移动 API/聚合多候选，正式环境可达即采，本环境 403 逐类申报。",
+  "endpoints": [
+    {
+      "name": "财联社电报",
+      "url": "https://www.cls.cn/telegraph",
+      "urls": [
+        "https://www.cls.cn/telegraph",
+        "https://www.cls.cn/v1/roll/get_roll_list"
+      ],
+      "type": "social_hot",
+      "level": "★",
+      "catalog_sec": 24,
+      "enabled": true,
+      "max_items": 50,
+      "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
+      "group_id": 24
+    },
+    {
+      "name": "60秒早报",
+      "url": "https://60s.viki.moe/v2/60s",
+      "urls": [
+        "https://60s.viki.moe/v2/60s",
+        "https://60s-api.viki.moe/v2/60s"
+      ],
+      "type": "social_hot",
+      "level": "★",
+      "catalog_sec": 25,
+      "enabled": true,
+      "max_items": 50,
+      "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
+      "group_id": 25
+    },
+    {
+      "name": "微信24h热文榜",
+      "url": "https://tophub.today/n/WnBe01o371",
+      "urls": [
+        "https://tophub.today/n/WnBe01o371",
+        "https://60s.viki.moe/v2/wechat"
+      ],
+      "type": "social_hot",
+      "level": "★",
+      "catalog_sec": 26,
+      "enabled": true,
+      "max_items": 50,
+      "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
+      "group_id": 26
+    },
+    {
+      "name": "微博热搜",
+      "url": "https://s.weibo.com/top/summary?cate=realtimehot",
+      "urls": [
+        "https://s.weibo.com/top/summary?cate=realtimehot",
+        "https://m.weibo.cn/api/container/getIndex?containerid=106003type%3D25%26t%3D3%26disable_hot%3D1%26show_type%3D1",
+        "https://tophub.today/n/KqndgxeLl9",
+        "https://api-hot.imsyy.top/weibo",
+        "https://api.vvhan.com/api/hotlist/wbHot",
+        "https://60s.viki.moe/v2/weibo",
+        "https://weibo.com/ajax/side/hotSearch",
+        "https://api.tenapi.cn/v2/weibohot"
+      ],
+      "type": "social_hot",
+      "level": "★",
+      "catalog_sec": 27,
+      "enabled": true,
+      "max_items": 50,
+      "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
+      "group_id": 27
+    },
+    {
+      "name": "百度热搜",
+      "url": "https://top.baidu.com/board?tab=realtime",
+      "urls": [
+        "https://top.baidu.com/board?tab=realtime",
+        "https://top.baidu.com/api/board?platform=wise&tab=realtime",
+        "https://tophub.today/n/Jb0vmloB1G",
+        "https://api-hot.imsyy.top/baidu",
+        "https://api.vvhan.com/api/hotlist/baiduRD"
+      ],
+      "type": "social_hot",
+      "level": "★",
+      "catalog_sec": 27,
+      "enabled": true,
+      "max_items": 50,
+      "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
+      "group_id": 27
+    },
+    {
+      "name": "抖音热榜",
+      "url": "https://www.iesdouyin.com/web/api/v2/hotsearch/billboard/word/",
+      "urls": [
+        "https://www.iesdouyin.com/web/api/v2/hotsearch/billboard/word/",
+        "https://www.douyin.com/aweme/v1/web/hot/search/list/",
+        "https://tophub.today/n/K7GdaMgdQy",
+        "https://api-hot.imsyy.top/douyin",
+        "https://api.vvhan.com/api/hotlist/douyinHot",
+        "https://60s.viki.moe/v2/douyin"
+      ],
+      "type": "social_hot",
+      "level": "★",
+      "catalog_sec": 27,
+      "enabled": true,
+      "max_items": 50,
+      "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
+      "group_id": 27
+    },
+    {
+      "name": "今日头条",
+      "url": "https://www.toutiao.com/",
+      "urls": [
+        "https://www.toutiao.com/",
+        "https://www.toutiao.com/hot-event/hot-board/?origin=toutiao_pc",
+        "https://tophub.today/n/x9ozB4KoXb",
+        "https://api-hot.imsyy.top/toutiao",
+        "https://60s.viki.moe/v2/toutiao"
+      ],
+      "type": "social_hot",
+      "level": "★",
+      "catalog_sec": 27,
+      "enabled": true,
+      "max_items": 50,
+      "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
+      "group_id": 27
+    },
+    {
+      "name": "知乎热榜",
+      "url": "https://www.zhihu.com/api/v3/feed/topstory/hot-lists/total?limit=50&desktop=true",
+      "urls": [
+        "https://www.zhihu.com/api/v3/feed/topstory/hot-lists/total?limit=50&desktop=true",
+        "https://www.zhihu.com/hot",
+        "https://tophub.today/n/mproPpoq6O",
+        "https://api-hot.imsyy.top/zhihu",
+        "https://api.vvhan.com/api/hotlist/zhihuHot",
+        "https://60s.viki.moe/v2/zhihu",
+        "https://www.zhihu.com/api/v3/feed/topstory/hot-lists/total?limit=50",
+        "https://news-at.zhihu.com/api/4/news/latest"
+      ],
+      "type": "social_hot",
+      "level": "★",
+      "catalog_sec": 27,
+      "enabled": true,
+      "max_items": 50,
+      "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
+      "group_id": 27
+    },
+    {
+      "name": "小红书",
+      "url": "https://www.xiaohongshu.com/explore",
+      "urls": [
+        "https://www.xiaohongshu.com/explore",
+        "https://www.xiaohongshu.com/search_result?keyword=%E7%83%AD%E6%90%9C",
+        "https://api-hot.imsyy.top/xiaohongshu",
+        "https://tophub.today/n/L4MdAefldL"
+      ],
+      "type": "social_hot",
+      "level": "★",
+      "catalog_sec": 27,
+      "enabled": true,
+      "max_items": 50,
+      "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
+      "group_id": 27
+    },
+    {
+      "name": "快手",
+      "url": "https://www.kuaishou.com/?isHome=1",
+      "urls": [
+        "https://www.kuaishou.com/?isHome=1",
+        "https://www.kuaishou.com/brilliant",
+        "https://api-hot.imsyy.top/kuaishou",
+        "https://tophub.today/"
+      ],
+      "type": "social_hot",
+      "level": "★",
+      "catalog_sec": 27,
+      "enabled": true,
+      "max_items": 50,
+      "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
+      "group_id": 27
+    },
+    {
+      "name": "百度贴吧",
+      "url": "https://tieba.baidu.com/hottopic/browse/topicList",
+      "urls": [
+        "https://tieba.baidu.com/hottopic/browse/topicList",
+        "https://tophub.today/n/4KvxKe4wR3",
+        "https://api-hot.imsyy.top/tieba"
+      ],
+      "type": "social_hot",
+      "level": "★",
+      "catalog_sec": 27,
+      "enabled": true,
+      "max_items": 50,
+      "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
+      "group_id": 27
+    },
+    {
+      "name": "微信搜一搜·搜索发现",
+      "url": "https://weixin.sogou.com/",
+      "urls": [
+        "https://weixin.sogou.com/",
+        "https://weixin.sogou.com/weixin?type=2&query=%E4%BB%8A%E6%97%A5%E7%83%AD%E7%82%B9",
+        "https://tophub.today/n/WnBe01o371"
+      ],
+      "type": "social_hot",
+      "level": "★",
+      "catalog_sec": 27,
+      "enabled": true,
+      "max_items": 50,
+      "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
+      "group_id": 27
+    },
+    {
+      "name": "澎湃热榜",
+      "url": "https://www.thepaper.cn/",
+      "urls": [
+        "https://www.thepaper.cn/",
+        "https://tophub.today/n/WnBe01o371"
+      ],
+      "type": "social_hot",
+      "level": "★",
+      "catalog_sec": 28,
+      "enabled": true,
+      "max_items": 50,
+      "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
+      "group_id": 28
+    },
+    {
+      "name": "今日热榜聚合",
+      "url": "https://tophub.today/",
+      "urls": [
+        "https://tophub.today/",
+        "https://api.vvhan.com/api/hotlist/all",
+        "https://tenapi.cn/v2/weibohot",
+        "https://api.oioweb.cn/api/common/HotList",
+        "https://api.rebang.today/v1/items?tab=weibo",
+        "https://60s-api.viki.moe/v2/weibo",
+        "https://hot.imsyy.top/api/weibo",
+        "https://uapis.cn/api/misc/hotlist?type=weibo",
+        "https://www.tophub.fun/api/hot"
+      ],
+      "type": "social_hot",
+      "level": "★",
+      "catalog_sec": 28,
+      "enabled": true,
+      "max_items": 50,
+      "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
+      "group_id": 28
+    },
+    {
+      "name": "B站热门",
+      "url": "https://api.bilibili.com/x/web-interface/popular?ps=50&pn=1",
+      "urls": [
+        "https://api.bilibili.com/x/web-interface/popular?ps=50&pn=1",
+        "https://api.bilibili.com/x/web-interface/ranking/v2?rid=0&type=all",
+        "https://tophub.today/n/74Kvx59dkx",
+        "https://api.bilibili.com/x/web-interface/popular?ps=20&pn=1"
+      ],
+      "type": "social_hot",
+      "level": "★",
+      "catalog_sec": 29,
+      "enabled": true,
+      "max_items": 50,
+      "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
+      "group_id": 29
+    },
+    {
+      "name": "夸克/搜狗热点",
+      "url": "https://quark.sm.cn/s?q=%E7%83%AD%E6%90%9C",
+      "urls": [
+        "https://quark.sm.cn/s?q=%E7%83%AD%E6%90%9C",
+        "https://tophub.today/n/KqndgxeLl9"
+      ],
+      "type": "social_hot",
+      "level": "★",
+      "catalog_sec": 30,
+      "enabled": true,
+      "max_items": 50,
+      "note": "多候选 URL 运行时逐个自适应；本环境策略层 403 不代表正式环境不可达",
+      "group_id": 30
+    }
+  ]
 }

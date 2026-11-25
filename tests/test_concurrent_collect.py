@@ -65,9 +65,7 @@ def test_concurrent_fetch_is_faster_and_keeps_every_endpoint(monkeypatch, tmp_pa
     n, delay = 24, 0.15
     seen: list = []
     timing: list = []
-    # 冷启动时 discover() 首次 import 7 个采集器模块约 5s（比 24×0.15s 的
-    # 串行基线还长），会把「并发耗时」误判成退化。预热把模块导入移出计时，
-    # t0 之后只量并发采集本身；干净解压副本首次运行也不会偶发 FAIL。
+# 冷启动首次 import 采集器约 5s，预热后耗时测试不抖。
     registry.discover()
     with _client(n, delay, seen, timing=timing) as c:
         t0 = time.monotonic()

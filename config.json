@@ -1,7 +1,7 @@
 {
   "network": {
     "timeout_seconds": 6,
-    "html_articles_per_endpoint": 4,
+    "html_articles_per_endpoint": 12,
     "endpoint_seconds": 12,
     "body_enrich_limit": 120,
     "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",

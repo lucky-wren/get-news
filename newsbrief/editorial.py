@@ -81,6 +81,9 @@ _TITLE_EXCLUDE = (
     "征求意见", "品种名单", "说明书修订建议", "工作会议在",
     "专业委员会", "荣获", "贺电", "部际", "司负责人", "监管局关于",
     "公告", "通知", "新赛道", "峰会", "声明",
+    "全链条全周期全流程", "服务保障", "提供全链条", "治理观察",
+    "精雕细琢", "新支撑", "牵头制定全球首个", "持续增资扩产",
+    "复苏提振新周期", "东西问",
 )
 # 政务/机构文体：无具体民生事实（无金额/伤亡/气温/价格/比分/时刻）时一律不进主表。
 _FACT_RE = re.compile(r"\d+\s*(?:元|亿元|万元|人|死|亡|℃|度|%|级|条|起|比|:\d|时|分)")
@@ -138,9 +141,7 @@ def title_abstract_correspondence(title: str, abstract: str) -> tuple[bool, str]
     tf, af = _families(t), _families(a)
     other = af - tf
     shared = _bigrams(t) & _bigrams(a)
-    # 只有「摘要混入 >=2 个标题没有的主题族」且「连一个实词都不共享」才是
-    # 多条新闻标题拼成的串。一条讲恶意差评的稿本来就会同时涉及外卖与金额，
-    # 不能因为它跨了两个族就误杀。
+# 多主题拼接串判据：≥2 个新主题族且零共享实词才拒。
     if len(other) >= 2 and not shared:
         return False, f"摘要是多主题拼接串（混入 {','.join(sorted(other))}）"
     if not (tf & af) and not shared:
@@ -247,34 +248,35 @@ def augment_platform_hits(items: list[Item], topics: list[dict]) -> dict[str, li
 
 def _bridge_missing_platforms(items: list[Item], topics: list[dict],
                               log: dict[str, list[str]]) -> None:
-    """有词条却未进来源列的平台：共享实词才桥接，留痕；零词条留缺口。"""
+    """缺平台：共享实词按相关度分散桥接，零词条如实留缺口。"""
     done = {p for it in items for p in real_platform_hits(it.sources)}
+    load = {it.title: len(real_platform_hits(it.sources)) for it in items}
     for plat in MAIN_PLATFORMS:
         if plat in done:
             continue
         names = [str(tp.get("title") or "") for tp in topics
                  if canon(str(tp.get("discovery") or tp.get("source") or "")) == plat]
-        hit_it, hit_w = None, ""
+        best, best_w, best_sc = None, "", 0.0
         for name in names:
-            for w in _bigrams(name):
-                for it in items:
-                    if w in it.title:
-                        hit_it, hit_w = it, w
-                        break
-                if hit_it:
-                    break
-            if hit_it:
-                break
-        if hit_it is None:
+            bg = _bigrams(name)
+            for it in items:
+                sh = len(bg & _bigrams(it.title))
+                if not sh:
+                    continue
+                sc = sh * 10 - load.get(it.title, 0)
+                if sc > best_sc:
+                    best, best_w, best_sc = it, "／".join(sorted(bg & _bigrams(it.title)))[:18], sc
+        if best is None:
             continue
-        parts = [x.strip() for x in hit_it.sources.split(" · ") if x.strip()]
+        parts = [x.strip() for x in best.sources.split(" · ") if x.strip()]
         if plat not in {canon(x) for x in parts}:
-            hit_it.sources = normalize_source(" · ".join([plat] + parts))
-            log[plat].append(f"议题桥接：共享实词「{hit_w}」→ {hit_it.title[:20]}"
+            best.sources = normalize_source(" · ".join([plat] + parts))
+            load[best.title] = load.get(best.title, 0) + 1
+            log[plat].append(f"议题桥接：共享实词「{best_w}」→ {best.title[:20]}"
                              "（同一议题不同侧面，非事件同一）")
 
 def _dedup_events(items: list[Item]) -> list[Item]:
-    """同一事件只留代表稿（U17 2:2 摩洛哥 / 黄仁勋复职 / 神舟乘组不再重复）。"""
+    """同一事件只留代表稿，按 Final_adj 取最高分。"""
     out: list[Item] = []
     for it in sorted(items, key=lambda x: -x.final_adj):
         b = _bigrams(it.title)
@@ -291,7 +293,7 @@ def _dedup_events(items: list[Item]) -> list[Item]:
 
 def select_daily(items: list[Item], topics: list[dict] | None = None,
                  *, cap: int = 50) -> tuple[list[Item], list[dict], dict]:
-    """主表唯一出表口：正向选题 → 对应硬闸 → 真实平台命中 → 重算分 → 重要性排序。"""
+    """主表唯一出表口：正向选题、对应硬闸、平台命中、重算分、严格降序。"""
     rejects: list[dict] = []
     kept: list[Item] = []
     for it in items:
