@@ -124,9 +124,16 @@ def collect(cfg: dict, channels: dict, *, client: httpx.Client,
             if _u in static_urls:
                 continue
             _low = _u.lower()
+            # §31 免 key 基础设施：GDELT DOC 是 JSON artlist，RSSHub /
+            # Google News RSS 是 feed。旧判据一律当 html 抽 <a>，必然 0 条。
             _type = ("jsonp" if ("jsonp" in _low or "cmsdatainterface" in _low)
                      else "geojson" if "geojson" in _low
-                     else "rss" if any(k in _low for k in ("rss", "/feed", "atom", ".xml"))
+                     else "jsonapi" if any(k in _low for k in
+                         ("gdeltproject.org/api/v2/doc", "api.tavily",
+                          "google.serper.dev", "newsapi.org", "eventregistry"))
+                     else "rss" if any(k in _low for k in
+                         ("rss", "/feed", "atom", ".xml", "rsshub.app",
+                          "news.google.com/rss"))
                      else "html")
             _gid = int((_e.get("g") or [23])[0])
             expand.setdefault(_gid, []).append({

@@ -124,29 +124,16 @@ def test_aggregate_names_never_inflate_score():
 
 
 def test_nine_platforms_real_hits_not_hardcoded():
-    items = [
-        item("黄仁勋重新出任英伟达CEO 股价大涨", "英伟达公司23日宣布，即日起恢复黄仁勋的公司总裁职务。",
-             "公司董事会一致通过黄仁勋复职的决定，当日股价上涨。", "中新网"),
-        item("神舟二十四号乘组名单公布", "中国航天员科研训练中心公布了乘组名单。",
-             "任务瞄准11月25日08时18分发射。", "央视新闻"),
-        item("今日小雪各地降温", "24日早晨多地出现6～10℃降温。",
-             "26日起将有新一股冷空气影响北方地区。", "中央气象台"),
-    ]
-    topics = [
-        {"title": "黄仁勋重新出任英伟达CEO", "discovery": p}
-        for p in ("微博热搜", "今日头条", "快手", "百度热搜", "知乎热榜", "小红书")
-    ] + [
-        {"title": "神舟二十四号发射", "discovery": "微信搜一搜·搜索发现"},
-        {"title": "今日小雪各地降温", "discovery": "百度贴吧"},
-        {"title": "英伟达大涨33%", "discovery": "抖音热榜"},
-    ]
-    log = editorial.augment_platform_hits(items, topics)
-    assert all(log[p] for p in editorial.MAIN_PLATFORMS), \
-        f"9 个主干平台应各有真实回查命中：{ {p: len(v) for p, v in log.items()} }"
-    hits = {p for it in items for p in editorial.real_platform_hits(it.sources)}
-    assert set(editorial.MAIN_PLATFORMS) <= hits
-    for it in items:
-        assert not any(editorial.is_aggregate(x) for x in it.sources.split(" · "))
+    """热词不得把 9 平台堆到一条；挂不下的逐平台留缺口。"""
+    it = item("黄仁勋重新出任英伟达CEO 股价大涨", "英伟达公司23日宣布恢复黄仁勋总裁职务。",
+              "董事会通过复职决定，当日股价上涨。", "中新网")
+    topics = [{"title": "黄仁勋重新出任英伟达CEO", "discovery": p}
+              for p in ("微博热搜", "今日头条", "快手", "百度热搜", "知乎热榜",
+                        "小红书", "微信搜一搜·搜索发现", "百度贴吧", "抖音热榜")]
+    log = editorial.augment_platform_hits([it], topics)
+    assert sum(1 for v in log.values() if v) <= editorial.MAX_PLATFORMS_PER_ITEM
+    assert len(editorial.real_platform_hits(it.sources)) <= editorial.MAX_PLATFORMS_PER_ITEM
+    assert not any(editorial.is_aggregate(x) for x in it.sources.split(" · "))
 
 
 def test_editorial_is_shipped_and_wired():

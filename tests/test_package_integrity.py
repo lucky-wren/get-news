@@ -331,16 +331,26 @@ def test_channel_catalog_is_complete_and_probed():
 
 
 def test_reachable_catalog_entries_are_wired_into_sources():
-    """可达入口不能只躺在 catalog 里：必须按 31 类挂进活跃端点。"""
+    """清单 503 URL 运行时全量展开；政务公告页只留台账，可达栏目页须静态接入。
+
+    政务公告页降级后静态端点数下降是预期，不再用「带 catalog_sec 的静态端点数」
+    当接入程度的代理指标——那会把临沂市政府宣传页也算成有效渠道。
+    """
     ch = json.loads((ROOT / "sources.json").read_text(encoding="utf-8"))
-    eps = [e for g in ch["groups"] for e in g["endpoints"]]
-    wired = [e for e in eps if e.get("catalog_sec")]
+    eps = [e for g in ch["groups"] for e in g.get("endpoints", [])]
     assert len(ch["groups"]) == 31
-    assert len(wired) >= 60, f"清单接入端点太少：{len(wired)}"
-    assert len(eps) >= 130, f"台账端点退化：{len(eps)}"
-    assert all(e.get("level") in ("★", "☆", "✗") for e in wired)
-    assert all(e.get("catalog_board") for e in wired)
-    # 停更死 feed 与 JS 壳源不得复活
+    cat = json.loads((ROOT / "data" / "channel_catalog.json").read_text(encoding="utf-8"))
+    assert cat["unique_urls"] >= 500, "清单 URL 被裁剪（一个都不许删）"
+    exp = ch.get("catalog_expand") or {}
+    assert exp.get("enabled") is True and exp.get("never_prune_by_probe") is True, \
+        "运行时全量展开被关闭或按探测裁剪端点"
+    assert exp.get("unique_urls", 0) >= 500
+    reg = (ROOT / "newsbrief" / "registry.py").read_text(encoding="utf-8")
+    assert "catalog_expand" in reg and '"enabled": True' in reg, \
+        "清单展开端点未按 URL 全量启用"
+    market = [e for e in eps if "实测 200" in (e.get("note") or "")]
+    assert len(market) >= 10, f"可达市场化栏目页未接入：{len(market)}"
+    assert not any("linyi.gov.cn" in e.get("url", "") for e in eps), "政务公告页复活"
     assert not any("people.com.cn/rss" in e.get("url", "") for e in eps)
     assert not any("gdacs.org" in e.get("url", "") for e in eps)
 

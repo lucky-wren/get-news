@@ -318,3 +318,99 @@ def test_catalog_stays_compact():
     from pathlib import Path
     p = Path(__file__).resolve().parents[1] / "data" / "channel_catalog.json"
     assert p.stat().st_size <= 140000, f"清单 {p.stat().st_size} 字节"
+
+
+# ── 截图 47/48 + 清单渠道排查：5 条根因回归 ──────────────────────────
+def test_no_gov_announcement_pages_as_news_endpoints():
+    """政务部委/地方政府公告页只作台账留痕，不挂面向大众新闻采集端点。"""
+    import json
+    from pathlib import Path
+    s = json.loads((Path(__file__).resolve().parents[1] / "sources.json").read_text(encoding="utf-8"))
+    urls = [e.get("url", "") for g in s["groups"] for e in g.get("endpoints", [])]
+    assert not any("linyi.gov.cn" in u or "临沂" in u for u in urls), \
+        "临沂市人民政府被重新挂成新闻采集端点（截图 48）"
+    assert not any("gov.cn/" in u and "/zhengce/" in u for u in urls)
+    assert len([u for u in urls if "scroll-news" in u or "gmw.cn" in u]) >= 2, \
+        "可达市场化栏目页被移除，渠道又变少"
+
+
+def test_local_gov_promo_rejected():
+    """地方公安/政务宣传稿即使蹭到「商圈」等大众词也不进主表。"""
+    from newsbrief.editorial import public_interest
+    ok, _, why = public_interest(
+        "兰山公安：以“体系警务”解锁社区警务新路径",
+        "高端商圈挨着老旧院落，海量人流叠加复杂业态，基层治理任务繁重。",
+        "临沂市人民政府")
+    assert ok is False and ("政务" in why or "警务" in why or "体系" in why), why
+
+
+def test_hot_topic_cannot_pile_all_platforms_on_one_item():
+    """全网热词（黄仁勋/英伟达）不得把 9 个平台堆成「多渠道合并」。"""
+    from newsbrief.model import Item
+    from newsbrief.editorial import select_daily, MAIN_PLATFORMS, MAX_PLATFORMS_PER_ITEM
+    it = Item("黄仁勋闪电复出 英伟达董事会宣布恢复职务",
+              "　　英伟达董事会宣布，黄仁勋恢复总裁兼首席执行官职务。\n"
+              "　　距离这位 AI 芯片巨头掌门人宣布辞职，仅过去 11 天。",
+              "中新网")
+    it.I, it.C, it.V, it.final_adj, it.published = 4, 5, 12.0, 70, "2026-11-24 12:00"
+    topics = [{"title": "黄仁勋 英伟达 复出", "discovery": p} for p in MAIN_PLATFORMS]
+    kept, _, _ = select_daily([it], topics)
+    assert kept, "样本稿被误剔"
+    hits = [p for p in MAIN_PLATFORMS if p in kept[0].sources]
+    assert len(hits) <= MAX_PLATFORMS_PER_ITEM, \
+        f"单条挂了 {len(hits)} 个平台：{kept[0].sources}"
+    assert kept[0].record_type == "独立原文", "平台发现渠道被冒充独立信源"
+
+
+def test_catalog_api_endpoints_not_treated_as_html():
+    """§31 免 key 结构化源必须按 jsonapi/rss 解析，不能当 html 抽 <a>。"""
+    from pathlib import Path
+    src = (Path(__file__).resolve().parents[1] / "newsbrief" / "registry.py").read_text(encoding="utf-8")
+    assert 'gdeltproject.org/api/v2/doc' in src and '"jsonapi"' in src
+    assert 'rsshub.app' in src and 'news.google.com/rss' in src
+    from newsbrief.registry import discover
+    assert "jsonapi" in discover(), "GDELT/搜索 API 采集器未注册"
+
+
+def test_jsonapi_parses_gdelt_artlist_with_time_caveat():
+    """GDELT seendate 转成可核对时间，并逐条标注非原文首发。"""
+    import httpx
+    from newsbrief.sources.rss import fetch_jsonapi
+    sample = {"articles": [
+        {"title": "测试稿：冷空气影响多地", "url": "https://example.com/a",
+         "seendate": "20261124T120000Z"},
+        {"title": "无时间稿", "url": "https://example.com/b"}]}
+    c = httpx.Client(transport=httpx.MockTransport(
+        lambda r: httpx.Response(200, json=sample)))
+    rows = fetch_jsonapi(c, {"name": "GDELT", "group_id": 18,
+                             "url": "https://api.gdeltproject.org/api/v2/doc/doc",
+                             "group_name": "国际三类重大突发"}, 6)
+    assert len(rows) == 2
+    assert rows[0]["published"].startswith("2026-11-24")
+    assert rows[0]["evidence"] == "B" and "非原文首发" in rows[0]["time_note"]
+
+
+def test_nine_platforms_spread_across_independent_items():
+    """9 平台分散命中不同独立稿，而不是堆在一条「多渠道合并」上。"""
+    from newsbrief.model import Item
+    from newsbrief.editorial import (augment_platform_hits, real_platform_hits,
+                                     MAIN_PLATFORMS, MAX_PLATFORMS_PER_ITEM)
+    mk = lambda t, a, s: Item(t, "　　" + a + "\n　　" + a, s)
+    items = [mk(*x) for x in (
+        ("黄仁勋重新出任英伟达CEO 股价大涨", "英伟达公司宣布恢复黄仁勋总裁职务。", "中新网"),
+        ("神舟二十四号乘组名单公布", "中国航天员科研训练中心公布乘组名单。", "央视新闻"),
+        ("今日小雪各地降温", "24日早晨多地出现降温，26日起新一股冷空气影响北方。", "中央气象台"),
+        ("医保目录新增药品 价格下调", "新版医保目录新增多种药品，价格明显下调。", "国家医保局"),
+        ("台风黄色预警 多趟航班取消", "中央气象台发布台风黄色预警，多趟航班取消。", "中央气象台"),
+    )]
+    B = (("黄仁勋重新出任英伟达CEO", "微博热搜"), ("黄仁勋复职 英伟达股价大涨", "今日头条"),
+         ("神舟二十四号乘组名单公布", "快手"), ("神舟二十四号发射时间", "百度热搜"),
+         ("今日小雪多地降温", "知乎热榜"), ("小雪天气穿搭 降温", "小红书"),
+         ("医保目录调整 药品", "微信搜一搜·搜索发现"), ("台风预警 航班取消", "百度贴吧"),
+         ("医保药品降价", "抖音热榜"))
+    topics = [{"title": a, "discovery": b} for a, b in B]
+    log = augment_platform_hits(items, topics)
+    assert all(log[p] for p in MAIN_PLATFORMS), {p: len(v) for p, v in log.items()}
+    hits = {p for it in items for p in real_platform_hits(it.sources)}
+    assert set(MAIN_PLATFORMS) <= hits
+    assert all(len(real_platform_hits(it.sources)) <= MAX_PLATFORMS_PER_ITEM for it in items)

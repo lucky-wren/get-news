@@ -107,10 +107,17 @@ def main() -> int:
        and cov == list(range(1, 32)),
        f"{cat.get('channels')} 渠道 / {cat.get('unique_urls')} 入口 / "
        f"可达 {cat.get('reachable_urls')} / 覆盖 {len(cov)} 类")
-    wired = [e for e in eps if e.get("catalog_sec")]
-    ck("可达清单入口已接入 31 类采集台账",
-       len(wired) >= 60 and len(eps) >= 130,
-       f"清单接入 {len(wired)} / 总端点 {len(eps)}")
+    # 政务公告页降级后静态端点数下降是预期：接入程度改由「运行时全量展开」
+    # 衡量，不再数带 catalog_sec 的静态端点（那会把临沂市政府宣传页算成渠道）。
+    exp = ch.get("catalog_expand") or {}
+    reg = (ROOT / "newsbrief" / "registry.py").read_text(encoding="utf-8")
+    market = [e for e in eps if "实测 200" in (e.get("note") or "")]
+    ck("清单 503 入口运行时全量展开、可达市场化栏目页已静态接入",
+       cat.get("unique_urls", 0) >= 500
+       and exp.get("enabled") is True and exp.get("never_prune_by_probe") is True
+       and '"enabled": True' in reg and len(market) >= 10
+       and not any("linyi.gov.cn" in e.get("url", "") for e in eps),
+       f"清单 {cat.get('unique_urls')} 入口 / 可达栏目页 {len(market)} / 静态端点 {len(eps)}")
 
     # 部署链路：推上去的 tree 必须包含全部必需文件（上一轮 CI 事故的根因）
     import deploy
