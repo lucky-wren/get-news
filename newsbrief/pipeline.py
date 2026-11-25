@@ -302,6 +302,14 @@ def run_live(cfg: dict, channels: dict, date: str, client: httpx.Client,
             timeout=min(cfg["network"]["timeout_seconds"], 6),
             budget=cfg["network"].get("enrich_budget_seconds", 60))
     cand, traces = clean.normalize_all(raw, window=win)
+    # 候选池是「待选要闻」，不是采集存档：形态垃圾与政务宣传稿逐条留痕后移出。
+    from . import editorial
+    cand, pool_edge = editorial.pool_filter(cand, win)
+    for _i, _it in enumerate(cand, 1):
+        _it.seq = _i
+        _it.score_order = _i
+    traces.extend({"类": "候选池边界留痕", "标题": e["标题"],
+                   "依据": e["依据"], "URL": "", "发布时间": ""} for e in pool_edge)
     inbox = json.loads(INBOX.read_text(encoding="utf-8")) if INBOX.exists() else {}
     for it in cand:
         # 注入条目已带合规的 8 大类与可读细标签；注册表条目按 31 类类目名归位。
@@ -400,9 +408,8 @@ def run_live(cfg: dict, channels: dict, date: str, client: httpx.Client,
                              enabled=cfg.get("rules", {}).get("orchestrate", True),
                              head_window=3, interleave=True)
 # 编辑层是主表唯一出表口。
-    from . import editorial
     main, ed_rejects, ed_stats = editorial.select_daily(
-        main, topics, cap=int(cfg["limits"].get("max_main_items", 50)))
+        main, topics, cap=int(cfg["limits"].get("max_main_items", 50)), window=win)
     for r in ed_rejects:
         tr.pool_edge.append({"类": "编辑层未进主表", "标题": r["标题"],
                              "依据": r["原因"], "URL": "", "发布时间": r.get("发布时间", "")})

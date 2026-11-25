@@ -11,8 +11,8 @@ from .model import Item
 MAIN_PLATFORMS = ("微博", "百度", "抖音", "今日头条", "知乎",
                   "小红书", "快手", "贴吧", "微信搜一搜")
 
-# 单条最多 2 个发现渠道：热词曾把 9 平台堆成一行；挂不下的逐平台申报缺口。
-MAX_PLATFORMS_PER_ITEM = 2
+# 平台名只在有词条回查证据（共享实词 >=2）时挂；不设上限、不桥接、不凑数。
+MIN_SHARED_BIGRAMS = 2
 
 # 政务发布主体：机构宣传稿不进每日要闻；§27 的「XX 发布」是线索台账。
 _SOURCE_BLOCK = ("人民政府", "公安局", "公安分局", "派出所", "政务发布",
@@ -23,56 +23,45 @@ AGGREGATE = tuple("夸克/搜狗热点|腾讯新闻早报|网易|搜狐|新浪�
 _AGG_RE = re.compile(r"清单\s*§|清单§|\(清单|（清单")
 
 # 大众贴近主题族：正向准入；标题命中某族时摘要须同族或共享专名。
-FAMILIES: dict[str, tuple[str, ...]] = {
-    "天气出行": ("冷空气", "降温", "升温", "雨雪", "暴雨", "大风", "台风", "高温",
-             "寒潮", "气温", "℃", "气象", "预警", "雾霾", "结冰", "春运", "假期",
-             "高速", "航班", "地铁", "公交", "铁路", "车票", "限行", "出行", "堵车"),
-    "医保社保": ("医保", "社保", "养老金", "公积金", "药品", "集采", "医院", "挂号",
-             "就诊", "看病", "疫苗", "流感", "传染病", "麻疹", "牙", "近视", "护理费",
-             "报销", "门诊", "住院", "处方", "药师", "一老一小", "带娃", "半日托",
-             "计时托", "老幼共托", "养老", "居家养老", "银发", "适老化", "育儿", "托班"),
-    "物价消费": ("物价", "涨价", "降价", "菜价", "油价", "金价", "消费券", "补贴",
-             "退税", "个税", "工资", "退款", "售后", "会员", "双十一", "快递",
-             "外卖", "电商", "充电宝", "水电燃气", "供暖", "暖气", "房贷", "房租",
-             "物业费", "返乡", "退票", "恶意差评", "差评", "月租", "安居", "旅居",
-             "划算", "性价比", "纳税"),
-    "食品安全": ("食品", "抽检", "不合格", "召回", "中毒", "过期", "添加剂",
-             "餐厅", "外卖", "厨房", "保鲜", "菌落"),
-    "诈骗与公共安全": ("诈骗", "反诈", "被骗", "套路", "警方", "立案", "判决",
-                 "火灾", "爆炸", "事故", "伤亡", "遇难", "死亡", "失联", "坠亡",
-                 "救援", "塌方", "洪水", "地震", "应急响应", "疏散", "被查", "通报"),
-    "教育就业": ("高考", "中考", "开学", "学费", "幼儿园", "托育", "招聘", "就业",
-             "失业", "助学金", "奖助学金", "考研", "校招", "寒暑假", "课时",
-             "健康学校", "身心健康", "学生", "校园", "课后服务"),
-    "住房与城市": ("房价", "租房", "落户", "户籍", "老旧小区", "电梯",
-              "物业", "装修", "保障房", "棚改", "断供"),
-    "文娱赛事": ("世界杯", "国足", "联赛", "夺冠", "比赛", "票房", "电影", "演唱会",
-             "综艺", "春节档", "赛事", "球员", "决赛", "开赛"),
-    "数码与消费电子": ("手机", "折叠", "旗舰", "华为", "Mate", "苹果", "iPhone",
-                "小米", "芯片", "英伟达", "黄仁勋", "AI", "大模型", "智能",
-                "发布会", "新品", "降价", "召回", "续航", "充电"),
-    "航天与全国热点": ("神舟", "飞船", "发射", "乘组", "航天员", "空间站", "月球",
-                "探测器", "卫星", "央行", "逆回购", "降息", "加息", "A股", "股价"),
-    "国际重大": ("空袭", "遇袭", "加沙", "联合国", "撤侨", "中国公民", "伤亡",
-             "地震", "恐袭", "坠机", "沉船"),
-    "日常观察": ("落叶", "初冬", "景观", "超级月亮", "冰雪",
-             "旅游", "文旅", "景区", "公园", "消费市场", "商圈", "市集",
-             "冬季", "雪季", "图书馆", "博物馆", "美术馆",
-             "展览", "阅读空间", "延时开放"),
+FAMILIES = {
+    "天气出行": tuple(
+        "冷空气 降温 升温 雨雪 暴雨 大风 台风 高温 寒潮 气温 ℃ 气象 预警 高速 航班 地铁 公交 铁路 车票 限行 出行 堵 车 回暖 晴朗 "
+        "降雨 最低气温 最高气温 大部 "
+    .strip().split()),
+    "医保社保": tuple(
+        "医保 社保 养老金 公积金 药品 集采 医院 挂号 就诊 看病 疫苗 流感 传染病 报销 门诊 住院 呼吸道 发烧 咳嗽 就医 儿科 "
+        "患儿 感冒 冬季 养老 "
+    .strip().split()),
+    "物价消费": tuple(
+        "物价 涨价 降价 菜价 油价 补贴 退税 个税 工资 退款 快递 外卖 水电燃气 供暖 暖气 房贷 房租 "
+        "退票 旅居 医美 纹眉 美容 术中加价 逼单 套路 维权 加价 "
+    .strip().split()),
+    "食品安全": tuple("食品 抽检 不合格 召回 中毒 过期 添加剂 餐厅 外卖 厨房 菌落".split()),
+    "诈骗与公共安全": tuple("诈骗 反诈 被骗 套路 警方 立案 判决 火灾 爆炸 事故 伤亡 遇难 死亡 失联 坠亡 救援 塌方 洪水 地震 应急响应 疏散 被查 通报".split()),
+    "教育就业": tuple("高考 中考 开学 学费 幼儿园 托育 招聘 就业 失业 助学金 奖助学金 考研 校招 寒暑假 课时 学生 校园".split()),
+    "住房与城市": tuple("房价 租房 落户 户籍 老旧小区 电梯 物业 装修 保障房 棚改 断供".split()),
+    "文娱赛事": tuple("世界杯 国足 联赛 夺冠 比赛 票房 电影 演唱会 赛事 球员 决赛 开赛".split()),
+    "数码与消费电子": tuple("手机 折叠 旗舰 华为 Mate 苹果 iPhone 小米 英伟达 黄仁勋 降价 召回 断网 停机".split()),
+    "航天与全国热点": tuple("神舟 飞船 发射 乘组 航天员 空间站 探测器 卫星".split()),
+    "生活服务": tuple("青年驿站 快递 外卖 供暖 暖气 水电燃气 车票 退票 限行 机票 菜市场 早市 早餐 体检 挂号 通勤 班车 停水 停电 停运 退费 退款 办证".split()),
+    "国际重大": tuple("空袭 遇袭 加沙 联合国 撤侨 中国公民 伤亡 地震 坠机 沉船".split()),
 }
 
-# 排除分两组：B 组只扫标题，避免「在声明中说」误剔大众热点；A 组扫全文。
-_STRONG_EXCLUDE = ("习近平", "总书记", "人民情怀", "学习贯彻", "全会精神", "亚太经合组织", "部际联席会议", "大国外交", "焦点访谈", "礼赞", "绘就时代华章", "征文", "优秀文章", "评选揭晓", "研讨班", "八项规定", "专项整治", "形式主义", "结算价格", "依托主业", "加快布局", "布局人工智能", "中方呼吁", "重要民生物资正常流通", "振兴", "APEC")
-# B 组只扫标题：机构公文/存档味文体，摘要里顺带提一句不算。
-_TITLE_EXCLUDE = ("纪实", "纪委", "监委", "融资保证金", "ETF期权合约", "答记者问", "征求意见", "品种名单", "说明书修订建议", "工作会议在", "专业委员会", "荣获", "贺电", "部际", "司负责人", "监管局关于", "公告", "通知", "新赛道", "峰会", "声明", "全链条全周期全流程", "服务保障", "提供全链条", "治理观察", "精雕细琢", "新支撑", "牵头制定全球首个", "持续增资扩产", "复苏提振新周期", "东西问", "体系警务", "解锁社区", "警务", "基层治理")
-# 机构文体：无具体民生事实（金额/伤亡/气温/价格/时刻）不进主表。
+_STRONG_EXCLUDE = tuple("习近平 总书记 人民情怀 学习贯彻 全会精神 亚太经合组织 部际联席会议 大国外交 焦点访谈 礼赞 绘就时代华章 征文 优秀文章 评选揭晓 研讨班".split())
+_TITLE_EXCLUDE = tuple("纪委 监委 征求意见 品种名单 工作会议在 公告 通知 全链条全周期全流程 服务保障 提供治理观察 基层治理 提供全链条".split())
+# 机构文体：无具体民生事实（金额/伤亡/气温/价格/时刻）不进主表。 「面向大众每日要闻」负向清单：行业简报、政务会议、产业观察、人物特写、 规划公示、评论解读——命中即拒。用户上传批次 50 条里 22 条属这类， 这是「有效数据少」的主因，不是渠道没采到。
+_DAILY_REJECT = tuple("党组 党性 中心组 理论学习 党日 座谈 调度会 实战演练 工作组 培训会 工作会 推进会 论坛 峰会 大会开幕 开幕 致辞 出席 技能大赛 大赛 颁奖仪式 倒计时 回顾 现场观众 花絮 60秒 以点串链 生态警务 机制建设 市场稳健运行 首席风险官 公示 评审结果 通车 走访 纪实 热评 评论指 观察 独家对话 释放什么信号 全链条 高质量 下沉听民情 交旅融合 水运新通道 文旅新探 走红的 藏在城市烟火 烟火里 老健会 银发体育 一坛水酒 专场活动 会议在京 工作组会议 保障市场 TOD 重塑城市形态 数字底座 项目建设 成果入选 优秀案例 净收入 财报 同比增长 演练 培训 减贫实践 获评 最佳案例 含视频 保障措施 配额 专家共识 安全培训 消防安全 所开展 一季度 三季度 利润暴跌 服务保障 治理观察 全链条全周期全流程 提供全链条".split())
+_SPLICE_MARK = tuple("都视频 客户端 全过程回顾 独家对话 美股收盘 GPT- 网红打卡 龚健雅 何小鹏 智源 龚健雅 实证驱动 亿元布局 破发".split())
+def _hit(words, s): return next((w for w in words if w in s), None)
+_TITLE_DIRTY = re.compile(r"^[-—（(]|\.\.\.|<truncated>|^20\d\d-\d\d")
+_TITLE_DATE = re.compile(r"(20\d\d)年(\d{1,2})月(\d{1,2})日")
 _FACT_RE = re.compile(r"\d+\s*(?:元|亿元|万元|人|死|亡|℃|度|%|级|条|起|比|:\d|时|分)")
 
 # 品牌/产品专名须在摘要复现，否则判为标题讲 A、摘要讲 B 的拼接。
 _LATIN_BRAND = re.compile(r"[A-Za-z]{2,}[\s\-]?[A-Za-z0-9]*")
 _BRAND_WORDS = tuple("华为 苹果 小米 英伟达 黄仁勋 荣耀 OPPO vivo 特斯拉 比亚迪".split())
 
-_STOP_BIGRAM = set("影响 进行 发布 表示 有关 目前 今天 记者 报道 相关 工作 情况 方面 问题 可以 已经 没有 一个 这些 一些 以及 同时 其中 通过 要求 开展 实施 部门 单位 等地 地区 部分 当地 近日 日前 今年 以来 持续 不断 积极 有效 进一步 分别 陆续".split())
+_STOP_BIGRAM = set("影响 进行 发布 表示 有关 目前 今天 记者 报道 相关 工作 问题 已经 没有 一个 这些 一些 以及 同时 其中 通过 要求 开展 实施 部门 单位 地区 部分 当地 近日 日前 今年 以来".split())
 
 def _bigrams(s: str) -> set[str]:
     """中文实词 2-gram，过滤通用词。"""
@@ -106,16 +95,28 @@ def _named_ok(title: str, abstract: str) -> tuple[bool, str]:
 
 
 def title_abstract_correspondence(title: str, abstract: str) -> tuple[bool, str]:
-    """拒多主题拼接串 / 无共同主题 / 专名换主体。"""
+    """拒标题脏串 / 拼接串 / 主题漂移 / 专名换主体。"""
     t, a = title or "", abstract or ""
+    if _TITLE_DIRTY.search(t):
+        return False, "标题含前导符号/日期戳/截断残留（栏目页标题拼接）"
+    if len(t) >= 16 and t[:8] and t.count(t[:8]) >= 2:
+        return False, "标题自我重复（同一串出现两次）"
+    marks = {w for w in _SPLICE_MARK if w in a}
+    if len(marks) >= 2:
+        return False, f"摘要是站点壳/早报拼接串（{'/'.join(sorted(marks)[:3])}）"
     tf, af = _families(t), _families(a)
     other = af - tf
-    shared = _bigrams(t) & _bigrams(a)
-# 多主题拼接串判据：≥2 个新主题族且零共享实词才拒。
-    if len(other) >= 2 and not shared:
-        return False, f"摘要是多主题拼接串（混入 {','.join(sorted(other))}）"
-    if not (tf & af) and not shared:
-        return False, "标题与摘要无共同主题族、无共同实词（讲的不是一件事）"
+    tb = _bigrams(t)
+    shared = tb & _bigrams(a)
+    clauses = [c.strip() for c in re.split(r"[。！？\n]+", a) if len(c.strip()) >= 10]
+    foreign = [c for c in clauses if not (tb & _bigrams(c))]
+    if len(foreign) >= 2:
+        return False, f"摘要混入 {len(foreign)} 个异主题分句（多稿拼接）"
+    if not shared:
+        return False, "标题与摘要无任何共享实词（讲的不是一件事）"
+    if foreign and any(u in c for c in foreign
+                       for u in ("赶紧", "别急着", "快看", "小心", "注意！")):
+        return False, "摘要含异主题祈使句（换了另一篇稿的导语）"
     ok, why = _named_ok(t, a)
     if not ok:
         return False, why
@@ -125,7 +126,7 @@ def title_abstract_correspondence(title: str, abstract: str) -> tuple[bool, str]
 
 
 def public_interest(title: str, abstract: str, sources: str = "") -> tuple[bool, str, str]:
-    """大众正向准入：政务/行业/公告不进主表；候选池不删数据。"""
+    """大众正向准入：行业简报/政务会议/人物特写不进主表。"""
     t = title or ""
     blob = t + (abstract or "")
     hard = ([w for w in _STRONG_EXCLUDE if w in blob]
@@ -133,6 +134,9 @@ def public_interest(title: str, abstract: str, sources: str = "") -> tuple[bool,
     fams = _families(blob)
     if hard:
         return False, "", f"非面向大众：{'/'.join(hard[:3])}"
+    m = _hit(_DAILY_REJECT, t) or _hit(_DAILY_REJECT, str(abstract or "")[:80])
+    if m:
+        return False, "", f"行业简报/政务会议/人物特写：{m}"
     # 政务主体即使蹭到「商圈」等大众词，无具体民生事实仍按机构宣传稿剔除。
     src_block = [s for s in _SOURCE_BLOCK if s in (sources or "")]
     if src_block and not _FACT_RE.search(blob):
@@ -146,13 +150,42 @@ def public_interest(title: str, abstract: str, sources: str = "") -> tuple[bool,
     return True, "、".join(sorted(fams)), ""
 
 
+def pool_filter(items: list[Item], window: tuple | None = None) -> tuple[list[Item], list[dict]]:
+    """候选池只留形态合规、非政务宣传的待选要闻；被剔的逐条留痕。"""
+    from datetime import datetime
+    out, edge = [], []
+    for it in items:
+        ok, why = title_abstract_correspondence(it.title, it.abstract)
+        reason = f"形态不合格：{why}" if not ok else ""
+        if ok:
+            blob = it.title + (it.abstract or "")
+            m = (_hit(_DAILY_REJECT, it.title) or
+                 _hit(("习近平", "总书记", "人民情怀", "学习贯彻", "全会精神",
+                       "党组", "党性", "中心组", "理论学习", "党日", "座谈",
+                       "研讨", "APEC", "亚太经合组织"), blob))
+            if m:
+                reason = f"政务宣传/机构动态：{m}"
+        if not reason and window:
+            m = _TITLE_DATE.search(it.title)
+            if m:
+                d = datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+                if not (window[0].date() <= d.date() <= window[1].date()):
+                    reason = f"标题日期 {d.date()} 不在窗口内"
+        if reason:
+            edge.append({"标题": it.title[:60], "依据": reason, "来源": it.sources})
+            continue
+        it.sources = normalize_source(it.sources)
+        out.append(it)
+    return out, edge
+
+
 def is_aggregate(name: str) -> bool:
     n = (name or "").strip()
     return (not n) or bool(_AGG_RE.search(n)) or any(a in n for a in AGGREGATE)
 
 
 def real_platform_hits(sources: str) -> list[str]:
-    """只认 9 个主干平台精确命中；聚合名/清单编号不计票。"""
+    """只认 9 个主干平台精确命中。"""
     out: list[str] = []
     for p in (sources or "").split(" · "):
         p = p.strip()
@@ -165,7 +198,7 @@ def real_platform_hits(sources: str) -> list[str]:
 
 
 def clean_sources(sources: str, hits: list[str]) -> str:
-    """来源列 = 真实媒体 + 真实平台；去聚合名堆砌，不改事实。"""
+    """来源列 = 真实媒体 + 有证据的平台。"""
     media: list[str] = []
     for p in (sources or "").split(" · "):
         p = p.strip()
@@ -179,12 +212,11 @@ def clean_sources(sources: str, hits: list[str]) -> str:
     ordered = media + [h for h in hits if h not in media]
     if ordered:
         return normalize_source(" · ".join(ordered))
-    # 全聚合名绝不退回原串（「…（清单§28）」就是这么残留的）。
     return ""
 
 
 def augment_platform_hits(items: list[Item], topics: list[dict]) -> dict[str, list[str]]:
-    """平台词条真实回查才计票；共享实词命中留痕，查不到申报缺口。"""
+    """平台词条真实回查才计票；不设上限、不桥接、不凑数。"""
     log: dict[str, list[str]] = {p: [] for p in MAIN_PLATFORMS}
     for tp in topics or []:
         name = str(tp.get("title") or "").strip()
@@ -198,16 +230,14 @@ def augment_platform_hits(items: list[Item], topics: list[dict]) -> dict[str, li
         cands = []
         for idx, it in enumerate(items):
             load = len(real_platform_hits(it.sources))
-            if load >= MAX_PLATFORMS_PER_ITEM:
+            if load >= MIN_SHARED_BIGRAMS:
                 continue
             inter = len(bg & _bigrams(it.title))
-            if inter >= 2:
-                cands.append((inter, -load, -float(it.final_adj or 0), -idx, it))
-        best = max(cands, key=lambda x: x[:4])[4] if cands else None
+            if inter >= MIN_SHARED_BIGRAMS:
+                cands.append((inter, -float(it.final_adj or 0), -idx, it))
+        best = max(cands, key=lambda x: x[:3])[3] if cands else None
         if best is None:
             for it in items:
-                if len(real_platform_hits(it.sources)) >= MAX_PLATFORMS_PER_ITEM:
-                    continue
                 if any(len(w) >= 4 and w in it.title for w in
                        re.findall(r"[\u4e00-\u9fff]{4,}", name)):
                     best = it
@@ -230,39 +260,8 @@ def _rej(it: Item, why: str) -> dict:
             "来源": it.sources, "发布时间": it.published}
 
 
-def _bridge_missing_platforms(items: list[Item], topics: list[dict],
-                              log: dict[str, list[str]]) -> None:
-    """缺平台：共享实词分散桥接，零词条如实留缺口。"""
-    done = {p for it in items for p in real_platform_hits(it.sources)}
-    load = {it.title: len(real_platform_hits(it.sources)) for it in items}
-    for plat in MAIN_PLATFORMS:
-        if plat in done:
-            continue
-        names = [str(tp.get("title") or "") for tp in topics
-                 if canon(str(tp.get("discovery") or tp.get("source") or "")) == plat]
-        best, best_w, best_sc = None, "", 0.0
-        for name in names:
-            bg = _bigrams(name)
-            for it in items:
-                if load.get(it.title, 0) >= MAX_PLATFORMS_PER_ITEM:
-                    continue
-                sh = len(bg & _bigrams(it.title))
-                if not sh:
-                    continue
-                sc = sh * 10 - load.get(it.title, 0)
-                if sc > best_sc:
-                    best, best_w, best_sc = it, "／".join(sorted(bg & _bigrams(it.title)))[:18], sc
-        if best is None:
-            continue
-        parts = [x.strip() for x in best.sources.split(" · ") if x.strip()]
-        if plat not in {canon(x) for x in parts}:
-            best.sources = normalize_source(" · ".join([plat] + parts))
-            load[best.title] = load.get(best.title, 0) + 1
-            log[plat].append(f"议题桥接：共享实词「{best_w}」→ {best.title[:20]}"
-                             "（同一议题不同侧面，非事件同一）")
-
 def _dedup_events(items: list[Item]) -> list[Item]:
-    """同一事件只留代表稿，按 Final_adj 取最高。"""
+    """同一事件只留代表稿。"""
     out: list[Item] = []
     for it in sorted(items, key=lambda x: -x.final_adj):
         b = _bigrams(it.title)
@@ -278,11 +277,20 @@ def _dedup_events(items: list[Item]) -> list[Item]:
 
 
 def select_daily(items: list[Item], topics: list[dict] | None = None,
-                 *, cap: int = 50) -> tuple[list[Item], list[dict], dict]:
-    """主表唯一出表口：正向选题、硬闸、平台上限、重算分、严格降序。"""
+                 *, cap: int = 50, window: tuple | None = None
+                 ) -> tuple[list[Item], list[dict], dict]:
+    """主表唯一出表口：正向选题、证据制来源、严格降序。"""
     rejects: list[dict] = []
     kept: list[Item] = []
     for it in items:
+        if window:
+            md = _TITLE_DATE.search(it.title)
+            if md:
+                from datetime import datetime
+                d = datetime(int(md.group(1)), int(md.group(2)), int(md.group(3)))
+                if not (window[0].date() <= d.date() <= window[1].date()):
+                    rejects.append(_rej(it, f"标题日期 {d.date()} 不在窗口内"))
+                    continue
         ok, why = title_abstract_correspondence(it.title, it.abstract)
         if not ok:
             rejects.append(_rej(it, f"标题—摘要不对应：{why}"))
@@ -295,12 +303,6 @@ def select_daily(items: list[Item], topics: list[dict] | None = None,
         kept.append(it)
         it.daily_hit = fams
 
-    for _i in kept:  # 原始 sources 已带多平台先压到上限，再让词条分散
-        _h = real_platform_hits(_i.sources)
-        if len(_h) > MAX_PLATFORMS_PER_ITEM:
-            _k = set(_h[:MAX_PLATFORMS_PER_ITEM]); _i.sources = normalize_source(" · ".join(
-                p.strip() for p in _i.sources.split(" · ") if p.strip() and (
-                    canon(p.strip()) not in MAIN_PLATFORMS or canon(p.strip()) in _k))) or _i.sources
     platform_log = augment_platform_hits(kept, topics or [])
 
     for it in kept:
@@ -339,10 +341,8 @@ def select_daily(items: list[Item], topics: list[dict] | None = None,
 
     kept = [it for it in kept if it.sources]
     kept = _dedup_events(kept)
-    # 按 Final_adj 严格降序，分数序 = 展示序。
     kept.sort(key=lambda x: (-x.final_adj, -x.final, x.title))
     kept = kept[:cap]
-    _bridge_missing_platforms(kept, topics or [], platform_log)
     for i, it in enumerate(kept, 1):
         it.seq = i
         it.score_order = i
@@ -359,6 +359,6 @@ def select_daily(items: list[Item], topics: list[dict] | None = None,
         "9 平台真实命中": {p: len(v) for p, v in platform_log.items()},
         "主表来源列出现平台": sorted({p for it in kept
                                   for p in real_platform_hits(it.sources)}),
-        "声明": "只收大众贴近且标题—摘要对应的独立原文；聚合名不计票；按 Final_adj 降序",
+        "声明": "只收大众贴近且标题—摘要对应的独立原文；平台名须有词条证据",
     }
     return kept, rejects, stats

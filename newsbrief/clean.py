@@ -204,6 +204,8 @@ EXACT_PLATFORM = {
 def canon(c: str) -> str:
     """把频道名 / "RSS" 尾巴 / 平台内部层级归一为可核对的平台或媒体名。"""
     c = (c or "").strip()
+    # 清单台账编号是登记用的，不是信源名：「工信部（清单§3）」→「工信部」。
+    c = re.sub(r"[（(]?\s*清单\s*§\s*\d+\s*[)）]?", "", c).strip()
     if c in EXACT_PLATFORM:
         return EXACT_PLATFORM[c]
     # 平台内部层级用不带空格的 `·`，必须原样保留（01 §6）。
@@ -232,6 +234,7 @@ def normalize_source(s: str) -> str:
     s = re.sub(r"https?://\S+", "", (s or "").strip())
     parts = [p.strip() for p in s.split(" · ") if p.strip()]
     parts = [re.sub(r"^\d+、", "", p) for p in parts]
+    parts = [re.sub(r"[（(]?\s*清单\s*§\s*\d+\s*[)）]?", "", p).strip() for p in parts]
     parts = [p for p in parts if not re.search(r"\|\||｜|等\d+家|未取得|待补|N/A", p)]
     out, seen = [], set()
     for p in parts:

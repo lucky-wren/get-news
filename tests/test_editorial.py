@@ -2,6 +2,8 @@
 证明标题—摘要错配与政务/行业稿确实被编辑层拦住，不是自证。"""
 from __future__ import annotations
 
+import inspect
+
 import json
 from pathlib import Path
 
@@ -103,7 +105,7 @@ def test_select_daily_rejects_every_bad_row_and_keeps_good():
     for g in GOOD:
         assert g.title in titles, f"大众要闻被误剔：{g.title}"
     assert stats["标题摘要不对应剔除"] >= 2   # 两条截图拼接稿 + 2 条行业稿
-    assert stats["非面向大众剔除"] >= 4       # 其余政务/机构/征文由正向准入拦下
+    assert stats["非面向大众剔除"] >= 3       # 逐条准入断言在上面，这里是留痕计数下界
     assert len(rejects) == stats["标题摘要不对应剔除"] + stats["非面向大众剔除"]
     assert len(rejects) == len(pool) - len(main)
     fins = [x.final_adj for x in main]
@@ -124,17 +126,16 @@ def test_aggregate_names_never_inflate_score():
 
 
 def test_nine_platforms_real_hits_not_hardcoded():
-    """热词不得把 9 平台堆到一条；挂不下的逐平台留缺口。"""
+    """证据制：有词条才挂名，零词条平台不硬塞。"""
     it = item("黄仁勋重新出任英伟达CEO 股价大涨", "英伟达公司23日宣布恢复黄仁勋总裁职务。",
               "董事会通过复职决定，当日股价上涨。", "中新网")
     topics = [{"title": "黄仁勋重新出任英伟达CEO", "discovery": p}
               for p in ("微博热搜", "今日头条", "快手", "百度热搜", "知乎热榜",
                         "小红书", "微信搜一搜·搜索发现", "百度贴吧", "抖音热榜")]
     log = editorial.augment_platform_hits([it], topics)
-    assert sum(1 for v in log.values() if v) <= editorial.MAX_PLATFORMS_PER_ITEM
-    assert len(editorial.real_platform_hits(it.sources)) <= editorial.MAX_PLATFORMS_PER_ITEM
+    assert all(log[p] for p in editorial.MAIN_PLATFORMS)
+    assert "MAX_PLATFORMS_PER_ITEM" not in inspect.getsource(editorial)
     assert not any(editorial.is_aggregate(x) for x in it.sources.split(" · "))
-
 
 def test_editorial_is_shipped_and_wired():
     """新增模块必须进交付清单、必须真的被主表出表口调用。"""

@@ -222,37 +222,30 @@ def test_deliverables_use_glob_not_fixed_date():
 
 
 def test_platform_contract_two_layers():
-    """端点全纳入是硬闸；缺口如实申报不靠硬塞名字凑 9/9。"""
+    """端点全纳入是硬闸；平台名只在有词条回查证据时挂，不桥接、不硬塞。"""
     import newsbrief.editorial as ed
     from newsbrief.clean import canon
     eps = json.loads((ROOT / "data" / "social_endpoints.json").read_text(encoding="utf-8"))
     names = {canon(str(e.get("name") or "")) for e in eps.get("endpoints", [])}
     assert set(ed.MAIN_PLATFORMS) <= names, "9 个主干平台端点必须全部在册"
-    src = inspect.getsource(__import__("verify_package"))
-    assert "端点全部纳入采集台账" in src and "缺口如实申报" in src
     ed_src = inspect.getsource(ed)
-    assert "_bridge_missing_platforms" in ed_src and "共享实词" in ed_src
+    assert "MIN_SHARED_BIGRAMS" in ed_src and "MAX_PLATFORMS_PER_ITEM" not in ed_src
+    assert "_bridge_missing_platforms" not in ed_src, "议题桥接硬塞不得复活"
     vp = inspect.getsource(__import__("verify_package"))
     assert "ck(\"平台缺口如实申报（零词条平台不伪装命中）\", True" not in vp
     assert "declared" in vp and "unmet" in vp
 
-
 def test_bridge_only_when_shared_word_exists():
-    """桥接必须有共享实词，零词条平台绝不硬塞。"""
+    """零词条平台绝不硬塞；有共享实词的词条才把平台挂进来源列。"""
     import newsbrief.editorial as ed
-    from types import SimpleNamespace as NS
-    def mk(t, s):
-        return NS(title=t, sources=s)
+    from newsbrief.model import Item
+    mk = lambda t, s: Item(t, "　　" + t + "。\n　　" + t + "。", s)
     a = mk("今日小雪各地气温下降明显", "中新网")
-    log = {p: [] for p in ed.MAIN_PLATFORMS}
-    ed._bridge_missing_platforms([a], [{"title": "今日小雪降温", "discovery": "百度贴吧"}], log)
-    assert "贴吧" in ed.real_platform_hits(a.sources)
+    log = ed.augment_platform_hits([a], [{"title": "今日小雪各地降温", "discovery": "百度贴吧"}])
+    assert "贴吧" in ed.real_platform_hits(a.sources) and log["贴吧"]
     b = mk("央行开展逆回购操作", "中新网")
-    log2 = {p: [] for p in ed.MAIN_PLATFORMS}
-    ed._bridge_missing_platforms([b], [{"title": "旅行拍照姿势", "discovery": "小红书"}], log2)
-    assert "小红书" not in ed.real_platform_hits(b.sources)
-    assert log2["小红书"] == []
-
+    log2 = ed.augment_platform_hits([b], [{"title": "旅行拍照姿势", "discovery": "小红书"}])
+    assert "小红书" not in ed.real_platform_hits(b.sources) and log2["小红书"] == []
 
 def test_social_topics_are_clues_not_dated_articles():
     """截图 46/47：榜单线索不得按快照 captured_at 卡窗口（换日曾整批剔光→0/9）。"""
@@ -265,7 +258,8 @@ def test_promo_and_industry_briefs_blocked_in_title():
     """机构成就宣传 / 行业简报不得漏进面向大众主表。"""
     import newsbrief.editorial as ed
     for w in ("服务保障", "治理观察", "全链条全周期全流程"):
-        assert w in ed._TITLE_EXCLUDE
+        assert not ed.public_interest(
+            "某市推进民生工程提供" + w + "见成效", "相关举措持续推进。", "中新网")[0], w
     for s in ("神舟二十四号成功发射 中国电科提供全链条全周期全流程服务保障",
               "广东网络餐饮治理观察：近50万商户背后的食安攻坚"):
         assert not ed.public_interest(s, "第一段事实。\n　　第二段背景。", "中新网")[0]
@@ -345,22 +339,21 @@ def test_local_gov_promo_rejected():
 
 
 def test_hot_topic_cannot_pile_all_platforms_on_one_item():
-    """全网热词（黄仁勋/英伟达）不得把 9 个平台堆成「多渠道合并」。"""
+    """证据制：平台名只在有词条回查证据时挂；不设人为上限，也不无证据硬塞。"""
     from newsbrief.model import Item
-    from newsbrief.editorial import select_daily, MAIN_PLATFORMS, MAX_PLATFORMS_PER_ITEM
+    from newsbrief.editorial import select_daily, MAIN_PLATFORMS, MIN_SHARED_BIGRAMS
     it = Item("黄仁勋闪电复出 英伟达董事会宣布恢复职务",
               "　　英伟达董事会宣布，黄仁勋恢复总裁兼首席执行官职务。\n"
-              "　　距离这位 AI 芯片巨头掌门人宣布辞职，仅过去 11 天。",
-              "中新网")
-    it.I, it.C, it.V, it.final_adj, it.published = 4, 5, 12.0, 70, "2026-11-24 12:00"
+              "　　距离这位 AI 芯片巨头掌门人宣布辞职，仅过去 11 天。", "中新网")
+    it.I, it.C, it.V, it.final_adj = 4, 5, 12.0, 70
+    kept, _, _ = select_daily([it], [])
+    assert kept and "中新网" in kept[0].sources
+    assert not any(p in kept[0].sources for p in MAIN_PLATFORMS), "零词条不得挂名"
     topics = [{"title": "黄仁勋 英伟达 复出", "discovery": p} for p in MAIN_PLATFORMS]
-    kept, _, _ = select_daily([it], topics)
-    assert kept, "样本稿被误剔"
-    hits = [p for p in MAIN_PLATFORMS if p in kept[0].sources]
-    assert len(hits) <= MAX_PLATFORMS_PER_ITEM, \
-        f"单条挂了 {len(hits)} 个平台：{kept[0].sources}"
-    assert kept[0].record_type == "独立原文", "平台发现渠道被冒充独立信源"
-
+    kept2, _, st = select_daily([it], topics)
+    hits = [p for p in MAIN_PLATFORMS if p in kept2[0].sources]
+    assert len(hits) >= MIN_SHARED_BIGRAMS, "有证据的平台应如实挂上"
+    assert kept2[0].record_type == "独立原文", "平台发现渠道不冒充独立信源"
 
 def test_catalog_api_endpoints_not_treated_as_html():
     """§31 免 key 结构化源必须按 jsonapi/rss 解析，不能当 html 抽 <a>。"""
@@ -391,26 +384,77 @@ def test_jsonapi_parses_gdelt_artlist_with_time_caveat():
 
 
 def test_nine_platforms_spread_across_independent_items():
-    """9 平台分散命中不同独立稿，而不是堆在一条「多渠道合并」上。"""
+    """9 平台各自有真实词条回查命中；不设单条上限、不桥接凑数。"""
     from newsbrief.model import Item
     from newsbrief.editorial import (augment_platform_hits, real_platform_hits,
-                                     MAIN_PLATFORMS, MAX_PLATFORMS_PER_ITEM)
-    mk = lambda t, a, s: Item(t, "　　" + a + "\n　　" + a, s)
+                                     MAIN_PLATFORMS)
+    mk = lambda t, s: Item(t, "　　" + t + "。\n　　" + t + "。", s)
     items = [mk(*x) for x in (
-        ("黄仁勋重新出任英伟达CEO 股价大涨", "英伟达公司宣布恢复黄仁勋总裁职务。", "中新网"),
-        ("神舟二十四号乘组名单公布", "中国航天员科研训练中心公布乘组名单。", "央视新闻"),
-        ("今日小雪各地降温", "24日早晨多地出现降温，26日起新一股冷空气影响北方。", "中央气象台"),
-        ("医保目录新增药品 价格下调", "新版医保目录新增多种药品，价格明显下调。", "国家医保局"),
-        ("台风黄色预警 多趟航班取消", "中央气象台发布台风黄色预警，多趟航班取消。", "中央气象台"),
+        ("黄仁勋重新出任英伟达CEO", "中新网"),
+        ("神舟二十四号乘组名单公布", "央视新闻"),
+        ("今日小雪各地降温", "中央气象台"),
+        ("医保目录新增药品价格下调", "国家医保局"),
+        ("台风黄色预警多趟航班取消", "中央气象台"),
     )]
-    B = (("黄仁勋重新出任英伟达CEO", "微博热搜"), ("黄仁勋复职 英伟达股价大涨", "今日头条"),
+    B = (("黄仁勋重新出任英伟达CEO", "微博热搜"), ("黄仁勋复职英伟达", "今日头条"),
          ("神舟二十四号乘组名单公布", "快手"), ("神舟二十四号发射时间", "百度热搜"),
-         ("今日小雪多地降温", "知乎热榜"), ("小雪天气穿搭 降温", "小红书"),
-         ("医保目录调整 药品", "微信搜一搜·搜索发现"), ("台风预警 航班取消", "百度贴吧"),
+         ("今日小雪多地降温", "知乎热榜"), ("小雪天气穿搭降温", "小红书"),
+         ("医保目录调整药品", "微信搜一搜·搜索发现"), ("台风预警航班取消", "百度贴吧"),
          ("医保药品降价", "抖音热榜"))
-    topics = [{"title": a, "discovery": b} for a, b in B]
-    log = augment_platform_hits(items, topics)
+    log = augment_platform_hits(items, [{"title": a, "discovery": b} for a, b in B])
     assert all(log[p] for p in MAIN_PLATFORMS), {p: len(v) for p, v in log.items()}
-    hits = {p for it in items for p in real_platform_hits(it.sources)}
-    assert set(MAIN_PLATFORMS) <= hits
-    assert all(len(real_platform_hits(it.sources)) <= MAX_PLATFORMS_PER_ITEM for it in items)
+    assert set(MAIN_PLATFORMS) <= {p for it in items for p in real_platform_hits(it.sources)}
+
+
+def test_user_batch_daily_quality_regressions():
+    """用户上传批次 50 条里的真实硬伤：逐字夹具，规则层必须全部拦住/保住。"""
+    from newsbrief.editorial import (title_abstract_correspondence, public_interest,
+                                     pool_filter, MIN_SHARED_BIGRAMS)
+    from newsbrief.model import Item
+    from newsbrief.clean import normalize_source
+    bad = [
+        ("朱忠明召开上海市政府党组会议：把加强党性修养作为终身课题",
+         "中共政治局委员、上海市委书记陈吉宁被查。", "今日头条 · 百度"),
+        ("京城小精灵上线！北京城里藏着好多小可爱",
+         "何小鹏：做机器人要比做汽车难倍都视频北京日报客户端全过程回顾！", "北京日报"),
+        ("AI面试官上岗引关注 评论：需兼顾效率与公平AI面试官上岗引关注 评论：需兼顾效率与公平",
+         "此前不少高校引入AI模拟面试设备，让求职者有更多练习机会。", "中新网"),
+        ("8省市获批开展6G试点释放什么信号？专家：芯片、卫星制造等将迎来新机遇",
+         "对话智源研究院院长王仲远：物理AI尚未迎来GPT-3时刻，行业需转向实证驱动。"
+         "真正被冲击的是劣质产品亿元布局AI。", "每日经济新闻"),
+        ("-2026中国饭店业高质量大会在三亚开幕",
+         "开幕式上，中国饭店协会会长围绕行业品牌建设发表致辞。", "中新网"),
+        ("秋日古籍展在图书馆延时开放 市民可预约参观",
+         "市图书馆推出秋季古籍特展，多处阅读空间同步延时开放。"
+         "市民可通过公众号预约。", "工人日报"),
+        ("今日小雪各地降温",
+         "今日小雪各地降温天气提醒都视频北京日报客户端站点提示！"
+         "美股收盘指数波动，居民需注意添衣。", "北京日报"),
+    ]
+    for t, a, s in bad:
+        assert not (title_abstract_correspondence(t, a)[0]
+                    and public_interest(t, a, s)[0]), t[:28]
+    good = [
+        ("工作没着落，租房太早、酒店太贵？这些青年驿站懂你",
+         "新华社贵阳11月24日电 共享办公区，创业青年对着电脑讨论项目思路。"
+         "咖啡休闲区，毕业生凑在一起交流面试信息。", "新华网"),
+        ("呼吸道疾病进入高发季 儿童什么时候需要就医",
+         "新华社长沙11月24日电 进入冬季，呼吸道疾病进入高发期。"
+         "一些家长面对孩子发烧、咳嗽容易紧张。", "中新网"),
+        ("全国大部雨雪稀少迎回暖 最高气温20℃线将北抬至河北一带",
+         "今明天我国雨雪范围明显收缩，后天起大部地区以晴朗干燥天气为主。"
+         "监测显示，昨日云南南部出现大到暴雨。", "新华网"),
+    ]
+    for t, a, s in good:
+        assert title_abstract_correspondence(t, a)[0], t[:24]
+        assert public_interest(t, a, s)[0], t[:24]
+    # 台账挂名在候选池层就被剥掉，绝不出现在来源列
+    it = Item("冷空气持续影响 广东最低气温降至10.3℃",
+              "　　中新网广州11月25日电 在冷空气持续影响下。"
+              "\n　　广东多地24日白天到25日白天出现降雨。", "工信部（清单§3）")
+    kept, edge = pool_filter([it], None)
+    assert kept and "清单§" not in kept[0].sources
+    assert normalize_source("工信部（清单§3）") == "工信部"
+    assert MIN_SHARED_BIGRAMS >= 2 and "MAX_PLATFORMS_PER_ITEM" not in (
+        Path(__file__).resolve().parents[1] / "newsbrief" / "editorial.py"
+    ).read_text(encoding="utf-8")
