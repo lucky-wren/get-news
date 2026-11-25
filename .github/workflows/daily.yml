@@ -1,0 +1,169 @@
+name: daily-newsbrief
+
+on:
+  schedule:
+    - cron: '0 12 * * *'          # UTC 12:00 = Asia/Shanghai 20:00
+  workflow_dispatch:
+    inputs:
+      window_start:
+        description: '窗口左端 YYYY-MM-DD HH:MM（Asia/Shanghai，左开；留空用默认昨 20:00）'
+        required: false
+        default: ''
+      window_end:
+        description: '窗口右端 YYYY-MM-DD HH:MM（Asia/Shanghai，右闭；留空用默认今 20:00）'
+        required: false
+        default: ''
+
+# 同一时刻只允许一个 Pages 部署，且不打断正在跑的那次
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write             # 提交 docs/ 与固定下载地址
+      actions: read               # deploy-pages@v4 读取 artifact 元数据需要
+      pages: read                 # configure-pages / Pages 站点守卫步骤需要
+    steps:
+      - uses: actions/checkout@v4
+      - name: 清理旧版残留文件
+        run: |
+          # 旧版中文名说明文件 / 旧模块会让「交付包 ASCII」自检与 pytest 收集红。
+          # 新版已改 DELIVERY_NOTES.md，这里兜底删掉仓库历史里可能残留的旧名。
+          for f in "交付说明.md" "test_contract.py" "contract.py" "quality.py" "workbook.py"; do
+            find . -name "$f" -not -path "./.git/*" -print -delete
+          done
+          test -f DELIVERY_NOTES.md || {
+            echo "::error::DELIVERY_NOTES.md 缺失，请用最新包重新运行 deploy.bat"
+            exit 1
+          }
+          echo "工作区残留已清理"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: 安装依赖
+        run: pip install -e ".[dev,extract]"
+      - name: 规范化 deploy.bat 换行
+        # actions/checkout 在 Linux runner 上做文本规范化会把 bat 变成纯 LF。
+        # 复用 deploy.normalize_deploy_bat（与推送前同一份逻辑）转回 CRLF，
+        # 不依赖 .gitattributes 是否已在远端生效。改文件，不是放宽断言。
+        run: python -c "import deploy; deploy.normalize_deploy_bat()"
+      - name: 零网络自检
+        run: pytest -q
+      - name: 采集并出表
+        env:
+          WINDOW_START: ${{ inputs.window_start }}
+          WINDOW_END: ${{ inputs.window_end }}
+        run: |
+          set -e
+          args=(--mode live)
+          # 页面「时间窗口设置」里填的起止值，通过 Run workflow 的 inputs 传到这里，
+          # 由 CLI 的时间窗口硬闸执行「只采集窗口内数据」。
+          if [ -n "$WINDOW_START" ]; then args+=(--window-start "$WINDOW_START"); fi
+          if [ -n "$WINDOW_END" ]; then args+=(--window-end "$WINDOW_END"); fi
+          echo "运行参数: ${args[*]}"
+          python -m newsbrief "${args[@]}"
+      - name: 成品质量硬验（出表后）
+        run: python verify_package.py
+      - name: 上传当期产物
+        if: always()              # Excel 备份；注意它叫 daily-news，不是 Pages 产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-news
+          path: output/*.xlsx
+          retention-days: 7
+          if-no-files-found: warn
+      - name: 提交固定下载地址与页面
+        if: success()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/
+          if git diff --cached --quiet; then
+            echo "本轮产物与上一版相同，跳过提交"
+          else
+            git commit -m "chore: daily brief $(date +%F)"
+            git push origin HEAD:main
+          fi
+      - name: 校验 Pages 产物目录
+        run: |
+          test -f docs/index.html || { echo "::error::docs/index.html 缺失，Pages 产物为空"; exit 1; }
+          test -f docs/news-data.js || { echo "::error::docs/news-data.js 缺失"; exit 1; }
+          echo "docs/ 文件数: $(find docs -type f | wc -l)"
+      - name: 检查 Pages 站点已启用（GitHub Actions 源）
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          # 截图 43：configure-pages@v5 只 GET /repos/{owner}/{repo}/pages，
+          # 站点从未创建过就返回 404 "Get Pages site failed"。默认 GITHUB_TOKEN
+          # 没有 administration 作用域，enablement: true 也只会把它换成
+          # "Create Pages site failed. Resource not accessible by integration"。
+          # 所以 deploy.bat 用用户自己的 Token 负责一次性创建；这里只做守卫，
+          # 让「有人绕过 deploy.bat 直接推代码」时给出人话而不是英文 404。
+          bt=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq .build_type 2>/dev/null) || {
+            echo "::error::GitHub Pages 站点尚未启用（GET /pages 返回 404）。"
+            echo "::error::用最新 deploy.bat 重新部署一次即可自动创建；或执行 gh api -X POST repos/$GITHUB_REPOSITORY/pages -f build_type=workflow；或网页 Settings → Pages → Source 选 GitHub Actions。"
+            exit 1
+          }
+          if [ "$bt" != "workflow" ]; then
+            echo "::error::Pages 来源是 $bt，不是 GitHub Actions；请在 Settings → Pages 把 Source 改成 GitHub Actions，或用 gh api -X PUT repos/$GITHUB_REPOSITORY/pages -f build_type=workflow。"
+            exit 1
+          fi
+          echo "Pages 站点已就绪：build_type=$bt"
+      - name: 配置 Pages
+        # 不加 enablement: true：默认 GITHUB_TOKEN 无 administration:write，
+        # 加了反而报 Create Pages site failed（见上一步注释）。
+        uses: actions/configure-pages@v5
+      - name: 上传 Pages 产物
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: github-pages      # deploy-pages@v4 按这个名字找，必须完全一致
+          path: docs              # 目录内容直接位于站点根，不能再套一层目录
+
+  # 官方推荐：上传与部署拆成两个 job，用 needs 串联（artifact 在同一 run 内共享）。
+  # 这样部署失败时只需重跑 deploy，不必重跑 20 分钟的采集与出表。
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+      actions: read
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 等待 github-pages artifact 可见
+        run: |
+          # deploy-pages 偶发 "Fetching artifact metadata failed"：artifact 刚上传
+          # 时元数据 API 存在最终一致性延迟，这里轮询到可见再放行。
+          for i in $(seq 1 12); do
+            n=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts" \
+                 --jq '[.artifacts[] | select(.name=="github-pages" and .expired==false)] | length' \
+                 2>/dev/null || echo 0)
+            if [ "$n" -ge 1 ]; then
+              echo "github-pages artifact 已可见（第 $i 次探测，数量 $n）"
+              if [ "$n" -gt 1 ]; then
+                echo "::warning::同一次 run 存在多个同名 artifact（多见于 Re-run jobs），必要时到 Actions 页删除旧的"
+              fi
+              exit 0
+            fi
+            echo "第 $i 次未可见，10s 后重试"
+            sleep 10
+          done
+          echo "::error::12 次探测仍未见 github-pages artifact，请检查 build job 的「上传 Pages 产物」步骤"
+          exit 1
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: 部署 Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages

@@ -1,0 +1,4 @@
+# Windows batch files MUST be CRLF in the working tree on EVERY platform.
+# Without this, Git text normalization (actions/checkout on Linux sets
+# core.autocrlf=input) turns deploy.bat into bare LF and cmd.exe breaks.
+*.bat text eol=crlf

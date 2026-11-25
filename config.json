@@ -1,0 +1,27 @@
+{
+  "network": {
+    "timeout_seconds": 6,
+    "html_articles_per_endpoint": 4,
+    "endpoint_seconds": 12,
+    "body_enrich_limit": 120,
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "enrich_budget_seconds": 60,
+    "total_budget_seconds": 300,
+    "concurrent_endpoints": 16
+  },
+  "limits": {
+    "max_main_items": 50,
+    "abstract_net_chars": 100
+  },
+  "output": {
+    "dir": "output",
+    "latest": "docs/downloads/latest.xlsx"
+  },
+  "rules": {
+    "strict": "strict",
+    "h_channel_closed": true,
+    "story_dedup": true,
+    "story_max_keep": 1,
+    "orchestrate": true
+  }
+}

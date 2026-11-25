@@ -1,0 +1,31 @@
+[project]
+name = "newsbrief"
+version = "2.0.0"
+description = "每日 20:00 大众向要闻简报：31 类注册表采集 → 5 表 12 列 xlsx"
+requires-python = ">=3.10"
+dependencies = [
+  "feedparser==6.0.11",
+  "httpx==0.28.1",
+  "openpyxl==3.1.5",
+]
+
+[project.optional-dependencies]
+extract = ["trafilatura==1.12.2"]
+dev = ["pytest==8.3.5", "PyYAML==6.0.2"]
+
+[project.scripts]
+newsbrief = "newsbrief.__main__:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["newsbrief*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+pythonpath = ["."]
+filterwarnings = ["ignore:SOCKS support in urllib3.*"]

@@ -1,0 +1,1270 @@
+{
+  "version": "4.0",
+  "scope": "31 类精细端点；《资讯渠道清单》503 URL 与社交平台 16 个端点均由 registry 运行时从 data/ 下台账全量展开（NewsNow 单一真值源 + 构建期展开），不按本环境 403 裁剪，也不把清单静态塞进本文件。",
+  "groups": [
+    {
+      "id": 1,
+      "board": "官方一手源",
+      "name": "中央政务部委总表",
+      "endpoints": [
+        {
+          "name": "中国政府网·要闻",
+          "url": "https://www.gov.cn/yaowen/liebiao/",
+          "type": "html"
+        },
+        {
+          "name": "中国政府网·最新政策",
+          "url": "https://www.gov.cn/zhengce/zuixin/",
+          "type": "html"
+        },
+        {
+          "name": "央视网·要闻 JSONP",
+          "url": "https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/news_1.jsonp?cb=cb",
+          "type": "jsonp",
+          "pages": 2,
+          "max_items": 160
+        },
+        {
+          "name": "外交部",
+          "url": "https://www.fmprc.gov.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 3,
+          "catalog_board": "中央政务部委总表",
+          "max_articles": 6
+        },
+        {
+          "name": "教育部",
+          "url": "https://www.moe.gov.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 3,
+          "catalog_board": "中央政务部委总表",
+          "max_articles": 6
+        },
+        {
+          "name": "自然资源部",
+          "url": "https://www.mnr.gov.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 3,
+          "catalog_board": "中央政务部委总表",
+          "max_articles": 6
+        },
+        {
+          "name": "生态环境部",
+          "url": "https://www.mee.gov.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 3,
+          "catalog_board": "中央政务部委总表",
+          "max_articles": 6
+        },
+        {
+          "name": "住建部",
+          "url": "https://www.mohurd.gov.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 3,
+          "catalog_board": "中央政务部委总表",
+          "max_articles": 6
+        },
+        {
+          "name": "农业农村部",
+          "url": "https://www.moa.gov.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 3,
+          "catalog_board": "中央政务部委总表",
+          "max_articles": 6
+        },
+        {
+          "name": "商务部",
+          "url": "https://www.mofcom.gov.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 3,
+          "catalog_board": "中央政务部委总表",
+          "max_articles": 6
+        },
+        {
+          "name": "中国人民银行",
+          "url": "https://www.pbc.gov.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 3,
+          "catalog_board": "中央政务部委总表",
+          "max_articles": 6
+        },
+        {
+          "name": "审计署",
+          "url": "https://www.audit.gov.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 3,
+          "catalog_board": "中央政务部委总表",
+          "max_articles": 6
+        },
+        {
+          "name": "广电总局",
+          "url": "https://www.nrta.gov.cn/",
+          "type": "html",
+          "level": "☆",
+          "catalog_sec": 3,
+          "catalog_board": "中央政务部委总表",
+          "max_articles": 6
+        },
+        {
+          "name": "国家体育总局",
+          "url": "https://www.sport.gov.cn/",
+          "type": "html",
+          "level": "✗",
+          "catalog_sec": 3,
+          "catalog_board": "中央政务部委总表",
+          "max_articles": 6
+        },
+        {
+          "name": "国家粮食和物资储备局",
+          "url": "https://www.lswz.gov.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 3,
+          "catalog_board": "中央政务部委总表",
+          "max_articles": 6
+        },
+        {
+          "name": "国家林草局",
+          "url": "https://www.forestry.gov.cn/",
+          "type": "html",
+          "level": "✗",
+          "catalog_sec": 3,
+          "catalog_board": "中央政务部委总表",
+          "max_articles": 6
+        },
+        {
+          "name": "国家网信办",
+          "url": "https://www.cac.gov.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 3,
+          "catalog_board": "中央政务部委总表",
+          "max_articles": 6
+        },
+        {
+          "name": "国家疾控局",
+          "url": "https://www.ndcpa.gov.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 3,
+          "catalog_board": "中央政务部委总表",
+          "max_articles": 6
+        },
+        {
+          "name": "中国证监会",
+          "url": "https://www.csrc.gov.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 3,
+          "catalog_board": "中央政务部委总表",
+          "max_articles": 6
+        },
+        {
+          "name": "中国气象局",
+          "url": "https://www.cma.gov.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 3,
+          "catalog_board": "中央政务部委总表",
+          "max_articles": 6
+        },
+        {
+          "name": "中国地震局",
+          "url": "https://www.cea.gov.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 3,
+          "catalog_board": "中央政务部委总表",
+          "max_articles": 6
+        },
+        {
+          "name": "国家信访局",
+          "url": "https://www.gjxfj.gov.cn/",
+          "type": "html",
+          "level": "☆",
+          "catalog_sec": 3,
+          "catalog_board": "中央政务部委总表",
+          "max_articles": 6
+        },
+        {
+          "name": "中国社会科学院",
+          "url": "https://www.cass.cn/",
+          "type": "html",
+          "level": "☆",
+          "catalog_sec": 3,
+          "catalog_board": "中央政务部委总表",
+          "max_articles": 6
+        },
+        {
+          "name": "国家版权局",
+          "url": "https://www.ncac.gov.cn/",
+          "type": "html",
+          "level": "☆",
+          "catalog_sec": 3,
+          "catalog_board": "中央政务部委总表",
+          "max_articles": 6
+        }
+      ],
+      "note": "替换 403 的 zhengce/index.htm；CCTV JSONP 当天 80 条/页带秒级 focus_date 与正文 brief"
+    },
+    {
+      "id": 2,
+      "board": "官方一手源",
+      "name": "政策原文与法规库",
+      "endpoints": [
+        {
+          "name": "国务院政策文件（最新）",
+          "url": "https://www.gov.cn/zhengce/zuixin/",
+          "type": "html"
+        },
+        {
+          "name": "央视网·政策要闻 JSONP",
+          "url": "https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/news_2.jsonp?cb=cb",
+          "type": "jsonp",
+          "pages": 1,
+          "max_items": 80
+        },
+        {
+          "name": "中国政府网",
+          "url": "https://www.gov.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 2,
+          "catalog_board": "政策原文与法规库",
+          "max_articles": 6
+        }
+      ],
+      "note": "政策原文；标题月日不作发布时间，以 JSONP focus_date / 原文 meta 为准"
+    },
+    {
+      "id": 3,
+      "board": "官方一手源",
+      "name": "纪检监察司法与破产",
+      "endpoints": [
+        {
+          "name": "人民法院公告网",
+          "url": "https://rmfygg.court.gov.cn/",
+          "type": "html"
+        },
+        {
+          "name": "央视网·法治 JSONP",
+          "url": "https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/law_1.jsonp?cb=cb",
+          "type": "jsonp",
+          "pages": 1,
+          "max_items": 80
+        },
+        {
+          "name": "最高人民检察院",
+          "url": "https://www.spp.gov.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 4,
+          "catalog_board": "纪检监察、司法与破产",
+          "max_articles": 6
+        },
+        {
+          "name": "全国企业破产重整案件信息网",
+          "url": "https://pccz.court.gov.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 4,
+          "catalog_board": "纪检监察、司法与破产",
+          "max_articles": 6
+        },
+        {
+          "name": "中国裁判文书网",
+          "url": "https://wenshu.court.gov.cn/",
+          "type": "html",
+          "level": "☆",
+          "catalog_sec": 4,
+          "catalog_board": "纪检监察、司法与破产",
+          "max_articles": 6
+        },
+        {
+          "name": "中国庭审公开网",
+          "url": "https://tingshen.court.gov.cn/",
+          "type": "html",
+          "level": "✗",
+          "catalog_sec": 4,
+          "catalog_board": "纪检监察、司法与破产",
+          "max_articles": 6
+        },
+        {
+          "name": "中国执行信息公开网",
+          "url": "https://zxgk.court.gov.cn/",
+          "type": "html",
+          "level": "☆",
+          "catalog_sec": 4,
+          "catalog_board": "纪检监察、司法与破产",
+          "max_articles": 6
+        },
+        {
+          "name": "12309 检察服务中心",
+          "url": "https://www.12309.gov.cn/",
+          "type": "html",
+          "level": "✗",
+          "catalog_sec": 4,
+          "catalog_board": "纪检监察、司法与破产",
+          "max_articles": 6
+        },
+        {
+          "name": "中国法律服务网",
+          "url": "https://www.12348.gov.cn/",
+          "type": "html",
+          "level": "☆",
+          "catalog_sec": 4,
+          "catalog_board": "纪检监察、司法与破产",
+          "max_articles": 6
+        },
+        {
+          "name": "中国社会组织政务服务平台",
+          "url": "https://chinanpo.mca.gov.cn/",
+          "type": "html",
+          "level": "☆",
+          "catalog_sec": 4,
+          "catalog_board": "纪检监察、司法与破产",
+          "max_articles": 6
+        }
+      ],
+      "note": "破产主体须可核对规模，否则只留痕；公告/下载类锚文本由 html 采集器拒绝"
+    },
+    {
+      "id": 4,
+      "board": "官方一手源",
+      "name": "上市公司公告与披露",
+      "endpoints": [
+        {
+          "name": "上交所",
+          "url": "http://www.sse.com.cn/",
+          "type": "html"
+        },
+        {
+          "name": "东方财富",
+          "url": "https://www.eastmoney.com/",
+          "type": "html"
+        },
+        {
+          "name": "同花顺",
+          "url": "https://www.10jqka.com.cn/",
+          "type": "html"
+        },
+        {
+          "name": "巨潮资讯网",
+          "url": "https://www.cninfo.com.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 5,
+          "catalog_board": "上市公司公告与资本市场披露",
+          "max_articles": 6
+        },
+        {
+          "name": "上海证券交易所",
+          "url": "https://www.sse.com.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 5,
+          "catalog_board": "上市公司公告与资本市场披露",
+          "max_articles": 6
+        },
+        {
+          "name": "港交所披露易",
+          "url": "https://www.hkexnews.hk/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 5,
+          "catalog_board": "上市公司公告与资本市场披露",
+          "max_articles": 6
+        },
+        {
+          "name": "上海期货交易所",
+          "url": "https://www.shfe.com.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 5,
+          "catalog_board": "上市公司公告与资本市场披露",
+          "max_articles": 6
+        },
+        {
+          "name": "中国金融期货交易所",
+          "url": "http://www.cffex.com.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 5,
+          "catalog_board": "上市公司公告与资本市场披露",
+          "max_articles": 6
+        },
+        {
+          "name": "中国外汇交易中心",
+          "url": "https://www.chinamoney.com.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 5,
+          "catalog_board": "上市公司公告与资本市场披露",
+          "max_articles": 6
+        },
+        {
+          "name": "中国银行间市场交易商协会",
+          "url": "https://www.nafmii.org.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 5,
+          "catalog_board": "上市公司公告与资本市场披露",
+          "max_articles": 6
+        }
+      ],
+      "note": "公告列表按窗口倒排"
+    },
+    {
+      "id": 5,
+      "board": "官方一手源",
+      "name": "信用与主体登记",
+      "endpoints": [
+        {
+          "name": "市场监管总局",
+          "url": "https://www.samr.gov.cn/",
+          "type": "html"
+        }
+      ],
+      "note": "主体核验入口，不作为新闻成稿源；creditchina 412 未取得"
+    },
+    {
+      "id": 6,
+      "board": "官方一手源",
+      "name": "地方政府与债务",
+      "endpoints": [
+        {
+          "name": "国家统计局",
+          "url": "https://www.stats.gov.cn/",
+          "type": "html"
+        },
+        {
+          "name": "国家税务总局",
+          "url": "https://www.chinatax.gov.cn/",
+          "type": "html"
+        },
+        {
+          "name": "全国公共资源交易平台",
+          "url": "https://www.ggzy.gov.cn/",
+          "type": "html",
+          "level": "☆",
+          "catalog_sec": 6,
+          "catalog_board": "地方政府与债务",
+          "max_articles": 6
+        }
+      ],
+      "note": "地方债数据口径需并列标注；celma 403 未取得，改由统计/税务口径补位"
+    },
+    {
+      "id": 7,
+      "board": "官方一手源",
+      "name": "食品安全与产品质量",
+      "endpoints": [
+        {
+          "name": "国家医保局",
+          "url": "https://www.nhsa.gov.cn/",
+          "type": "html"
+        },
+        {
+          "name": "市场监管总局",
+          "url": "https://www.samr.gov.cn/",
+          "type": "html"
+        },
+        {
+          "name": "FDA",
+          "url": "https://www.ema.europa.eu/",
+          "type": "html",
+          "level": "☆",
+          "catalog_sec": 9,
+          "catalog_board": "医疗、医药与公共卫生",
+          "max_articles": 6
+        },
+        {
+          "name": "FDA",
+          "url": "https://www.pmda.go.jp/",
+          "type": "html",
+          "level": "☆",
+          "catalog_sec": 9,
+          "catalog_board": "医疗、医药与公共卫生",
+          "max_articles": 6
+        },
+        {
+          "name": "欧洲疾控中心 ECDC",
+          "url": "https://www.ecdc.europa.eu/",
+          "type": "html",
+          "level": "☆",
+          "catalog_sec": 9,
+          "catalog_board": "医疗、医药与公共卫生",
+          "max_articles": 6
+        },
+        {
+          "name": "日本厚生劳动省",
+          "url": "https://www.mhlw.go.jp/",
+          "type": "html",
+          "level": "☆",
+          "catalog_sec": 9,
+          "catalog_board": "医疗、医药与公共卫生",
+          "max_articles": 6
+        },
+        {
+          "name": "国家标准全文公开系统",
+          "url": "https://www.sac.gov.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 20,
+          "catalog_board": "市场监管、知识产权与标准",
+          "max_articles": 6
+        }
+      ],
+      "note": "抽检/召回属即时可行动信息；nmpa 412 未取得"
+    },
+    {
+      "id": 8,
+      "board": "官方一手源",
+      "name": "气象灾害应急",
+      "endpoints": [
+        {
+          "name": "应急管理部",
+          "url": "https://www.mem.gov.cn/",
+          "type": "html"
+        },
+        {
+          "name": "央视网·社会 JSONP",
+          "url": "https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/society_1.jsonp?cb=cb",
+          "type": "jsonp",
+          "pages": 2,
+          "max_items": 160
+        },
+        {
+          "name": "各省气象局与 12379 分站",
+          "url": "https://he.cma.gov.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 17,
+          "catalog_board": "气象、灾害与应急",
+          "max_articles": 6
+        },
+        {
+          "name": "NOAA",
+          "url": "https://www.noaa.gov/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 17,
+          "catalog_board": "气象、灾害与应急",
+          "max_articles": 6
+        },
+        {
+          "name": "美国国家气象局 NWS",
+          "url": "https://www.weather.gov/",
+          "type": "html",
+          "level": "☆",
+          "catalog_sec": 17,
+          "catalog_board": "气象、灾害与应急",
+          "max_articles": 6
+        },
+        {
+          "name": "美国海啸预警中心",
+          "url": "https://www.tsunami.gov/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 17,
+          "catalog_board": "气象、灾害与应急",
+          "max_articles": 6
+        },
+        {
+          "name": "日本气象厅 JMA",
+          "url": "https://www.jma.go.jp/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 17,
+          "catalog_board": "气象、灾害与应急",
+          "max_articles": 6
+        },
+        {
+          "name": "美国联邦航空局 FAA",
+          "url": "https://www.faa.gov/",
+          "type": "html",
+          "level": "☆",
+          "catalog_sec": 17,
+          "catalog_board": "气象、灾害与应急",
+          "max_articles": 6
+        }
+      ],
+      "note": "ceic / nmc / weather.com.cn 均 403，改由应急管理部与 CCTV 社会稿覆盖；震级时间以权威通报为准"
+    },
+    {
+      "id": 9,
+      "board": "官方一手源",
+      "name": "金融监管风险处置",
+      "endpoints": [
+        {
+          "name": "中国人民银行",
+          "url": "http://www.pbc.gov.cn/",
+          "type": "html"
+        },
+        {
+          "name": "证监会·新闻",
+          "url": "http://www.csrc.gov.cn/csrc/c100028/common_list.shtml",
+          "type": "html"
+        },
+        {
+          "name": "国家外汇管理局",
+          "url": "https://www.safe.gov.cn/",
+          "type": "html"
+        }
+      ],
+      "note": "政策变动/风险处置成稿"
+    },
+    {
+      "id": 10,
+      "board": "官方一手源",
+      "name": "海关外贸跨境",
+      "endpoints": [
+        {
+          "name": "国家外汇管理局",
+          "url": "https://www.safe.gov.cn/",
+          "type": "html"
+        },
+        {
+          "name": "国家统计局",
+          "url": "https://www.stats.gov.cn/",
+          "type": "html"
+        }
+      ],
+      "note": "海关总署 412 未取得；与普通人无关的行业动态剔"
+    },
+    {
+      "id": 11,
+      "board": "民生与行业",
+      "name": "物价与民生消费",
+      "endpoints": [
+        {
+          "name": "国家发改委价格监测",
+          "url": "https://www.ndrc.gov.cn/",
+          "type": "html"
+        },
+        {
+          "name": "农业农村部",
+          "url": "http://www.moa.gov.cn/",
+          "type": "html"
+        },
+        {
+          "name": "化肥农药与农资",
+          "url": "https://www.chinacoop.gov.cn/",
+          "type": "html",
+          "level": "☆",
+          "catalog_sec": 22,
+          "catalog_board": "农业、粮食与乡村",
+          "max_articles": 6
+        }
+      ],
+      "note": "逐日报价、油价、菜价属正面清单"
+    },
+    {
+      "id": 12,
+      "board": "民生与行业",
+      "name": "就业社保劳动关系",
+      "endpoints": [
+        {
+          "name": "教育部",
+          "url": "http://www.moe.gov.cn/",
+          "type": "html"
+        },
+        {
+          "name": "民政部",
+          "url": "https://www.mca.gov.cn/",
+          "type": "html"
+        },
+        {
+          "name": "央视网·教育 JSONP",
+          "url": "https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/edu_1.jsonp?cb=cb",
+          "type": "jsonp",
+          "pages": 1,
+          "max_items": 80
+        },
+        {
+          "name": "人民网·时政",
+          "url": "http://politics.people.com.cn/GB/1024/index.html",
+          "type": "html"
+        },
+        {
+          "name": "老龄协会",
+          "url": "https://www.cncaprc.gov.cn/",
+          "type": "html",
+          "level": "☆",
+          "catalog_sec": 24,
+          "catalog_board": "教育、人口与养老",
+          "max_articles": 6
+        },
+        {
+          "name": "中国教育考试网",
+          "url": "https://www.neea.edu.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 24,
+          "catalog_board": "教育、人口与养老",
+          "max_articles": 6
+        }
+      ],
+      "note": "欠薪/社保/辟谣属即时可行动信息；央视网教育 JSONP 实测 200（173 条）已接入"
+    },
+    {
+      "id": 13,
+      "board": "民生与行业",
+      "name": "工厂制造业供应链",
+      "endpoints": [
+        {
+          "name": "工信部",
+          "url": "https://www.miit.gov.cn/",
+          "type": "html"
+        },
+        {
+          "name": "国家能源局",
+          "url": "https://www.nea.gov.cn/",
+          "type": "html"
+        },
+        {
+          "name": "OPEC",
+          "url": "https://www.eia.gov/",
+          "type": "html",
+          "level": "☆",
+          "catalog_sec": 15,
+          "catalog_board": "能源、电力与油气",
+          "max_articles": 6
+        }
+      ],
+      "note": "裁员/停产/供应链中断成稿；cpnn 403 未取得"
+    },
+    {
+      "id": 14,
+      "board": "民生与行业",
+      "name": "交通出行物流",
+      "endpoints": [
+        {
+          "name": "交通运输部",
+          "url": "https://www.mot.gov.cn/",
+          "type": "html"
+        },
+        {
+          "name": "国家邮政局",
+          "url": "https://www.spb.gov.cn/",
+          "type": "html"
+        }
+      ],
+      "note": "高速管制/停运/限行一律保留；12306 403 未取得"
+    },
+    {
+      "id": 15,
+      "board": "民生与行业",
+      "name": "文旅消费社会议题",
+      "endpoints": [
+        {
+          "name": "光明网",
+          "url": "https://www.gmw.cn/",
+          "type": "html"
+        }
+      ],
+      "note": "文旅部未探测；小众粉丝向内容不通过"
+    },
+    {
+      "id": 16,
+      "board": "民生与行业",
+      "name": "地方媒体与政务发布",
+      "endpoints": [
+        {
+          "name": "人民网",
+          "url": "http://www.people.com.cn/",
+          "type": "html"
+        },
+        {
+          "name": "腾讯新闻",
+          "url": "https://news.qq.com/",
+          "type": "html"
+        },
+        {
+          "name": "中国日报中文网",
+          "url": "https://cn.chinadaily.com.cn/",
+          "type": "html"
+        },
+        {
+          "name": "临沂市人民政府",
+          "url": "https://www.linyi.gov.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 27,
+          "catalog_board": "地方与区域媒体",
+          "max_articles": 6
+        }
+      ],
+      "note": "北京日报 / 四川观察 403 未取得；地方发布逐条回查独立原文"
+    },
+    {
+      "id": 17,
+      "board": "民生与行业",
+      "name": "行业垂直与科研",
+      "endpoints": [
+        {
+          "name": "中国科学院",
+          "url": "https://www.cas.cn/",
+          "type": "html"
+        },
+        {
+          "name": "科技部",
+          "url": "https://www.nsfc.gov.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 13,
+          "catalog_board": "科技、互联网与 AI",
+          "max_articles": 6
+        },
+        {
+          "name": "中国工程院",
+          "url": "https://www.cae.cn/",
+          "type": "html",
+          "level": "☆",
+          "catalog_sec": 13,
+          "catalog_board": "科技、互联网与 AI",
+          "max_articles": 6
+        },
+        {
+          "name": "arXiv",
+          "url": "https://arxiv.org/",
+          "type": "html",
+          "level": "☆",
+          "catalog_sec": 13,
+          "catalog_board": "科技、互联网与 AI",
+          "max_articles": 6
+        }
+      ],
+      "note": "论文/学术预告不计入大众要闻，见 F5 噪声"
+    },
+    {
+      "id": 18,
+      "board": "民生与行业",
+      "name": "交易所行情与指数",
+      "endpoints": [
+        {
+          "name": "上交所",
+          "url": "http://www.sse.com.cn/",
+          "type": "html"
+        },
+        {
+          "name": "东方财富",
+          "url": "https://www.eastmoney.com/",
+          "type": "html"
+        }
+      ],
+      "note": "单日涨跌不构成新闻，除非影响大范围人群"
+    },
+    {
+      "id": 19,
+      "board": "民生与行业",
+      "name": "智库高校与会议",
+      "endpoints": [],
+      "note": "未接入：会务预热、内部评优一律剔"
+    },
+    {
+      "id": 20,
+      "board": "港澳台侨务",
+      "name": "港澳台侨务",
+      "endpoints": [
+        {
+          "name": "香港特区政府",
+          "url": "https://www.gov.hk/",
+          "type": "html"
+        },
+        {
+          "name": "大公文汇",
+          "url": "https://www.tkww.hk/",
+          "type": "html"
+        },
+        {
+          "name": "澳门特区政府",
+          "url": "https://www.gov.mo/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 26,
+          "catalog_board": "港澳台与侨务",
+          "max_articles": 6
+        },
+        {
+          "name": "国台办",
+          "url": "https://www.gwytb.gov.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 26,
+          "catalog_board": "港澳台与侨务",
+          "max_articles": 6
+        },
+        {
+          "name": "国台办",
+          "url": "https://www.hmo.gov.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 26,
+          "catalog_board": "港澳台与侨务",
+          "max_articles": 6
+        }
+      ],
+      "note": "tkww 403 本轮未取得；港澳台稿件统一繁→简归一，独立成类不并入国际"
+    },
+    {
+      "id": 21,
+      "board": "国际",
+      "name": "国际一手通报",
+      "endpoints": [
+        {
+          "name": "新华网国际",
+          "url": "http://www.xinhuanet.com/world/",
+          "type": "html"
+        },
+        {
+          "name": "央视网·国际 JSONP",
+          "url": "https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/world_1.jsonp?cb=cb",
+          "type": "jsonp",
+          "pages": 2,
+          "max_items": 160
+        },
+        {
+          "name": "外交部",
+          "url": "https://www.mfa.gov.cn/",
+          "type": "html"
+        },
+        {
+          "name": "新华网",
+          "url": "http://www.news.cn/",
+          "type": "html"
+        }
+      ],
+      "note": "使馆页需逐馆枚举；CCTV 国际每页 80 条带秒级时间与导语"
+    },
+    {
+      "id": 22,
+      "board": "国际",
+      "name": "国际结构化数据源",
+      "endpoints": [
+        {
+          "name": "USGS 地震 GeoJSON",
+          "url": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_day.geojson",
+          "type": "geojson"
+        }
+      ],
+      "note": "仅重大浅源地震；GDACS 403 且返回 JS 壳，已移除不再灌入候选池"
+    },
+    {
+      "id": 23,
+      "board": "媒体传播层",
+      "name": "央媒与门户",
+      "endpoints": [
+        {
+          "name": "央视网·要闻",
+          "url": "https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/news_1.jsonp?cb=cb",
+          "type": "jsonp",
+          "pages": 3,
+          "max_items": 240
+        },
+        {
+          "name": "央视网·国内",
+          "url": "https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/china_1.jsonp?cb=cb",
+          "type": "jsonp",
+          "pages": 2,
+          "max_items": 160
+        },
+        {
+          "name": "央视网·国际",
+          "url": "https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/world_1.jsonp?cb=cb",
+          "type": "jsonp",
+          "pages": 2,
+          "max_items": 160
+        },
+        {
+          "name": "央视网·社会",
+          "url": "https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/society_1.jsonp?cb=cb",
+          "type": "jsonp",
+          "pages": 2,
+          "max_items": 160
+        },
+        {
+          "name": "央视网·法治",
+          "url": "https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/law_1.jsonp?cb=cb",
+          "type": "jsonp",
+          "pages": 1,
+          "max_items": 80
+        },
+        {
+          "name": "央视网·健康",
+          "url": "https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/health_1.jsonp?cb=cb",
+          "type": "jsonp",
+          "pages": 1,
+          "max_items": 80
+        },
+        {
+          "name": "央视网·科技",
+          "url": "https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/tech_1.jsonp?cb=cb",
+          "type": "jsonp",
+          "pages": 1,
+          "max_items": 80
+        },
+        {
+          "name": "央视网·文娱",
+          "url": "https://news.cctv.com/2019/07/gaiban/cmsdatainterface/page/ent_1.jsonp?cb=cb",
+          "type": "jsonp",
+          "pages": 1,
+          "max_items": 80
+        },
+        {
+          "name": "中新网·importnews",
+          "url": "https://www.chinanews.com.cn/rss/importnews.xml",
+          "type": "rss"
+        },
+        {
+          "name": "中新网·scroll-news",
+          "url": "https://www.chinanews.com.cn/rss/scroll-news.xml",
+          "type": "rss"
+        },
+        {
+          "name": "中新网·society",
+          "url": "https://www.chinanews.com.cn/rss/society.xml",
+          "type": "rss"
+        },
+        {
+          "name": "中新网·finance",
+          "url": "https://www.chinanews.com.cn/rss/finance.xml",
+          "type": "rss"
+        },
+        {
+          "name": "中新网·world",
+          "url": "https://www.chinanews.com.cn/rss/world.xml",
+          "type": "rss"
+        },
+        {
+          "name": "中新网·china",
+          "url": "https://www.chinanews.com.cn/rss/china.xml",
+          "type": "rss"
+        },
+        {
+          "name": "中新网·sports",
+          "url": "https://www.chinanews.com.cn/rss/sports.xml",
+          "type": "rss"
+        },
+        {
+          "name": "中新网·edu",
+          "url": "https://www.chinanews.com.cn/rss/edu.xml",
+          "type": "rss"
+        },
+        {
+          "name": "中新网·health",
+          "url": "https://www.chinanews.com.cn/rss/health.xml",
+          "type": "rss"
+        },
+        {
+          "name": "中新网·life",
+          "url": "https://www.chinanews.com.cn/rss/life.xml",
+          "type": "rss"
+        },
+        {
+          "name": "中新网·photo",
+          "url": "https://www.chinanews.com.cn/rss/photo.xml",
+          "type": "rss"
+        },
+        {
+          "name": "中新网·video",
+          "url": "https://www.chinanews.com.cn/rss/video.xml",
+          "type": "rss"
+        },
+        {
+          "name": "外部注入·会话内检索补强",
+          "type": "inbox",
+          "url": "data/external_inbox.json",
+          "level": "☆"
+        },
+        {
+          "name": "央视新闻",
+          "url": "https://news.cctv.com/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 1,
+          "catalog_board": "央媒与国家级通讯社",
+          "max_articles": 6
+        },
+        {
+          "name": "新华网",
+          "url": "https://www.news.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 1,
+          "catalog_board": "央媒与国家级通讯社",
+          "max_articles": 6
+        },
+        {
+          "name": "新华网",
+          "url": "https://www.xinhuanet.com/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 1,
+          "catalog_board": "央媒与国家级通讯社",
+          "max_articles": 6
+        },
+        {
+          "name": "中新网",
+          "url": "https://www.chinanews.com.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 1,
+          "catalog_board": "央媒与国家级通讯社",
+          "max_articles": 6
+        },
+        {
+          "name": "人民网",
+          "url": "https://www.people.com.cn/",
+          "type": "html",
+          "level": "★",
+          "catalog_sec": 1,
+          "catalog_board": "央媒与国家级通讯社",
+          "max_articles": 6
+        },
+        {
+          "name": "中国青年报",
+          "url": "https://www.cyol.com/",
+          "type": "html",
+          "level": "☆",
+          "catalog_sec": 1,
+          "catalog_board": "央媒与国家级通讯社",
+          "max_articles": 6
+        },
+        {
+          "name": "中国日报",
+          "url": "https://www.chinadaily.com.cn/",
+          "type": "html",
+          "level": "☆",
+          "catalog_sec": 1,
+          "catalog_board": "央媒与国家级通讯社",
+          "max_articles": 6
+        },
+        {
+          "name": "经济参考报",
+          "url": "https://www.jjckb.cn/",
+          "type": "html",
+          "level": "☆",
+          "catalog_sec": 1,
+          "catalog_board": "央媒与国家级通讯社",
+          "max_articles": 6
+        }
+      ],
+      "note": "人民网/新华网 RSS 停更于 2025-06 / 2022，已移除；改接 CCTV JSONP（当天秒级时间+正文导语）与中新网 12 个有效频道"
+    },
+    {
+      "id": 24,
+      "board": "媒体传播层",
+      "name": "快讯流与财经媒体",
+      "endpoints": [
+        {
+          "name": "东方财富",
+          "url": "https://www.eastmoney.com/",
+          "type": "html"
+        },
+        {
+          "name": "同花顺",
+          "url": "https://www.10jqka.com.cn/",
+          "type": "html"
+        }
+      ],
+      "note": "财联社电报 / 澎湃 403 本轮未取得；全量拆条与逐条回查保留在口径申报"
+    },
+    {
+      "id": 25,
+      "board": "媒体传播层",
+      "name": "60秒早报与新闻联播",
+      "endpoints": [],
+      "note": "未接入：无母行正文就不拆假词条"
+    },
+    {
+      "id": 26,
+      "board": "媒体传播层",
+      "name": "微信公众号生态",
+      "endpoints": [],
+      "note": "未接入：无官方免鉴权列表接口"
+    },
+    {
+      "id": 27,
+      "board": "社交平台主干",
+      "name": "社交平台主干（10 平台）",
+      "endpoints": [
+        {
+          "name": "知乎",
+          "url": "https://www.zhihu.com/",
+          "type": "html",
+          "level": "☆",
+          "catalog_sec": 29,
+          "catalog_board": "社交平台与内容社区",
+          "max_articles": 6
+        },
+        {
+          "name": "B站",
+          "url": "https://www.bilibili.com/",
+          "type": "html",
+          "level": "☆",
+          "catalog_sec": 29,
+          "catalog_board": "社交平台与内容社区",
+          "max_articles": 6
+        }
+      ],
+      "note": "主干不是补充；词条→回查独立原文→成稿，快照不进主表"
+    },
+    {
+      "id": 28,
+      "board": "热榜聚合与搜索",
+      "name": "热榜聚合站",
+      "endpoints": [],
+      "note": "未接入：仅作入口核验，不独立成稿"
+    },
+    {
+      "id": 29,
+      "board": "热榜聚合与搜索",
+      "name": "视频与社区垂类",
+      "endpoints": [],
+      "note": "未接入：与 §27 平台去重登记"
+    },
+    {
+      "id": 30,
+      "board": "热榜聚合与搜索",
+      "name": "搜索与抓取基础设施",
+      "endpoints": [
+        {
+          "name": "GDELT DOC",
+          "url": "https://api.gdeltproject.org/",
+          "type": "html"
+        }
+      ],
+      "note": "GDELT 403 未取得；请求间隔 ≥5 秒，seendate 非发布时间"
+    },
+    {
+      "id": 31,
+      "board": "边界申报",
+      "name": "边界申报类",
+      "endpoints": [],
+      "note": "写明全渠道定义、本轮真实触达、未取得当日明细的类目、会话内检索能力边界"
+    }
+  ],
+  "catalog_expand": {
+    "enabled": true,
+    "file": "data/channel_catalog.json",
+    "unique_urls": 503,
+    "never_prune_by_probe": true,
+    "policy": "运行时把清单中未静态登记的 URL 全部追加为活跃端点；失败隔离、预算跳过不算不可达"
+  },
+  "endpoint_policy": {
+    "enabled_by_default": true,
+    "probe_status_is_advisory_only": true,
+    "fallback": "同一端点 urls[] 逐个试；全失败逐类申报缺口，端点保留"
+  },
+  "social_endpoints_file": "data/social_endpoints.json"
+}

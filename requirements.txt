@@ -1,0 +1,12 @@
+# 运行依赖：与 pyproject.toml [project].dependencies 完全一致
+feedparser==6.0.11
+httpx==0.28.1
+openpyxl==3.1.5
+
+# 零网络自检：pytest + CI 工作流解析用的 PyYAML（对应 [dev]）
+pytest==8.3.5
+PyYAML==6.0.2
+
+# 网页正文抽取（对应 [extract]）。CI 用 pip install -e ".[dev,extract]" 安装；
+# 缺失时 html 类端点由采集器如实申报缺口，不影响离线回放与自检。
+trafilatura==1.12.2
